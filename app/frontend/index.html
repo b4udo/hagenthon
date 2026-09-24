@@ -153,6 +153,21 @@
       </p>
     </div>
 
+    <!-- chiedere aiuto: sempre disponibile, non solo sul semaforo giallo.
+         Il momento in cui una persona si sente in difficolta' non coincide
+         con il momento in cui il sistema ha dei dubbi. -->
+    <div class="scheda scheda-aiuto" id="scheda-aiuto">
+      <h3>Non se la sente?</h3>
+      <p class="aiuto">
+        Può girare questo messaggio a una persona di fiducia e farselo spiegare.
+        Non è un errore: è la cosa giusta da fare quando qualcosa non le torna.
+      </p>
+      <button type="button" class="bottone bottone-aiuto" id="btn-aiuto">
+        <span aria-hidden="true">🤝</span> Chieda aiuto a Luca
+      </button>
+      <p class="conferma-aiuto" id="conferma-aiuto" hidden role="status" aria-live="polite"></p>
+    </div>
+
     <!-- ═══ da qui in giu': pannelli tecnici, nascosti a chi usa il prodotto ═══
          Maria non deve vedere ne' la pipeline ne' gli strumenti da demo. Si
          aprono solo con ?tecnico=1, che e' come la giuria vede il sistema

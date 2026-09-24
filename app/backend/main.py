@@ -15,6 +15,7 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from . import clock, db, orchestrator
+from .agents import sicurezza
 from .contracts import Email
 from .engines import gulpease
 from .llm import client
@@ -196,6 +197,33 @@ def invia(email_id: str, richiesta: RichiestaInvio) -> dict:
         datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
     return {"inviata": True, "completate_da_sola": db.conteggio_invii()}
+
+
+@app.post("/api/email/{email_id}/aiuto")
+def chiedi_aiuto(email_id: str) -> dict:
+    """Gira il messaggio a una persona di fiducia.
+
+    Deve essere raggiungibile **sempre**, non solo quando il semaforo e'
+    giallo: il momento in cui una persona si sente in difficolta' non coincide
+    con il momento in cui il sistema ha dei dubbi. Legarlo al verdetto
+    significherebbe offrire aiuto solo quando lo decidiamo noi.
+
+    Chiedere aiuto non e' un fallimento del percorso: e' un esito legittimo, e
+    viene registrato come le risposte.
+    """
+    if db.leggi_email(email_id) is None:
+        raise HTTPException(status_code=404, detail="Email non trovata")
+
+    a_chi = sicurezza.NOME_PERSONA_FIDUCIA
+    db.registra_aiuto(
+        email_id, a_chi, datetime.now(timezone.utc).isoformat(timespec="seconds")
+    )
+    return {
+        "inoltrata": True,
+        "a_chi": a_chi,
+        "messaggio": f"Ho girato il messaggio a {a_chi}. La richiamerà lui.",
+        "aiuti": db.conteggio_aiuti(),
+    }
 
 
 @app.get("/api/autonomia")

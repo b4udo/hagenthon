@@ -147,3 +147,44 @@ def test_non_si_puo_spostare_in_una_cartella_inventata():
     db.connessione()
     with pytest.raises(ValueError):
         db.sposta("em-01", "archivio")
+
+
+# ───────────────────── chiedere aiuto a una persona ─────────────────────
+
+
+def test_si_puo_chiedere_aiuto_su_qualunque_email(cliente: TestClient):
+    """La via d'uscita umana non dipende dal verdetto del semaforo.
+
+    Il momento in cui una persona si sente in difficoltà non coincide con il
+    momento in cui il sistema ha dei dubbi: legare l'aiuto al giallo vuol dire
+    offrirlo solo quando lo decidiamo noi.
+    """
+    for email_id in ("em-01", "em-03", "em-04", "em-05", "em-06"):
+        risposta = cliente.post(f"/api/email/{email_id}/aiuto")
+        assert risposta.status_code == 200, email_id
+        corpo = risposta.json()
+        assert corpo["inoltrata"] is True
+        assert corpo["a_chi"] == "Luca"
+
+
+def test_la_richiesta_di_aiuto_viene_registrata(cliente: TestClient):
+    assert db.conteggio_aiuti() == 0
+    cliente.post("/api/email/em-03/aiuto")
+    assert db.conteggio_aiuti() == 1
+    assert db.id_con_aiuto() == {"em-03"}
+
+
+def test_chiedere_aiuto_su_una_email_inesistente_da_404(cliente: TestClient):
+    assert cliente.post("/api/email/em-999/aiuto").status_code == 404
+
+
+def test_chiedere_aiuto_non_conta_come_risposta_inviata(cliente: TestClient):
+    """Sono due esiti diversi: «ho risposto da sola» e «ho chiesto aiuto».
+
+    Contarli insieme gonfierebbe il contatore di autonomia con l'esatto
+    contrario dell'autonomia.
+    """
+    cliente.post("/api/email/em-03/aiuto")
+    assert cliente.get("/api/autonomia").json()["completate_da_sola"] == 0
+    dati = cliente.get("/api/mailbox").json()
+    assert all(e["gia_risposto"] is False for e in dati["email"])

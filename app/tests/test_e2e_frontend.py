@@ -488,3 +488,58 @@ def test_una_cartella_vuota_lo_dice_a_parole(page: Page):
     vuota = page.locator(".vuota")
     expect(vuota).to_be_visible()
     expect(vuota).to_contain_text("Non ha eliminato nessun messaggio")
+
+
+def test_il_pulsante_di_aiuto_e_presente_su_ogni_email(page: Page):
+    """Su verde, giallo e rosso: la via d'uscita umana è sempre lì."""
+    for mittente in ("Bianchi", "Poste", "Spesa Conveniente"):
+        page.goto(page.url.split("#")[0])
+        page.wait_for_selector(".voce")
+        page.locator(".voce", has_text=mittente).first.click()
+        page.wait_for_selector("#semaforo")
+
+        aiuto = page.locator("#btn-aiuto")
+        expect(aiuto).to_be_visible()
+        riquadro = aiuto.bounding_box()
+        assert riquadro["height"] >= TARGET_MINIMO_PX, f"{mittente}: {riquadro}"
+
+
+def test_chiedere_aiuto_conferma_a_schermo(page: Page):
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Poste").first.click()
+    page.wait_for_selector("#btn-aiuto")
+
+    expect(page.locator("#conferma-aiuto")).to_be_hidden()
+    page.locator("#btn-aiuto").click()
+
+    conferma = page.locator("#conferma-aiuto")
+    expect(conferma).to_be_visible()
+    expect(conferma).to_contain_text("Luca")
+
+    # Aprendo un'altra email la conferma non resta appiccicata.
+    page.locator("#btn-indietro").click()
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="INPS").first.click()
+    expect(page.locator("#conferma-aiuto")).to_be_hidden()
+
+
+def test_una_email_gia_risposta_non_mostra_anche_il_semaforo(page: Page):
+    """«Può rispondere» e «Già risposto» insieme si contraddicono a colpo d'occhio."""
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    page.locator(".intento", has_text="Confermo che vengo").click()
+    page.locator("#btn-invia").click()
+    expect(page.locator("#conferma-invio")).to_be_visible()
+
+    page.locator("#btn-indietro").click()
+    # Si attende il ridisegno *con* il badge, non una lista qualsiasi.
+    page.wait_for_selector(".voce:has([data-risposto])")
+
+    riga = page.locator('.voce:has-text("Bianchi")').first
+    expect(riga.locator("[data-risposto]")).to_have_count(1)
+    expect(riga.locator("[data-pallino]")).to_have_count(0)
+
+    # Su un'email non ancora risposta il semaforo resta al suo posto.
+    altra = page.locator('.voce:has-text("INPS")').first
+    expect(altra.locator("[data-pallino]")).to_have_count(1)
+    expect(altra.locator("[data-risposto]")).to_have_count(0)

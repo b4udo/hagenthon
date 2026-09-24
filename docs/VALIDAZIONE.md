@@ -13,9 +13,9 @@ python -m pytest -q
 
 | Ambiente | Comando | Risultato |
 |---|---|---|
-| **Clone pulito**, sole dipendenze di `requirements.txt` | `python -m pytest -q` | **69 passati · 1 saltato** |
-| Macchina di sviluppo, con Playwright installato | `python -m pytest -q` | **94 passati · 0 saltati** |
-| Sola suite principale, Playwright escluso a mano | `python -m pytest -q --ignore=app/tests/test_e2e_frontend.py` | **69 passati** |
+| **Clone pulito**, sole dipendenze di `requirements.txt` | `python -m pytest -q` | **73 passati · 1 saltato** |
+| Macchina di sviluppo, con Playwright installato | `python -m pytest -q` | **101 passati · 0 saltati** |
+| Sola suite principale, Playwright escluso a mano | `python -m pytest -q --ignore=app/tests/test_e2e_frontend.py` | **73 passati** |
 
 Il saltato del primo caso è la suite end-to-end del browser (`app/tests/test_e2e_frontend.py`): dipende da **Playwright**, che è una dipendenza facoltativa e **non è in `requirements.txt`**. Senza Playwright il modulo si salta invece di fallire, perché la suite principale non deve dipendere da un pacchetto opzionale. Con Playwright installato, quella suite avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium vero: **13 test in più, tutti verdi**.
 
@@ -119,7 +119,7 @@ Il riassunto è di **12 parole e 77 lettere**. Di queste, *«INPS - Istituto Naz
 
 | Prova | Esito | Dove si rifà |
 |---|---|---|
-| Test automatici | **69 passati, 1 saltato** su un clone pulito · **94 passati** con Playwright installato | `python -m pytest -q` |
+| Test automatici | **73 passati, 1 saltato** su un clone pulito · **101 passati** con Playwright installato | `python -m pytest -q` |
 | Zero codice di rete in `app/` | ✅ verificato staticamente sull'AST di ogni sorgente | `pytest app/tests/test_llm_modes.py -q` |
 | Contratti allineati agli schema pubblicati | ✅ | `pytest app/tests/test_contracts_sync.py -q` |
 | Checklist accessibilità, 27 voci | ✅ su entrambe le schermate, due valori da rimisurare in proiezione | `agents/build-time/commands/verifica-a11y.md` |

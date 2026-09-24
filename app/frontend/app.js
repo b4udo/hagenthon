@@ -99,10 +99,20 @@ function voceRicevuta(email) {
   bottone.type = "button";
   bottone.className = "voce" + (email.gia_risposto ? " voce-risposta" : "");
 
+  // Un'email gia' risposta mostra **solo** «Già risposto».
+  //
+  // «Può rispondere» e «Già risposto» insieme sono due stati che si
+  // contraddicono a colpo d'occhio: il primo invita a fare una cosa che il
+  // secondo dice essere gia' fatta. Su una riga sola, con due pastiglie verdi
+  // quasi identiche, e' rumore. Il semaforo ha gia' fatto il suo lavoro
+  // quando serviva, cioe' prima della risposta.
+  const marcatore = email.gia_risposto
+    ? '<span class="risposto" data-risposto>✓ Già risposto</span>'
+    : '<span class="pallino pallino-attesa" data-pallino>· da controllare</span>';
+
   bottone.innerHTML = `
     <span class="voce-alto">
-      <span class="pallino pallino-attesa" data-pallino>· da controllare</span>
-      <span class="risposto" data-risposto hidden>✓ Già risposto</span>
+      ${marcatore}
       <span class="voce-mittente"></span>
       <span class="voce-data"></span>
     </span>
@@ -111,8 +121,6 @@ function voceRicevuta(email) {
   bottone.querySelector(".voce-mittente").textContent = email.mittente_nome;
   bottone.querySelector(".voce-oggetto").textContent = email.oggetto;
   bottone.querySelector(".voce-data").textContent = dataItaliana(email.data_ricezione);
-
-  if (email.gia_risposto) bottone.querySelector("[data-risposto]").hidden = false;
 
   bottone.setAttribute(
     "aria-label",
@@ -125,6 +133,8 @@ function voceRicevuta(email) {
   voce.appendChild(bottone);
 
   // Il verdetto arriva dalla pipeline, non e' precalcolato nel corpus.
+  // Su un'email gia' risposta serve ancora, ma solo per la classe
+  // «secondo piano»: il pallino non c'e' piu' da aggiornare.
   valutaInSecondoPiano(email.id, bottone);
   return voce;
 }
@@ -200,9 +210,11 @@ async function valutaInSecondoPiano(id, bottone) {
   try {
     const r = await chiedi(`/api/email/${id}/elabora`, { method: "POST" });
     const pallino = bottone.querySelector("[data-pallino]");
-    const s = r.sicurezza.semaforo;
-    pallino.className = `pallino pallino-${s}`;
-    pallino.textContent = `${SIMBOLI[s]} ${ETICHETTE_SEMAFORO[s]}`;
+    if (pallino) {
+      const s = r.sicurezza.semaforo;
+      pallino.className = `pallino pallino-${s}`;
+      pallino.textContent = `${SIMBOLI[s]} ${ETICHETTE_SEMAFORO[s]}`;
+    }
     if (r.triage && r.triage.priorita === "secondo_piano") {
       bottone.classList.add("voce-secondo-piano");
     }
@@ -266,6 +278,7 @@ function disegna(email, r) {
   disegnaTracce(r);
 
   $("conferma-invio").hidden = true;
+  $("conferma-aiuto").hidden = true;
 }
 
 function disegnaStatoCartella(r) {
@@ -467,6 +480,16 @@ async function inviaRisposta() {
   // Da adesso questa email e' "gia' risposto", qui e nell'elenco.
   $("stato-risposta").hidden = false;
   if (stato.risultato) stato.risultato.gia_risposto = true;
+}
+
+async function chiediAiuto() {
+  if (!stato.emailCorrente) return;
+  const esito = await chiedi(`/api/email/${stato.emailCorrente.id}/aiuto`, { method: "POST" });
+  const conferma = $("conferma-aiuto");
+  conferma.textContent = `✓ ${esito.messaggio}`;
+  conferma.hidden = false;
+  // Lo dice anche a voce: chi fa fatica a leggere deve sapere che è partito.
+  if (Voce.puoLeggere()) Voce.leggi(esito.messaggio);
 }
 
 async function spostaEmail(destinazione) {
@@ -680,6 +703,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   for (const bottone of document.querySelectorAll(".cartella")) {
     bottone.addEventListener("click", () => apriCartella(bottone.dataset.cartella));
   }
+  $("btn-aiuto").addEventListener("click", () => {
+    chiediAiuto().catch((e) => alert("Non sono riuscito a girare il messaggio: " + e.message));
+  });
   $("btn-elimina").addEventListener("click", () => {
     spostaEmail("elimina").catch((e) => alert("Non sono riuscito a spostarla: " + e.message));
   });

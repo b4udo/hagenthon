@@ -68,6 +68,16 @@ CREATE TABLE IF NOT EXISTS invio (
     testo      TEXT NOT NULL,
     inviato_il TEXT NOT NULL
 );
+
+-- Le volte in cui Maria ha girato un messaggio a una persona di fiducia.
+-- Chiedere aiuto e' un esito legittimo del percorso, non un fallimento: va
+-- registrato come le risposte, perche' anche questo e' aver risolto la cosa.
+CREATE TABLE IF NOT EXISTS richiesta_aiuto (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email_id   TEXT NOT NULL,
+    a_chi      TEXT NOT NULL,
+    chiesto_il TEXT NOT NULL
+);
 """
 
 _conn: sqlite3.Connection | None = None
@@ -317,6 +327,24 @@ def invii() -> list[dict[str, Any]]:
 
 def conteggio_invii() -> int:
     return int(interroga("SELECT COUNT(*) AS n FROM invio")[0]["n"])
+
+
+def registra_aiuto(email_id: str, a_chi: str, quando: str) -> None:
+    conn = connessione()
+    with _lock:
+        conn.execute(
+            "INSERT INTO richiesta_aiuto (email_id, a_chi, chiesto_il) VALUES (?, ?, ?)",
+            (email_id, a_chi, quando),
+        )
+        conn.commit()
+
+
+def id_con_aiuto() -> set[str]:
+    return {r["email_id"] for r in interroga("SELECT DISTINCT email_id FROM richiesta_aiuto")}
+
+
+def conteggio_aiuti() -> int:
+    return int(interroga("SELECT COUNT(*) AS n FROM richiesta_aiuto")[0]["n"])
 
 
 def posta_inviata() -> list[dict[str, Any]]:

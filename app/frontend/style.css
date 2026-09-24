@@ -195,6 +195,26 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
 }
 .azioni-cartella { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
 
+/* ─────────── chiedere aiuto ───────────
+
+   Sempre presente, in ogni email, qualunque sia il semaforo. E' la via
+   d'uscita umana: deve essere trovabile senza cercarla, e non deve sembrare
+   una resa. Per questo ha il colore dell'accento e non quello di un avviso. */
+
+.scheda-aiuto { border-color: #a97ef0; background: var(--accento-fondo); }
+.bottone-aiuto {
+  background: var(--accento); color: #fff;
+  min-height: 56px;
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 6px;
+}
+.conferma-aiuto {
+  margin: 14px 0 0;
+  background: var(--verde-fondo); border: 2px solid var(--verde);
+  color: var(--verde); border-radius: var(--raggio);
+  padding: 12px 16px; font-weight: 700;
+}
+
 /* La voce gia' risposta resta leggibile: si distingue, non si spegne. */
 .voce-risposta { border-left: 6px solid var(--verde); }
 

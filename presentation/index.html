@@ -37,7 +37,7 @@
     background: rgba(255,255,255,0.06); z-index: 60;
   }
   .barra i {
-    display: block; height: 100%; width: 9.09%;
+    display: block; height: 100%; width: 14.28%;
     background: linear-gradient(90deg, var(--purple-dark), var(--purple), var(--purple-light));
     transition: width 260ms ease;
   }
@@ -200,6 +200,56 @@
     border-left: 3px solid var(--purple); padding: 2px 0 2px 16px; margin: 0 0 12px;
     font-size: clamp(15px, 1.35vw, 22px); color: #fff; font-weight: 600; letter-spacing: -0.01em;
   }
+  /* ---------- card numerate (struttura commerciale) ---------- */
+  .numerata { position: relative; }
+  .numerata .cifra {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: clamp(26px, 2.2vw, 34px); height: clamp(26px, 2.2vw, 34px);
+    border-radius: 999px; margin-bottom: 10px;
+    border: 1px solid rgba(161,0,255,0.45); background: rgba(161,0,255,0.14);
+    color: var(--purple-light); font-weight: 700;
+    font-size: clamp(12px, 1vw, 16px); font-variant-numeric: tabular-nums;
+  }
+
+  /* Citazione di chiusura: chiude il ragionamento della slide del problema. */
+  .chiusa {
+    border-left: 3px solid var(--purple);
+    padding: 4px 0 4px 18px; margin: clamp(12px, 2vh, 22px) 0 0;
+    font-size: clamp(14px, 1.22vw, 20px); color: rgba(255,255,255,0.82);
+  }
+  .chiusa strong { display: block; color: #fff; }
+
+  /* Scheda della persona, colonna sinistra dello scope. */
+  .persona { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .persona .tondo {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: clamp(42px, 3.6vw, 58px); height: clamp(42px, 3.6vw, 58px); border-radius: 999px;
+    background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+    font-size: clamp(19px, 1.7vw, 27px); font-weight: 700;
+  }
+  .persona .chi { font-size: clamp(16px, 1.4vw, 23px); font-weight: 700; letter-spacing: -0.01em; }
+  .persona .ruolo { font-size: clamp(9px, 0.76vw, 11px); text-transform: uppercase; letter-spacing: 0.2em; color: var(--tenue); }
+  .dato { margin-bottom: 11px; }
+  .dato:last-child { margin-bottom: 0; }
+  .dato dt { font-size: clamp(9px, 0.74vw, 10px); text-transform: uppercase; letter-spacing: 0.2em; color: var(--purple-light); }
+  .dato dd { margin: 1px 0 0; font-size: clamp(12px, 1.02vw, 16px); color: var(--testo); }
+
+  /* Journey: passi in colonna, numerati, compatti. */
+  .passi { list-style: none; padding: 0; margin: 0; counter-reset: p; }
+  .passi li {
+    counter-increment: p; position: relative; padding-left: 38px;
+    margin-bottom: clamp(7px, 1.1vh, 12px); color: var(--testo);
+    font-size: clamp(12px, 1.05vw, 17px);
+  }
+  .passi li::before {
+    content: counter(p); position: absolute; left: 0; top: 1px;
+    width: 25px; height: 25px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(161,0,255,0.42); background: rgba(161,0,255,0.12);
+    color: var(--purple-light); font-size: 12px; font-weight: 700;
+  }
+  .passi li strong { display: block; }
+
   .kpi { font-variant-numeric: tabular-nums; font-size: clamp(26px, 3vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
   .kpi.viola { color: var(--purple-light); }
   .kpi.rosa { color: var(--rose); }
@@ -288,312 +338,210 @@
 
 <main class="deck" id="deck">
 
-  <!-- ============ 1 ============ -->
-  <section class="slide slide-1 attiva" aria-roledescription="slide" aria-label="Slide 1 di 11: Posta Chiara">
+  <!-- ============ 1 · copertina ============ -->
+  <section class="slide slide-1 attiva" aria-roledescription="slide" aria-label="Slide 1 di 7: Posta Chiara">
     <div class="contenuto">
-      <span class="eyebrow">Tema 01 · Accessibilità Digitale</span>
-      <h1>Posta <span class="grad">Chiara</span></h1>
-      <p class="sub">accanto a chi si ferma davanti al riquadro bianco</p>
-      <div class="g3" style="margin-top:clamp(16px,3vh,34px)">
-        <div class="card"><h4>Il problema</h4><p>Maria, 74 anni. Preme <strong>Rispondi</strong> e si blocca.</p></div>
-        <div class="card"><h4>La soluzione</h4><p>Sei agenti in pipeline. La risposta si <strong>sceglie</strong>, non si scrive.</p></div>
-        <div class="card"><h4>La garanzia</h4><p><strong>FactGuard</strong>: codice deterministico, mai un LLM.</p></div>
-      </div>
+      <span class="eyebrow">Tema 01 &middot; Accessibilit&agrave; Digitale</span>
+      <h1>La sua posta,<br /><span class="grad">spiegata</span>.</h1>
+      <p class="sub">Rendere autonoma la gestione della posta con il medico, il Comune e l&rsquo;INPS &mdash; dalla lettura alla risposta inviata &mdash; per chi il computer non l&rsquo;ha mai usato per lavoro.</p>
+      <p class="aiuto" style="margin-top:clamp(14px,3vh,30px)">Proposta progettuale &middot; Hagenthon &middot; Accenture Application Engineering</p>
     </div>
-    <aside class="nota">Posta Chiara. Non un client di posta più grande: uno che sta accanto a chi si blocca davanti al riquadro bianco della risposta. Undici slide, cinque minuti, una dimostrazione dal vivo alla slide sei.</aside>
+    <aside class="nota">Buongiorno. Posta Chiara. Il problema che affrontiamo non e' che le persone anziane non sappiano cosa dire: e' che l'interfaccia non glielo lascia dire. In cinque minuti vi mostriamo il prodotto che gira, e perche' conviene averlo.</aside>
   </section>
 
-  <!-- ============ 2 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 2 di 11: Maria, 74 anni">
+  <!-- ============ 2 · problema ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 2 di 7: Overview della problematica">
     <div class="contenuto">
-      <span class="eyebrow">Persona e barriera</span>
-      <h1>Maria, <span class="grad">74 anni</span></h1>
-      <p class="sub">Ogni dettaglio impone un vincolo tecnico. Se non impone nulla, l'abbiamo tolto.</p>
-      <div class="g23">
-        <table>
-          <caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Dettagli della persona e vincoli tecnici che impongono</caption>
-          <thead><tr><th scope="col">Dettaglio</th><th scope="col">Vincolo che impone</th></tr></thead>
-          <tbody>
-            <tr><td class="chiave">Tremore, artrosi</td><td>Target <strong>&ge; 44px</strong> · niente drag, niente doppio clic</td></tr>
-            <tr><td class="chiave">Cataratta iniziale</td><td>Contrasto <strong>&ge; 7:1</strong> · base <strong>20px</strong></td></tr>
-            <tr><td class="chiave">Vocali WhatsApp, non digita</td><td>La risposta si <strong>sceglie</strong>, non si scrive</td></tr>
-            <tr><td class="chiave">Tablet 10&Prime; sul tavolo</td><td>Colonna singola, niente menu a scomparsa</td></tr>
-            <tr><td class="chiave">Mai usato le cartelle</td><td>Una sola lista piatta, zero gerarchie</td></tr>
-          </tbody>
-        </table>
-        <div class="card rosa">
-          <h4 style="color:var(--rose)">Il momento esatto in cui si ferma</h4>
-          <p style="color:rgba(255,255,255,0.82);font-size:clamp(13px,1.12vw,18px)">Apre la mail della dott.ssa Bianchi: le chiede di <strong>confermare la visita del 14 ottobre</strong>.<br />
-          Preme <strong>Rispondi</strong>.<br />
-          Davanti a lei, un <strong>riquadro bianco vuoto</strong>.<br />
-          Chiude tutto e aspetta <strong>domenica</strong>, quando viene Luca.</p>
+      <span class="eyebrow">Overview della problematica</span>
+      <h1>Sa cosa vuole rispondere.<br /><span class="grad">Il riquadro bianco</span> glielo impedisce.</h1>
+      <div class="g3" style="margin-top:clamp(12px,2.4vh,26px)">
+        <div class="card numerata">
+          <span class="cifra">1</span>
+          <h5>Una lingua che esclude</h5>
+          <p>&laquo;Ai sensi e per gli effetti degli artt. 33 e 40 del D.P.R. 445/2000&raquo;. Chi scrive lo sa: chi legge deve chiamare qualcuno per farselo tradurre.</p>
+        </div>
+        <div class="card numerata">
+          <span class="cifra">2</span>
+          <h5>Il foglio bianco</h5>
+          <p>Preme <strong>Rispondi</strong> e trova un riquadro vuoto. Sa perfettamente cosa vuole dire. Non sa da dove cominciare a scriverlo, n&eacute; se sta sbagliando.</p>
+        </div>
+        <div class="card numerata">
+          <span class="cifra">3</span>
+          <h5>La truffa sembra vera</h5>
+          <p>La finta Poste e l&rsquo;INPS autentico dicono le stesse due parole: <strong>urgente</strong> e <strong>soldi</strong>. Distinguerle richiede competenze che non le sono mai state date.</p>
         </div>
       </div>
+      <p class="chiusa">
+        <strong>Non manca la testa. Manca un&rsquo;interfaccia che parli la sua lingua.</strong>
+        Il risultato &egrave; rimandare, rinunciare, o aspettare che passi il nipote &mdash; con perdita di autonomia. &Egrave; il punto di partenza di questa proposta.
+      </p>
     </div>
-    <aside class="nota">Maria non è un profilo generico. Il tremore fissa i 44 pixel, la cataratta il contrasto 7 a 1, i vocali di WhatsApp decidono che la risposta si sceglie invece di scriverla. E il blocco ha un momento preciso: preme Rispondi e si ferma. Non è una difficoltà, è un'attesa di sei giorni.</aside>
+    <aside class="nota">Tre barriere, non una. Il burocratese, il foglio bianco, e il fatto che una truffa e una comunicazione vera si somigliano moltissimo. Nessuna delle tre si risolve con un font piu' grande. La frase da tenere: non manca la testa, manca un'interfaccia che parli la sua lingua.</aside>
   </section>
 
-  <!-- ============ 3 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 3 di 11: Prima domenica prossima, ora 4 minuti">
+  <!-- ============ 3 · scope ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 3 di 7: Scope del progetto">
     <div class="contenuto">
-      <span class="eyebrow">Il miglioramento</span>
-      <h1>Prima: domenica prossima.<br />Ora: <span class="grad">4 minuti</span>.</h1>
-      <div class="g2" style="margin-top:clamp(12px,2.4vh,26px)">
-        <div class="card">
-          <h4>Prima &mdash; non una schermata brutta: un fallimento</h4>
-          <ul class="bullets">
-            <li>Preme Rispondi, riquadro bianco</li>
-            <li>L'email <strong>non parte</strong></li>
-            <li>Attesa fino a domenica: <strong>6 giorni</strong></li>
-            <li>Autonomia guadagnata: <strong>zero</strong></li>
-          </ul>
-        </div>
+      <span class="eyebrow">Scope del progetto</span>
+      <h1>Il perimetro: <span class="grad">una comunicazione</span>, dall&rsquo;inizio alla fine</h1>
+      <div class="g23" style="margin-top:clamp(10px,2vh,22px)">
         <div class="card viola">
-          <h4 style="color:var(--purple-light)">Dopo &mdash; una risposta inviata</h4>
-          <ul class="bullets">
-            <li>Legge <strong>Chi · Cosa · Entro quando</strong></li>
-            <li>Sceglie l'intento: <strong>&laquo;Confermo&raquo;</strong></li>
-            <li>Rilegge e <strong>preme invia</strong></li>
-            <li>Tempo totale: <strong>4 minuti</strong></li>
-          </ul>
+          <div class="persona">
+            <span class="tondo" aria-hidden="true">M</span>
+            <span>
+              <span class="chi">Maria Rossi, 74 anni</span><br />
+              <span class="ruolo">Persona target &middot; Torino</span>
+            </span>
+          </div>
+          <dl style="margin:0">
+            <div class="dato"><dt>Difficolt&agrave;</dt><dd>Cataratta iniziale, tremore alla mano destra, artrosi. Usa i vocali di WhatsApp: sa parlare, non digitare.</dd></div>
+            <div class="dato"><dt>Contesto d&rsquo;uso</dt><dd>La posta dell&rsquo;ASL, del Comune e dell&rsquo;INPS, su un tablet appoggiato al tavolo.</dd></div>
+            <div class="dato"><dt>Blocco tipico</dt><dd>Preme Rispondi alla mail del medico e si ferma davanti al riquadro vuoto. Chiude, e aspetta domenica.</dd></div>
+            <div class="dato"><dt>Cosa vuole</dt><dd>Confermare da sola la visita del 14 ottobre, senza aspettare il nipote.</dd></div>
+          </dl>
         </div>
-      </div>
-      <div class="g2" style="margin-top:clamp(10px,1.8vh,20px);align-items:center">
-        <img class="schermata" src="img/08-riassunto-dettaglio.png"
-             alt="Schermata del prodotto, riquadro «In breve»: Chi le scrive, Cosa le
-                  chiedono, Entro quando — le tre righe che sostituiscono il burocratese." />
-        <p class="frase" style="margin:0">Nel prodotto Maria vede un contatore: <span class="grad">&laquo;Risposte inviate da sola&raquo;</span>. L'autonomia è misurata, non promessa.</p>
-      </div>
-    </div>
-    <aside class="nota">Il prima non è una schermata brutta: è un fallimento, l'email non parte e si aspetta il nipote. Il dopo è una risposta effettivamente inviata. E nel prodotto c'è un contatore visibile a Maria, "Risposte inviate da sola": l'autonomia la misuriamo dentro l'applicazione, non in una slide.</aside>
-  </section>
-
-  <!-- ============ 4 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 4 di 11: L'architettura agentica">
-    <div class="contenuto">
-      <span class="eyebrow">Runtime · 24% del punteggio</span>
-      <h1>L'architettura <span class="grad">agentica</span></h1>
-      <div class="pipe">
-        <div class="nodo orch">
-          <span class="tit">Orchestratore</span>
-          <span class="meta">Stato esternalizzato su disco (JSON), ripartenza da checkpoint · <strong>limiti di iterazione</strong> (max 2 retry) · <strong>budget token</strong> per email · routing deterministico-first</span>
-        </div>
-        <span class="fr giu" aria-hidden="true">&#9660;</span>
-        <div class="fila">
-          <div class="nodo"><span class="n">1</span><span class="tit">Triage</span><span class="meta">ente · persona · commerciale · sospetta</span><span class="chips"><span class="badge">regole · seam Haiku</span></span></div>
-          <div class="nodo"><span class="n">2</span><span class="tit">Sicurezza</span><span class="meta">semaforo + azione, regole spiegabili</span><span class="chips"><span class="badge det">mai LLM</span></span></div>
-          <div class="nodo"><span class="n">3</span><span class="tit">Estrazione fatti</span><span class="meta">date · importi · orari, ancorati a keyword</span><span class="chips"><span class="badge det">mai LLM</span></span></div>
-        </div>
-        <span class="fr giu" aria-hidden="true">&#9660;</span>
-        <div class="fila frecciata">
-          <div class="nodo"><span class="n">4</span><span class="tit">Semplificatore</span><span class="meta">parole semplici + Chi / Cosa / Entro quando</span><span class="chips"><span class="badge">regole · seam Sonnet</span></span></div>
-          <span class="fr" aria-hidden="true">&rarr;</span>
-          <div class="nodo chiave"><span class="n">5</span><span class="tit">Verificatore &mdash; FactGuard</span><span class="meta">confronta i fatti originale vs semplificato · fallisce &rarr; retry con feedback · fallisce ancora &rarr; fallback all'originale evidenziato</span><span class="chips"><span class="badge det">mai LLM, per progetto</span></span></div>
-          <span class="fr" aria-hidden="true">&rarr;</span>
-          <div class="nodo"><span class="n">6</span><span class="tit">Compositore</span><span class="meta">bozza per intento, slot riempiti coi fatti <strong>verificati</strong></span><span class="chips"><span class="badge">regole · seam Sonnet</span></span></div>
-        </div>
-        <span class="fr giu" aria-hidden="true">&#9660;</span>
-        <div class="nodo hitl">
-          <span class="tit">Escalation umana &mdash; Maria rilegge e preme invia</span>
-          <span class="meta">Nessun invio automatico. Mai, in nessun caso.</span>
-        </div>
-      </div>
-    </div>
-    <aside class="nota">Sei agenti specializzati in pipeline, un contratto Pydantic per ciascun confine. L'orchestratore tiene lo stato fuori dal processo, in JSON ispezionabile, e impone limiti di iterazione e un budget token per email. Il routing è deterministico-first: per ogni agente è scritto quando NON chiamare un modello. Il verificatore è al centro, e non è un LLM.</aside>
-  </section>
-
-  <!-- ============ 5 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 5 di 11: Il team che ha costruito il team">
-    <div class="contenuto">
-      <span class="eyebrow">Build-time · 9 agenti</span>
-      <h1>Il team che ha <span class="grad">costruito il team</span></h1>
-      <div class="pipe">
-        <div class="nodo orch">
-          <span class="tit">team-leader</span>
-          <span class="meta">Possiede piano e timebox · apre e chiude i gate di fase · non scrive codice di produzione · stato in <code>state/progress.json</code></span>
-        </div>
-        <span class="fr giu" aria-hidden="true">&#9660;</span>
-        <div class="g4">
-          <div class="nodo"><h4>Developers</h4><span class="meta"><strong>dev-core</strong> · <strong>dev-pipeline</strong> · <strong>dev-frontend</strong> · <strong>dev-corpus</strong> · <strong>dev-deck</strong></span></div>
-          <div class="nodo"><h4>QA</h4><span class="meta"><strong>test-engineer</strong> · <strong>qa-critic</strong> (sola lettura su <code>app/</code>)</span></div>
-          <div class="nodo"><h4>Review</h4><span class="meta"><strong>bando-compliance</strong> &mdash; audit contro i 4 file del bando</span></div>
-          <div class="nodo hitl"><h4 style="color:var(--rose)">Human gate</h4><span class="meta">La persona, a 3 checkpoint di fase</span></div>
-        </div>
-      </div>
-      <div class="g23" style="margin-top:clamp(12px,2.2vh,22px)">
-        <p class="frase" style="margin:0">Abbiamo scritto prima gli agenti, <span class="grad">poi gli agenti hanno scritto l'app</span>.</p>
-        <ul class="bullets fitta">
-          <li><strong>Confine di file disgiunto</strong> per ogni agente: lavorano in parallelo senza collidere</li>
-          <li>I prompt in <code>agents/runtime/prompts/</code> sono <strong>caricati dal codice a runtime</strong>, non copiati dentro</li>
-          <li>Conseguenza: <strong>la documentazione non può divergere dal comportamento</strong> &mdash; è lo stesso file</li>
-        </ul>
-      </div>
-    </div>
-    <aside class="nota">Il progetto è stato sviluppato da una persona sola: i sotto-agenti sostituiscono il secondo sviluppatore. Nove agenti di build, ciascuno con un confine di file disgiunto, quindi in parallelo senza collidere. La frase da tenere: abbiamo scritto prima gli agenti, poi gli agenti hanno scritto l'app. E i prompt di runtime non descrivono il codice: sono caricati dal codice. La documentazione non può divergere dal comportamento perché è lo stesso file.</aside>
-  </section>
-
-  <!-- ============ 6 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 6 di 11: FactGuard, il verificatore">
-    <div class="contenuto">
-      <span class="eyebrow">Robustezza · dimostrata, non affermata</span>
-      <h1>Il motore propone, il verificatore controlla, <span class="grad">la persona decide</span>.</h1>
-      <div class="g23" style="margin-top:clamp(8px,1.6vh,18px)">
         <div>
-          <img class="schermata" src="img/06-factguard-dettaglio.png"
-               alt="Avviso nel prodotto: «Non le mostro la versione semplificata.
-                    Il controllo automatico ha trovato una differenza rispetto
-                    all'originale, quindi le mostro il testo così come è arrivato.
-                    L'importo non corrisponde all'originale: € 1.247,83 è diventato € 1.247.»" />
-          <p style="margin-top:12px"><span class="badge viva">DAL VIVO</span> <span style="color:var(--tenue);font-size:clamp(12px,1vw,16px)">Schermata vera del prodotto. Il pulsante da presentatore &laquo;E se l'AI sbaglia?&raquo; inietta la corruzione mentre guardate.</span></p>
-        </div>
-        <ul class="bullets">
-          <li><strong>Il verificatore non è un LLM: è codice deterministico.</strong> Un verificatore che allucina dà una garanzia falsa.</li>
-          <li>Confronta <strong>date, importi, orari</strong> fra originale e versione semplificata.</li>
-          <li>Fatto mancante, alterato o <strong>inventato</strong> &rarr; semplificazione rifiutata.</li>
-          <li>Il fallback non è un errore: è <strong>l'originale con i punti chiave evidenziati</strong>.</li>
-          <li>Nessuna semplificazione non verificata arriva mai sullo schermo di Maria.</li>
-        </ul>
-      </div>
-    </div>
-    <aside class="nota">Qui lo mostro dal vivo. Premo il pulsante da presentatore, l'importo viene corrotto da 1.247,83 a 1.247, e FactGuard rifiuta e ricade sull'originale. La frase: il verificatore non è un LLM, è codice deterministico. Un verificatore che allucina dà una garanzia falsa. Se in sala non parte, il blocco di rifiuto che vedete in slide è esattamente l'output del prodotto.</aside>
-  </section>
-
-  <!-- ============ 7 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 7 di 11: HITL a due livelli">
-    <div class="contenuto">
-      <span class="eyebrow">Escalation umana intenzionale</span>
-      <h1>HITL a <span class="grad">due livelli</span></h1>
-      <div class="g2" style="margin-top:clamp(10px,2vh,22px)">
-        <div class="card viola">
-          <h5>Nel prodotto</h5>
-          <ul class="bullets">
-            <li><strong>Nessuna email parte</strong> senza che Maria abbia riletto e premuto invia</li>
-            <li>Semaforo giallo &rarr; &laquo;chiedi a una persona di fiducia&raquo; + pulsante</li>
-            <li>Nessun invio automatico, in nessun caso</li>
-          </ul>
-        </div>
-        <div class="card viola">
-          <h5>Nella build</h5>
-          <ul class="bullets">
-            <li><strong>Nessuna fase avanza</strong> senza che lo sviluppatore abbia approvato il gate</li>
-            <li><strong>3 gate</strong> umani: T+1:15 · T+2:20 · T+2:30</li>
-            <li>Registrati in <code>build-time/state/progress.json</code></li>
-          </ul>
+          <h3>La journey coperta dalla demo</h3>
+          <ol class="passi">
+            <li><strong>Apre la casella</strong> Ogni messaggio ha gi&agrave; un semaforo: verde, giallo, rosso.</li>
+            <li><strong>Legge in parole semplici</strong> Chi le scrive &middot; Cosa le chiedono &middot; Entro quando.</li>
+            <li><strong>Ascolta ad alta voce</strong> Il riassunto e il messaggio, letti dal dispositivo.</li>
+            <li><strong>Sceglie la risposta</strong> Tre intenti: confermo, chiedo informazioni, non posso.</li>
+            <li><strong>Rilegge e conferma</strong> Pu&ograve; farsela rileggere o aggiungere qualcosa a voce. L&rsquo;invio &egrave; suo.</li>
+            <li><strong>Vede che &egrave; fatta</strong> La mail passa a &laquo;Gi&agrave; risposto&raquo;, la copia sta in Posta inviata.</li>
+          </ol>
         </div>
       </div>
-      <p class="frase" style="margin-top:clamp(12px,2.4vh,26px)">La simmetria non è casuale: <span class="grad">la stessa regola per chi usa il sistema e per chi lo costruisce</span>.</p>
-      <p style="color:var(--tenue);font-size:clamp(12px,1vw,16px);margin:0">Lo stato dei gate di build usa lo stesso pattern di stato esternalizzato del runtime: verificabile, non dichiarato.</p>
     </div>
-    <aside class="nota">Human in the loop compare due volte. Nel prodotto: nessuna email parte senza che Maria l'abbia riletta e abbia premuto invia. Nella build: nessuna fase è avanzata senza che io approvassi il gate, e i tre gate sono registrati su file con lo stesso pattern di stato esternalizzato che usiamo a runtime. La simmetria non è un espediente narrativo: è la stessa regola applicata a chi usa il sistema e a chi lo costruisce.</aside>
+    <aside class="nota">La persona e' specifica, non generica: ogni dettaglio qui impone una scelta tecnica. Il tremore impone i target da 48 pixel, la cataratta il contrasto AAA, il fatto che usi i vocali impone la voce. La journey e' di sei fasi e la demo le copre tutte, nessuna saltata.</aside>
   </section>
 
-  <!-- ============ 8 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 8 di 11: Nessuna chiave, nessun codice di rete">
+  <!-- ============ 4 · obiettivo ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 4 di 7: Obiettivo del progetto">
     <div class="contenuto">
-      <span class="eyebrow">Efficienza dei token · secrets · privacy</span>
-      <h1>Nessuna chiave, <span class="grad">nessun codice di rete</span></h1>
-      <div class="g2" style="margin-top:clamp(8px,1.6vh,18px)">
+      <span class="eyebrow">Obiettivo del progetto</span>
+      <h1>Dimostrare che l&rsquo;autonomia &egrave; <span class="grad">possibile</span>, non solo desiderabile</h1>
+      <p class="sub">Portare a termine una comunicazione con un ente &mdash; leggerla, capirla, risponderle &mdash; senza l&rsquo;intervento di un familiare, mantenendo sempre il controllo umano sulla decisione finale di invio.</p>
+      <div class="g3" style="margin-top:clamp(10px,2vh,24px)">
         <div class="card">
-          <h5><code>off</code> &mdash; il default</h5>
-          <ul class="bullets fitta">
-            <li>Solo regole deterministiche, nessuna seam LLM attraversata</li>
-            <li><strong>0 token</strong> per email</li>
-            <li>La giuria clona ed esegue <strong>senza configurare nulla</strong></li>
-          </ul>
-        </div>
-        <div class="card viola">
-          <h5><code>replay</code> &mdash; per mostrare la seam</h5>
-          <ul class="bullets fitta">
-            <li>Attraversa <strong>tutta</strong> la seam: prompt caricato, input hashato, JSON validato con Pydantic, token contati, retry</li>
-            <li>Solo il <strong>trasporto</strong> è sostituito</li>
-            <li>FactGuard verifica un output che il codice <strong>non ha generato lui</strong></li>
-          </ul>
-        </div>
-      </div>
-      <ul class="bullets fitta" style="margin-top:clamp(10px,2vh,20px)">
-        <li>Nessuna dipendenza <code>anthropic</code>, nessun client HTTP in tutto <code>app/</code>. Non è disattivato: <strong>non esiste</strong>.</li>
-        <li>Un <strong>test scansiona staticamente i sorgenti</strong> e lo dimostra a ogni esecuzione della suite.</li>
-      </ul>
-      <div class="card rosa" style="margin-top:clamp(10px,1.8vh,18px)">
-        <p style="color:rgba(255,255,255,0.85);font-size:clamp(13px,1.08vw,18px);margin:0">Le fixture di <code>replay</code> sono <strong>output di esempio scritti in fase di sviluppo, non registrazioni di chiamate API</strong>. Non volevamo una chiave in un repository pubblico.</p>
-      </div>
-    </div>
-    <aside class="nota">Non esiste una chiave API in questo progetto: non nel repo, non nella cronologia. Due modalità sole: off di default, replay per mostrare la seam attraversata. Nessuna dipendenza anthropic e nessun client HTTP in tutta la cartella app, e un test lo verifica scansionando i sorgenti. Detto con precisione: le fixture sono output di esempio scritti in fase di sviluppo, non registrazioni di chiamate API. Non volevamo una chiave in un repository pubblico.</aside>
-  </section>
-
-  <!-- ============ 9 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 9 di 11: Validazione">
-    <div class="contenuto">
-      <span class="eyebrow">Evidenza, non impressione</span>
-      <h1><span class="grad">Validazione</span></h1>
-      <div class="g3" style="margin-bottom:clamp(10px,2vh,20px)">
-        <div class="card"><div class="kpi viola">94</div><div class="kpi-eti">test superati · 25 nel browser vero</div></div>
-        <div class="card"><div class="kpi viola">90,1</div><div class="kpi-eti">Gulpease della sintesi, em-01 (molto facile)</div></div>
-        <div class="card"><div class="kpi rosa">4</div><div class="kpi-eti">falsi positivi reali trovati eseguendo, non leggendo</div></div>
-      </div>
-      <div class="g23">
-        <table>
-          <thead><tr><th scope="col">Email</th><th scope="col">Originale</th><th scope="col">Sintesi Chi/Cosa/Entro quando</th></tr></thead>
-          <tbody>
-            <tr><td class="chiave mono">em-01</td><td class="num">57,5</td><td class="num up">90,1 &mdash; molto facile</td></tr>
-            <tr><td class="chiave mono">em-02</td><td class="num">64,7</td><td class="num up">68,0</td></tr>
-            <tr><td class="chiave mono">em-04</td><td class="num">48,7</td><td class="num up">49,8</td></tr>
-          </tbody>
-        </table>
-        <ul class="bullets fitta">
-          <li><strong>Onestà sul dato:</strong> il <em>corpo riscritto</em> guadagna poco &mdash; <strong>57,0 &rarr; 57,3</strong> di media. Un motore a regole non può rifondere le frasi senza rischiare di tradirle.</li>
-          <li>Il guadagno vero è nella <strong>sintesi Chi / Cosa / Entro quando</strong>, che è anche ciò che Maria legge per prima.</li>
-          <li>Eseguire la pipeline sul corpus ha fatto emergere <strong>4 falsi positivi veri</strong>, due dei quali della stessa famiglia: <strong>cecità alla negazione</strong>. L'INPS autentico finiva in phishing perché diceva &laquo;non richiede mai le credenziali&raquo;, e la sua scheda diceva &laquo;Le chiedono di rispondere&raquo; perché diceva &laquo;non rispondere&raquo;.</li>
-        </ul>
-      </div>
-    </div>
-    <aside class="nota">94 test verdi, di cui 25 girano in un Chromium vero. Su un clone pulito sono 69 piu' uno saltato, perche' Playwright e' una dipendenza facoltativa e non sta in requirements.txt. Il Gulpease misurato sul corpus: la sintesi sale davvero, fino a 90 su em-01. Il corpo riscritto quasi no, da 57,0 a 57,3 di media, e lo diciamo noi per primi: un motore a regole non rifonde le frasi senza rischiare di tradirle, ed è esattamente per questo che la seam LLM esiste. Eseguire la pipeline sul corpus ha fatto emergere quattro falsi positivi veri, due della stessa famiglia: la cecita' alla negazione. L'INPS autentico finiva in phishing perche' diceva "non richiede mai le credenziali", e la sua scheda diceva "Le chiedono di rispondere" perche' diceva "non rispondere". Nessuno dei quattro si vedeva leggendo il codice.</aside>
-  </section>
-
-  <!-- ============ 10 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 10 di 11: Limiti e rischi">
-    <div class="contenuto">
-      <span class="eyebrow">Autonomia e limiti · dichiarati per primi</span>
-      <h1>Limiti e <span class="grad">rischi</span></h1>
-      <div class="g2" style="margin-top:clamp(8px,1.6vh,18px)">
-        <div class="card">
-          <h4>Quello che il sistema non sa fare</h4>
-          <ul class="bullets fitta">
-            <li><strong>FactGuard verifica la <em>presenza</em> dei fatti, non il loro <em>ruolo</em>:</strong> non distingue &laquo;importo dovuto&raquo; da &laquo;importo già versato&raquo;. È esattamente lì che serve la persona.</li>
-            <li>La <strong>classificazione truffa non è infallibile</strong>: soglia deliberatamente prudenziale, nel dubbio dice &laquo;chiedi a una persona di fiducia&raquo;, <strong>mai &laquo;è sicura&raquo;</strong>.</li>
-            <li>Dice <strong>cosa c'è scritto, mai cosa fare</strong>: niente contenuti clinici, fiscali o legali.</li>
-          </ul>
+          <div class="kpi viola">100%</div>
+          <div class="kpi-eti">delle risposte con conferma umana esplicita prima dell&rsquo;invio</div>
         </div>
         <div class="card">
-          <h4>Quello che è fuori dallo scope</h4>
-          <ul class="bullets fitta">
-            <li>Niente <strong>PEC</strong>, niente <strong>SPID</strong>, nessun modulo compilato.</li>
-            <li>Il <strong>semplificatore a regole</strong> copre il burocratese ricorrente, non il testo libero arbitrario.</li>
-            <li>Database <strong>in memoria</strong>: lo stato si azzera al riavvio.</li>
-            <li><strong>Casella simulata</strong>: nessuna integrazione IMAP reale.</li>
-          </ul>
+          <div class="kpi viola">90,1</div>
+          <div class="kpi-eti">indice Gulpease del riassunto, da 57,5: da &laquo;difficile&raquo; a &laquo;molto facile&raquo;</div>
+        </div>
+        <div class="card">
+          <div class="kpi rosa">0</div>
+          <div class="kpi-eti">dati sanitari che lasciano il dispositivo: nessuna chiave API, nessuna chiamata di rete</div>
+        </div>
+      </div>
+      <p class="chiusa">
+        <strong>Il metro non &egrave; la soddisfazione: &egrave; il compito portato a termine.</strong>
+        In interfaccia il guadagno &egrave; un numero che Maria vede crescere &mdash; &laquo;Risposte inviate da sola&raquo; &mdash; non un aggettivo in una slide.
+      </p>
+    </div>
+    <aside class="nota">Tre numeri, tutti verificabili. Il cento per cento e' architetturale: nel codice non esiste un percorso che invii da solo. Il novanta virgola uno e' misurato col Gulpease, l'indice di leggibilita' tarato sull'italiano. Lo zero e' la scelta che ci distingue: il dato sanitario di una persona anziana non lascia il suo dispositivo.</aside>
+  </section>
+
+  <!-- ============ 5 · proposta ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 5 di 7: Cosa si propone">
+    <div class="contenuto">
+      <span class="eyebrow">Cosa si propone</span>
+      <h1>Un assistente <span class="grad">accanto</span>, non un&rsquo;app da imparare</h1>
+      <div class="g23" style="margin-top:clamp(8px,1.6vh,20px)">
+        <div class="g2" style="grid-template-columns:1fr 1fr">
+          <div class="card numerata">
+            <span class="cifra">1</span>
+            <h5>Semaforo con l&rsquo;azione</h5>
+            <p>Verde, giallo, rosso &mdash; e sotto il verdetto, sempre un pulsante. Sul rosso, il numero verde ufficiale preso da una tabella nel codice, <strong>mai dall&rsquo;email</strong>.</p>
+          </div>
+          <div class="card numerata">
+            <span class="cifra">2</span>
+            <h5>Il burocratese tradotto</h5>
+            <p>Chi le scrive &middot; Cosa le chiedono &middot; Entro quando. Tre righe in cima, prima di tutto il resto. L&rsquo;originale resta sempre a un tocco.</p>
+          </div>
+          <div class="card numerata">
+            <span class="cifra">3</span>
+            <h5>Risposta guidata, e la voce</h5>
+            <p>La risposta si <strong>sceglie</strong>, non si scrive. Poi si ascolta, e si pu&ograve; aggiungere qualcosa parlando: il riquadro bianco non compare mai.</p>
+          </div>
+          <div class="card numerata rosa">
+            <span class="cifra">4</span>
+            <h5>FactGuard, il controllo</h5>
+            <p>Nessuna versione semplificata raggiunge la persona senza che date, importi e orari siano stati verificati uno per uno. <strong>Il controllo non &egrave; un modello.</strong></p>
+          </div>
+        </div>
+        <div>
+          <img class="schermata" style="max-height:44vh" src="img/08-riassunto-dettaglio.png"
+               alt="La scheda In breve: Chi le scrive, Cosa le chiedono, Entro quando, con il pulsante Ascolta il riassunto." />
+          <p class="aiuto" style="margin-top:10px">Schermata reale del prodotto</p>
         </div>
       </div>
     </div>
-    <aside class="nota">I limiti li dichiariamo noi, prima che li chieda la giuria. Il più importante: FactGuard verifica la presenza dei fatti, non il loro ruolo. Non distingue un importo dovuto da un importo già versato, ed è precisamente per questo che la persona resta nel ciclo. La classificazione truffa ha una soglia prudenziale: nel dubbio dice "chiedi a qualcuno di fiducia", mai "è sicura". Il resto è scope: niente PEC, niente SPID, casella simulata.</aside>
+    <aside class="nota">Quattro capacita', e ognuna finisce in un'azione che la persona puo' compiere. Un semaforo senza pulsante e' un checker travestito. La terza riga e' quella che risolve il blocco iniziale: la risposta si sceglie invece di scriverla. La quarta e' il pezzo tecnico di cui siamo piu' orgogliosi, e adesso ve lo mostro rompere apposta il sistema.</aside>
   </section>
 
-  <!-- ============ 11 ============ -->
-  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 11 di 11: Dove sta l'AI">
+  <!-- ============ 6 · perché conviene ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 6 di 7: Perché conviene a voi">
     <div class="contenuto">
-      <span class="eyebrow">La domanda che arriverà comunque</span>
-      <h1>Dove sta <span class="grad">l'AI</span></h1>
-      <p class="frase" style="margin-top:clamp(8px,1.6vh,18px)">L'AI ha progettato e scritto <span class="grad">l'intero sistema</span>: 9 agenti di build, i prompt, i contratti, i test.</p>
-      <div class="g4" style="margin-top:clamp(10px,2vh,22px)">
-        <div class="card viola"><h4 style="color:var(--purple-light)">Verificabile</h4><p>Ogni decisione è codice leggibile, non un output da interpretare.</p></div>
-        <div class="card viola"><h4 style="color:var(--purple-light)">Ripetibile</h4><p>Stesso input, stesso output. Sempre. Anche fra sei mesi.</p></div>
-        <div class="card viola"><h4 style="color:var(--purple-light)">A costo zero</h4><p>0 token per email nel default. Il costo marginale di una casella è zero.</p></div>
-        <div class="card rosa"><h4 style="color:var(--rose)">Privato</h4><p>La posta sanitaria e previdenziale di una persona anziana <strong>non lascia il dispositivo</strong>.</p></div>
+      <span class="eyebrow">Perch&eacute; conviene a voi</span>
+      <h1>Accessibilit&agrave; come <span class="grad">vantaggio competitivo</span>, non come costo di conformit&agrave;</h1>
+      <div class="g2" style="margin-top:clamp(10px,2vh,24px)">
+        <div class="card numerata">
+          <span class="cifra">1</span>
+          <h5>Compliance anticipata</h5>
+          <p>L&rsquo;European Accessibility Act &egrave; gi&agrave; in vigore. Essere pronti riduce il rischio normativo invece di rincorrerlo a scadenza.</p>
+        </div>
+        <div class="card numerata">
+          <span class="cifra">2</span>
+          <h5>Meno costi di assistenza</h5>
+          <p>Meno chiamate allo sportello per farsi leggere una lettera, meno pratiche scadute perch&eacute; nessuno aveva capito il termine.</p>
+        </div>
+        <div class="card numerata">
+          <span class="cifra">3</span>
+          <h5>Fiducia, e meno frodi</h5>
+          <p>Il semaforo insegna a distinguere una comunicazione vera da una truffa. Ogni tentativo bloccato &egrave; un danno evitato al cittadino <em>e</em> all&rsquo;ente.</p>
+        </div>
+        <div class="card numerata">
+          <span class="cifra">4</span>
+          <h5>Scalabile ad altri canali</h5>
+          <p>Lo stesso motore &mdash; traduzione, verifica, risposta guidata &mdash; si applica a portali, moduli online e pratiche, non solo alla posta.</p>
+        </div>
       </div>
-      <p class="sub" style="margin-top:clamp(14px,2.6vh,28px);font-size:clamp(15px,1.5vw,24px);color:rgba(255,255,255,0.8)">A runtime il default è deterministico <strong>di proposito</strong>. La seam LLM esiste, è completa, e ve l'abbiamo mostrata attraversata.</p>
-      <p style="margin-top:clamp(10px,2vh,20px);font-size:clamp(16px,1.7vw,28px);font-weight:700;letter-spacing:-0.02em">Posta <span class="grad">Chiara</span> &mdash; <span style="color:rgba(255,255,255,0.6);font-weight:400">accanto a chi si ferma davanti al riquadro bianco.</span></p>
+      <p class="chiusa">
+        <strong>Il costo marginale di una casella processata &egrave; zero.</strong>
+        Il motore &egrave; deterministico per progetto: nessun consumo per messaggio, nessuna dipendenza da crediti di terzi, e il dato sensibile resta sul dispositivo.
+      </p>
     </div>
-    <aside class="nota">La domanda arriva sempre, quindi la anticipiamo. L'AI ha progettato e scritto l'intero sistema: nove agenti di build, i prompt, i contratti, i test. A runtime il default è deterministico di proposito: verificabile, ripetibile, a costo zero, e la posta sanitaria e previdenziale di una persona anziana non lascia il dispositivo. Grazie.</aside>
+    <aside class="nota">Questa e' la slide che vende. L'accessibilita' qui non e' un costo di conformita': e' compliance anticipata, meno costi di contact center, meno frodi, e un motore che si riusa su altri canali. E il costo per messaggio e' zero, perche' il default non chiama nessun modello.</aside>
+  </section>
+
+  <!-- ============ 7 · prossimi passi ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 7 di 7: Prossimi passi">
+    <div class="contenuto">
+      <span class="eyebrow">Prossimi passi</span>
+      <h1>La demo &egrave; pronta. <span class="grad">Parliamo del pilot.</span></h1>
+      <div class="g3" style="margin-top:clamp(12px,2.4vh,28px)">
+        <div class="card viola">
+          <h4>Oggi</h4>
+          <h5>Prodotto funzionante</h5>
+          <p>La journey completa gira davvero: sei email reali, semaforo, traduzione, voce, risposta e verifica. Si clona e si esegue senza configurare nulla.</p>
+        </div>
+        <div class="card">
+          <h4>Prossimo step</h4>
+          <h5>Pilot con utenti veri</h5>
+          <p>Un gruppo reale su un canale scelto insieme &mdash; ASL, Comune o ente previdenziale &mdash; con la misura dell&rsquo;autonomia gi&agrave; integrata nel prodotto.</p>
+        </div>
+        <div class="card">
+          <h4>Scalabilit&agrave;</h4>
+          <h5>Dagli enti ai portali</h5>
+          <p>Lo stesso motore di traduzione e verifica esteso agli altri servizi digitali, e la seam per il modello linguistico gi&agrave; predisposta.</p>
+        </div>
+      </div>
+      <p class="frase" style="margin-top:clamp(14px,3vh,30px)">Prima: domenica prossima. <span class="grad">Ora: quattro minuti.</span></p>
+    </div>
+    <aside class="nota">Chiusura. Il prodotto c'e' e funziona oggi, non e' un mockup. Il passo successivo e' un pilot con utenti veri, e la misura dell'autonomia e' gia' dentro il prodotto: il contatore delle risposte inviate da sola. Ultima frase, e poi le domande: prima, domenica prossima. Ora, quattro minuti. Grazie.</aside>
   </section>
 
 </main>
@@ -605,7 +553,7 @@
   <nav class="comandi" aria-label="Navigazione delle slide">
     <span class="aiuto" aria-hidden="true">&larr; &rarr; · spazio · P = note</span>
     <button type="button" id="prec" aria-label="Slide precedente">&larr;</button>
-    <span class="contatore" id="contatore" aria-live="polite" aria-atomic="true">1 / 11</span>
+    <span class="contatore" id="contatore" aria-live="polite" aria-atomic="true">1 / 7</span>
     <button type="button" id="succ" aria-label="Slide successiva">&rarr;</button>
     <button type="button" id="btnNote" aria-pressed="false" aria-label="Mostra o nascondi le note del presentatore" style="font-size:13px;letter-spacing:0.12em">P</button>
   </nav>
