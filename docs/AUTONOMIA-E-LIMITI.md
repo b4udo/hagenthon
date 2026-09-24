@@ -61,7 +61,7 @@ Conseguenza onesta: copre bene convocazioni, scadenze, certificati e comunicazio
 
 Allargarlo è esattamente ciò per cui esiste la seam LLM sull'agente 04, ed è l'unico punto del sistema dove un modello linguistico è giustificato — perché è l'unico il cui errore è **rilevabile a valle** da FactGuard.
 
-### ★ Le fixture di `replay` sono scritte, non registrate
+### ★ Le fixture di `replay` sono scritte in sviluppo, non sono registrazioni di chiamate API
 
 > Sono **output di esempio scritti durante lo sviluppo**, conformi agli schema in `agents/runtime/contracts/`. **Non sono registrazioni di chiamate API.** Il progetto non ha mai usato una chiave.
 

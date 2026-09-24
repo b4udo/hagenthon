@@ -91,9 +91,9 @@ Costo quantificato delle due modalità: [`docs/TOKEN-EFFICIENCY.md`](docs/TOKEN-
 ```
 posta-chiara/
 ├── app/             la soluzione
-│   ├── backend/     FastAPI · orchestratore · 6 agenti · 5 motori a regole · seam LLM · DB in memoria
+│   ├── backend/     FastAPI · orchestratore · i 6 agenti · 5 motori a regole · seam LLM · DB in memoria
 │   ├── frontend/    HTML/CSS/JS vanilla, zero build, zero CDN
-│   ├── fixtures/    output di esempio della seam LLM (scritti, non registrati)
+│   ├── fixtures/    output di esempio della seam LLM, scritti in fase di sviluppo
 │   └── tests/       la suite pytest
 ├── agents/          ★ la struttura agentica — 9 agenti di build + 6 di runtime
 ├── presentation/    la presentazione HTML, brand Accenture
@@ -103,7 +103,7 @@ posta-chiara/
 
 | Cartella | Cosa contiene, in concreto |
 |---|---|
-| [`app/backend/`](app/backend/) | `main.py` (API, `StaticFiles` montato per ultimo) · `orchestrator.py` (ordine, limiti, budget, stato) · `contracts.py` (i modelli Pydantic su ogni confine) · `clock.py` («oggi» costante) · `db.py` (SQLite in memoria, seminato da `data/mailbox.json`) · `agents/` (i 6 agenti) · `engines/` (`normalize`, `fact_extract`, `phishing_rules`, `plain_rules`, `gulpease`) · `llm/` (la seam) · `state/` (checkpoint esternalizzato) |
+| [`app/backend/`](app/backend/) | `main.py` (API, `StaticFiles` montato per ultimo) · `orchestrator.py` (ordine, limiti, budget, stato) · `contracts.py` (i modelli Pydantic su ogni confine) · `clock.py` («oggi» costante) · `db.py` (SQLite in memoria, seminato da `data/mailbox.json`) · `agents/` (triage, sicurezza, semplificatore, verificatore, compositore) · `engines/` (`normalize`, `fact_extract`, `phishing_rules`, `plain_rules`, `gulpease`) · `llm/` (la seam) · `state/` (checkpoint esternalizzato) |
 | [`app/frontend/`](app/frontend/) | Una pagina, tre viste. Base 20px, target 48px, contrasto AAA, `aria-live`, tastiera completa. Nessun passo di build: si apre e funziona |
 | [`app/tests/`](app/tests/) | La suite. Include il test statico «zero rete» e i test end-to-end del percorso di Maria |
 | [`agents/`](agents/) | I due sistemi agentici, tenuti separati: `build-time/` (chi ha costruito) e `runtime/` (chi gira nel prodotto). I **prompt in `runtime/prompts/` sono caricati dal codice**, non descritti da esso |
@@ -173,7 +173,7 @@ La mappa che un giurato deve trovare senza cercarla. Ogni riga punta a file che 
 
 | # | Criterio | Peso | Dove si vede, concretamente |
 |---|---|---:|---|
-| 01 | **Profondità agentica** | **24%** | [`app/backend/orchestrator.py`](app/backend/orchestrator.py) — pipeline esplicita, non chiamate sparse · 6 sub-agenti in [`app/backend/agents/`](app/backend/agents/) con un contratto Pydantic ciascuno · **stato esternalizzato** in [`app/backend/state/store.py`](app/backend/state/store.py) + tabella `stato_pipeline` in [`db.py`](app/backend/db.py), ispezionabile in demo da `GET /api/debug/stato` · **output strutturati** in [`app/backend/contracts.py`](app/backend/contracts.py) e [`agents/runtime/contracts/`](agents/runtime/contracts/) · workflow multi-step in [`agents/runtime/orchestrator.md`](agents/runtime/orchestrator.md) |
+| 01 | **Profondità agentica** | **24%** | [`app/backend/orchestrator.py`](app/backend/orchestrator.py) — pipeline esplicita, non chiamate sparse · 6 agenti, uno per passo, **un contratto Pydantic ciascuno**: [`app/backend/agents/`](app/backend/agents/) più l'estrazione fatti in [`app/backend/engines/fact_extract.py`](app/backend/engines/fact_extract.py) · **stato esternalizzato** in [`app/backend/state/store.py`](app/backend/state/store.py) + tabella `stato_pipeline` in [`db.py`](app/backend/db.py), ispezionabile in demo da `GET /api/debug/stato` · **output strutturati** in [`app/backend/contracts.py`](app/backend/contracts.py) e [`agents/runtime/contracts/`](agents/runtime/contracts/) · workflow multi-step in [`agents/runtime/orchestrator.md`](agents/runtime/orchestrator.md) |
 | 02 | **Qualità delle istruzioni** | **19%** | [`agents/`](agents/) — ogni file ha la stessa struttura *Scopo · Input · Output · Passi · Vincoli · Fallback · Confine* · **niente sovrapposizioni**: [`agents/README.md`](agents/README.md) mappa, [`agents/workflow.md`](agents/workflow.md) ordina, [`agents/build-time/CLAUDE.md`](agents/build-time/CLAUDE.md) vincola, e ciascuno rimanda agli altri invece di ripeterli · ★ i prompt in [`agents/runtime/prompts/`](agents/runtime/prompts/) **sono caricati dal codice** (`client.carica_prompt`): documentazione e comportamento sono lo stesso artefatto |
 | 03 | **Robustezza** | **15%** | Fallback dichiarato per ogni agente nel proprio file `runtime/0*.md` e applicato in `orchestrator._Corsa.esegui` · `MAX_SIMPLIFY_RETRIES = 2`, `TIMEOUT_AGENTE_MS = 2000`, `BUDGET_TOKEN_EMAIL = 4000` · **HITL su due livelli**: nel prodotto nessun invio parte senza il click di Maria (`POST /api/email/{id}/invia`), nella build nessuna fase avanza senza un gate umano registrato in [`agents/build-time/state/progress.json`](agents/build-time/state/progress.json) · FactGuard: [`app/backend/agents/verificatore.py`](app/backend/agents/verificatore.py) |
 | 04 | **Efficienza dei token** | **12%** | [`agents/runtime/routing.md`](agents/runtime/routing.md) — per ogni agente è scritto **quando NON chiamare un LLM** · **0 token per email** nel default, misurati · cache sullo stato esternalizzato: ri-aprire la stessa email costa 0 · numeri affiancati in [`docs/TOKEN-EFFICIENCY.md`](docs/TOKEN-EFFICIENCY.md) |
@@ -190,9 +190,11 @@ La mappa che un giurato deve trovare senza cercarla. Ogni riga punta a file che 
 python -m pytest -q
 ```
 
-**Risultato corrente: 51 passati, 1 saltato.**
+**Risultato su un clone pulito, con le sole dipendenze di `requirements.txt`: 52 passati, 1 saltato.**
 
-Il test saltato è la suite end-to-end del browser ([`app/tests/test_e2e_frontend.py`](app/tests/test_e2e_frontend.py)): usa Playwright, che è una dipendenza **facoltativa** e non è in `requirements.txt`. Senza Playwright il modulo si salta invece di fallire, così la suite principale non dipende da un pacchetto opzionale. Dettaglio di cosa copre ciascun file: [`docs/VALIDAZIONE.md`](docs/VALIDAZIONE.md).
+Il saltato è la suite end-to-end del browser ([`app/tests/test_e2e_frontend.py`](app/tests/test_e2e_frontend.py)): usa **Playwright**, che è una dipendenza **facoltativa** e non è in `requirements.txt`. Senza Playwright il modulo si salta invece di fallire, così la suite principale non dipende da un pacchetto opzionale.
+
+Con Playwright installato quella suite gira davvero — avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium — e il totale diventa **65 passati, 0 saltati**. Dettaglio di cosa copre ciascun file: [`docs/VALIDAZIONE.md`](docs/VALIDAZIONE.md).
 
 **Nessun test tocca la rete** — ed è banale rispettarlo, perché nel progetto non esiste codice capace di toccarla. Il primo test di `test_llm_modes.py` lo dimostra invece di assumerlo.
 
@@ -208,7 +210,7 @@ I tre che pesano di più, in sintesi:
 
 - **FactGuard verifica la *presenza* dei fatti, non il loro *ruolo*.** Non distingue «importo dovuto» da «importo già versato». È esattamente lì che serve la revisione umana, ed è il motivo per cui l'originale resta sempre a un tocco.
 - **La classificazione delle truffe non è infallibile.** La soglia è prudenziale per costruzione: nel dubbio il sistema dice *«chieda a una persona di fiducia»*, e non dice **mai** *«è sicura»*.
-- **Le fixture di `replay` sono scritte, non registrate.** Dimostrano che la seam è completa; non dimostrano come si comporterebbe un modello reale su questo compito.
+- **Le fixture di `replay` sono output di esempio scritti in fase di sviluppo, non sono registrazioni di chiamate API.** Dimostrano che la seam è completa; non dimostrano come si comporterebbe un modello reale su questo compito.
 
 ---
 

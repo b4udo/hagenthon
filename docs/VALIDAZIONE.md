@@ -11,9 +11,13 @@
 python -m pytest -q
 ```
 
-### **51 passati · 1 saltato**
+| Ambiente | Comando | Risultato |
+|---|---|---|
+| **Clone pulito**, sole dipendenze di `requirements.txt` | `python -m pytest -q` | **52 passati · 1 saltato** |
+| Macchina di sviluppo, con Playwright installato | `python -m pytest -q` | **65 passati · 0 saltati** |
+| Sola suite principale, Playwright escluso a mano | `python -m pytest -q --ignore=app/tests/test_e2e_frontend.py` | **52 passati** |
 
-Il saltato è la suite end-to-end del browser (`app/tests/test_e2e_frontend.py`): dipende da **Playwright**, che è una dipendenza facoltativa e **non è in `requirements.txt`**. Senza Playwright il modulo si salta invece di fallire, perché la suite principale non deve dipendere da un pacchetto opzionale. Con Playwright installato, quella suite avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium vero.
+Il saltato del primo caso è la suite end-to-end del browser (`app/tests/test_e2e_frontend.py`): dipende da **Playwright**, che è una dipendenza facoltativa e **non è in `requirements.txt`**. Senza Playwright il modulo si salta invece di fallire, perché la suite principale non deve dipendere da un pacchetto opzionale. Con Playwright installato, quella suite avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium vero: **13 test in più, tutti verdi**.
 
 **Nessun test tocca la rete.** Non è una regola da rispettare: nel progetto non esiste codice capace di toccarla, e il primo test di `test_llm_modes.py` lo dimostra invece di assumerlo. La prova pratica è staccare il Wi-Fi e rilanciare: il risultato è identico, in `off` e in `replay`.
 
@@ -113,7 +117,7 @@ Il riassunto è di **12 parole e 77 lettere**. Di queste, *«INPS - Istituto Naz
 
 | Prova | Esito | Dove si rifà |
 |---|---|---|
-| Test automatici | **51 passati, 1 saltato** (il saltato è la suite Playwright facoltativa) | `python -m pytest -q` |
+| Test automatici | **52 passati, 1 saltato** su un clone pulito · **65 passati** con Playwright installato | `python -m pytest -q` |
 | Zero codice di rete in `app/` | ✅ verificato staticamente sull'AST di ogni sorgente | `pytest app/tests/test_llm_modes.py -q` |
 | Contratti allineati agli schema pubblicati | ✅ | `pytest app/tests/test_contracts_sync.py -q` |
 | Checklist accessibilità, 27 voci | ✅ su entrambe le schermate, due valori da rimisurare in proiezione | `agents/build-time/commands/verifica-a11y.md` |

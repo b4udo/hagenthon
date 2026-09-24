@@ -55,7 +55,7 @@ Un requisito segnato `ok` senza un path non è `ok`. Il report va al `team-leade
 |---|---|---|---|
 | 1 | La repository è **pubblica** | Sulla pagina del repository, prima del freeze | Una repository privata equivale a non aver consegnato |
 | 2 | **Il passaggio a pubblico avviene DOPO i controlli 3–6** | Ordine delle operazioni | Una chiave esposta anche per un minuto su una repository pubblica resta esposta |
-| 3 | Nessun segreto nella **cronologia**, non solo nei file | `git log -p \| Select-String "sk-ant-"` → vuoto | Rimuovere un file non rimuove la cronologia |
+| 3 | Nessun segreto nella **cronologia**, non solo nei file | `git log -p \| Select-String "sk-ant-[A-Za-z0-9_-]{10,}"` → vuoto | Rimuovere un file non rimuove la cronologia. ★ Il quantificatore serve: cercare il solo prefisso trova anche i documenti che **descrivono** questo controllo, e un allarme che suona sempre smette di essere letto |
 | 4 | `requirements.txt` **non** contiene `anthropic` | Lettura del file | È la prova materiale della frase detta alla giuria |
 | 5 | Zero codice di rete in `app/` | `pytest app/tests/test_llm_modes.py` verde | Stessa ragione, resa eseguibile |
 | 6 | `.env` **non** committato; `.env.example` sì | `git ls-files \| Select-String "^\.env"` | Configurazione sicura è un criterio esplicito |
@@ -129,7 +129,7 @@ Un requisito segnato `ok` senza un path non è `ok`. Il report va al `team-leade
       sostanziale.
 - [ ] Ogni riga `ok` riporta un path esistente; ogni riga `manca` o `a rischio` riporta azione e
       proprietario.
-- [ ] `git log -p | Select-String "sk-ant-"` è vuoto, e l'esito è nel report.
+- [ ] `git log -p | Select-String "sk-ant-[A-Za-z0-9_-]{10,}"` è vuoto, e l'esito è nel report.
 - [ ] `requirements.txt` non contiene `anthropic`; `test_llm_modes.py` è verde.
 - [ ] La ricerca di «registrat» non trova nessuna occorrenza che **descriva** le fixture come
       registrazioni di chiamate API.
