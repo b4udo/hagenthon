@@ -22,6 +22,26 @@ from . import normalize
 
 FINESTRA_ANCORA = 40
 
+# "D.P.R. 28 dicembre 2000, n. 445" contiene una data perfettamente valida che
+# non e' un fatto operativo: e' una citazione normativa. Protetta da FactGuard
+# costringerebbe il semplificatore a conservare il riferimento di legge, cioe'
+# esattamente cio' che deve eliminare.
+MARCATORI_NORMATIVI = (
+    "d.p.r",
+    "dpr",
+    "d.lgs",
+    "dlgs",
+    "d.l.",
+    "legge",
+    "decreto",
+    "art.",
+    "artt.",
+    "comma",
+    "codice civile",
+    "l. n.",
+)
+FINESTRA_NORMATIVA = 35
+
 ANCORE: dict[str, tuple[str, ...]] = {
     "data": (
         "entro",
@@ -81,6 +101,11 @@ def _si_sovrappone(inizio: int, fine: int, occupati: list[tuple[int, int]]) -> b
     return any(inizio < f and i < fine for i, f in occupati)
 
 
+def _e_citazione_normativa(testo: str, inizio: int) -> bool:
+    finestra = testo[max(0, inizio - FINESTRA_NORMATIVA) : inizio].lower()
+    return any(m in finestra for m in MARCATORI_NORMATIVI)
+
+
 def estrai_fatti(testo: str, anno_default: int) -> list[Fatto]:
     """I fatti ancorati, deduplicati per (tipo, valore normalizzato)."""
     fatti: list[Fatto] = []
@@ -105,6 +130,8 @@ def estrai_fatti(testo: str, anno_default: int) -> list[Fatto]:
                 occupati.append((m.start(), m.end()))
 
                 if not ancora:
+                    continue
+                if tipo == "data" and _e_citazione_normativa(testo, m.start()):
                     continue
                 if (tipo, valore) in visti:
                     continue

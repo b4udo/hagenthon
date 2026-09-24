@@ -1,0 +1,112 @@
+{
+  "progetto": "posta-chiara",
+  "timebox": "4:00",
+  "aggiornato_da": "team-leader",
+  "fase_corrente": 3,
+  "fasi": [
+    {
+      "id": 0,
+      "nome": "Smoke ambiente — venv, dipendenze congelate, un endpoint, una pagina statica",
+      "stato": "fatto",
+      "agenti": ["persona"],
+      "inizio": "T+0:00",
+      "fine": "T+0:10",
+      "nota": "Dipendenze congelate: fastapi, uvicorn, pydantic, pytest, httpx. Nessun pip install dopo questo punto."
+    },
+    {
+      "id": 1,
+      "nome": "Struttura agentica — build-time, runtime, contratti, prompt, workflow",
+      "stato": "fatto",
+      "agenti": ["team-leader"],
+      "inizio": "T+0:10",
+      "fine": "T+0:35",
+      "nota": "La struttura agentica esiste prima del codice: e' insieme il deliverable e la specifica di tutto il resto."
+    },
+    {
+      "id": 2,
+      "nome": "Nucleo fattuale — contracts, clock, normalize, fact_extract, FactGuard, fixture ‖ test dai contratti ‖ corpus",
+      "stato": "fatto",
+      "agenti": ["dev-core", "test-engineer", "dev-corpus"],
+      "inizio": "T+0:35",
+      "fine": "T+1:15",
+      "nota": "Smoke di dev-core superato: civici e CAP non estratti, data riformattata accettata, importo troncato rifiutato."
+    },
+    {
+      "id": 3,
+      "nome": "Pipeline e API — triage, sicurezza con azioni, plain_rules, orchestratore, stato, main.py ‖ test",
+      "stato": "in_corso",
+      "agenti": ["dev-pipeline", "test-engineer"],
+      "inizio": "T+1:15",
+      "fine": null,
+      "nota": "Handoff ricevuto: app/backend/contracts.py fermo. I contratti si consumano, non si modificano."
+    },
+    {
+      "id": 4,
+      "nome": "Frontend — lista, lettura affiancata, badge, risposta guidata a 3 intenti, contatore autonomia",
+      "stato": "da_fare",
+      "agenti": ["dev-frontend"],
+      "inizio": null,
+      "fine": null,
+      "nota": ""
+    },
+    {
+      "id": 5,
+      "nome": "Presentazione — presentation/index.html con screenshot veri (in parallelo)",
+      "stato": "in_corso",
+      "agenti": ["dev-deck"],
+      "inizio": "T+1:00",
+      "fine": null,
+      "nota": "Non tocca codice: gira in parallelo con qualsiasi fase fino al freeze. Chiude a T+2:30, poi rifinitura."
+    },
+    {
+      "id": 6,
+      "nome": "P1 — pannello «Come ha ragionato», prova in replay a rete staccata, Gulpease, sintesi vocale",
+      "stato": "da_fare",
+      "agenti": ["dev-frontend"],
+      "inizio": null,
+      "fine": null,
+      "nota": "Si apre solo se il gate 2 e' passato. In quest'ordine: si taglia dal fondo."
+    },
+    {
+      "id": 7,
+      "nome": "Verifica e consegna — pytest finale, checklist a11y, percorso demo, audit bando ‖ docs/ e screenshot di backup",
+      "stato": "da_fare",
+      "agenti": ["qa-critic", "bando-compliance", "team-leader"],
+      "inizio": null,
+      "fine": null,
+      "nota": "Dopo il freeze. qa-critic e bando-compliance sono in sola lettura: scrivono solo il proprio report."
+    },
+    {
+      "id": 8,
+      "nome": "Rifinitura deck e due prove a voce col cronometro",
+      "stato": "da_fare",
+      "agenti": ["persona", "dev-deck"],
+      "inizio": null,
+      "fine": null,
+      "nota": "Se si sfora: si accorpano le slide 9 e 10, mai le 4-8."
+    }
+  ],
+  "gate_umani": [
+    {
+      "id": 1,
+      "quando": "T+1:15",
+      "domanda": "FactGuard rifiuta l'importo troncato e accetta la data riformattata?",
+      "esito": "si",
+      "deciso_da": "persona"
+    },
+    {
+      "id": 2,
+      "quando": "T+2:20",
+      "domanda": "Maria puo' leggere un'email e inviare una risposta, dal browser, senza toccare la tastiera?",
+      "esito": null,
+      "deciso_da": null
+    },
+    {
+      "id": 3,
+      "quando": "T+2:30",
+      "domanda": "Feature freeze: si consegna cosi'?",
+      "esito": null,
+      "deciso_da": null
+    }
+  ]
+}

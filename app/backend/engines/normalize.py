@@ -113,6 +113,18 @@ def normalizza_orario(testo: str) -> str | None:
     return f"{ora:02d}:{minuti:02d}"
 
 
+MESI_PER_NUMERO = {numero: nome for nome, numero in MESI.items()}
+
+
+def formatta_data_italiana(iso: str) -> str:
+    """"2026-10-14" => "14 ottobre 2026". Input non valido => invariato."""
+    try:
+        anno, mese, giorno = (int(p) for p in iso.split("-"))
+        return f"{giorno} {MESI_PER_NUMERO[mese]} {anno}"
+    except (ValueError, KeyError):
+        return iso
+
+
 def normalizza(tipo: str, testo: str, anno_default: int) -> str | None:
     if tipo == "data":
         return normalizza_data(testo, anno_default)

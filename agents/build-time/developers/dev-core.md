@@ -122,8 +122,8 @@ fiducia nel verificatore molto più di quanto un fatto non protetto la costruisc
   staticamente i sorgenti.
 - **Due modalità, non tre.** `off` (default) e `replay`. Non si aggiunge `live` «per completezza».
 - **Le fixture sono scritte a mano in fase di sviluppo, conformi agli schema.** Non sono
-  registrazioni di chiamate API. La parola «registrate» non compare in nessun file di questo
-  progetto: il progetto non ha mai usato una chiave.
+  registrazioni di chiamate API, e non vanno mai descritte come tali in nessun file consegnato:
+  il progetto non ha mai usato una chiave.
 - **Le fixture contengono solo `model`, `content`, `usage`.** Nessun header, nessun campo di
   autenticazione, nessun identificativo di richiesta.
 - **Il verificatore non corregge.** Rifiuta e spiega; la correzione è compito del semplificatore al
