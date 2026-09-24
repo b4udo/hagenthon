@@ -79,7 +79,7 @@ Su rosso l'orchestratore **non chiama nemmeno il compositore**: non viene propos
 |---|---|---|
 | `em-02` Comune di Torino | Burocratese pesante (*«ai sensi e per gli effetti degli artt. 33 e 40 del D.P.R. 28 dicembre 2000, n. 445»*) + allegato PDF | 🟢 verde · 6 fatti protetti · semplificazione accettata |
 | `em-04` INPS | Comunicazione **vera** che parla di soldi e assomiglia a una truffa: è il contrasto con `em-03` | 🟢 verde · importo `€ 1.247,83` protetto · è l'email dell'esperimento qui sotto |
-| `em-05` Luca | Il nipote, in rubrica | 🟢 verde · **non semplificata**: «una persona conosciuta non scrive in burocratese». L'originale è già italiano semplice (Gulpease 76.0) |
+| `em-05` Guada | Il nipote, in rubrica | 🟢 verde · **non semplificata**: «una persona conosciuta non scrive in burocratese». L'originale è già italiano semplice (Gulpease 76.0) |
 | `em-06` Newsletter | Pubblicità | 🟡 giallo · categoria `commerciale`, messa in secondo piano · **nessuna bozza**: a una pubblicità non si risponde |
 
 > `em-03` e `em-04` sono la coppia che porta il valore: **dicono entrambe *soldi* e *urgente*, ma una è falsa e una è vera.** È lì che si vede la differenza fra un assistente e un filtro antispam.
@@ -109,7 +109,7 @@ Il ciclo riprova **due volte** con il feedback del verificatore (`MAX_SIMPLIFY_R
 | | Oggi | Con Posta Chiara |
 |---|---|---|
 | L'email del medico | Riquadro bianco → chiude tutto | Tre pulsanti → rilegge → invia |
-| Quando risponde | **Domenica**, quando viene Luca | **4 minuti** |
+| Quando risponde | **Domenica**, quando viene Guada | **4 minuti** |
 | La truffa di Poste | Indistinguibile dall'INPS | 🔴 + il numero verde **ufficiale** |
 | Chi decide | Il nipote | Maria |
 

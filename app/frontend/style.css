@@ -2,44 +2,127 @@
 
    Ogni valore qui dentro discende da un vincolo della persona, non da un gusto:
 
-   - base 20px e interlinea 1.6   -> cataratta iniziale
+   - base 20px e interlinea 1.65  -> cataratta iniziale
    - contrasto >= 7:1 ovunque     -> cataratta iniziale (AAA, non AA)
-   - target >= 44px               -> tremore alla mano destra, artrosi
+   - target >= 48px               -> tremore alla mano destra, artrosi
    - colonna singola              -> tablet 10" appoggiato al tavolo
    - nessun hover necessario      -> niente puntatore su tablet
    - focus sempre visibile        -> navigazione da tastiera completa
+   - mai il colore da solo        -> ogni stato ha simbolo e parola
+
+   ★ Due scelte visive che vengono dalla cataratta, non dall'estetica:
+
+   1. La pagina non e' bianca. Una superficie bianca a tutto schermo diffonde
+      luce e abbassa il contrasto percepito proprio nell'occhio che ha gia'
+      il cristallino opaco. Il fondo e' un grigio tenue, le schede sono
+      bianche: il contenuto si stacca dal fondo invece di annegarci.
+
+   2. Le schede hanno bordo **e** ombra. L'ombra da sola e' il modo elegante
+      di separare due piani, ma chi ha ridotta sensibilita' al contrasto non
+      la vede: resta il bordo a fare il lavoro, e l'ombra ad ammorbidirlo.
 
    Niente CDN, niente build: il file si apre e funziona.
 */
 
+/* ── il carattere ──────────────────────────────────────────────────────────
+
+   Atkinson Hyperlegible, disegnato dal Braille Institute **per chi ha una
+   vista ridotta**: le lettere che di solito si confondono — I l 1, O 0, rn e
+   m — hanno forme deliberatamente diverse. Con una cataratta iniziale e'
+   esattamente la differenza che conta.
+
+   Ospitato nel repository, non su una CDN: il progetto dichiara di funzionare
+   a rete staccata, e un @import da fonts.googleapis.com renderebbe falsa
+   quella frase e farebbe comparire un ripiego proprio durante la demo.
+   26 KB in tutto. Licenza e ragioni per esteso in font/LICENSE.md.
+
+   `font-display: swap` e non `block`: meglio leggere subito col carattere di
+   sistema che fissare un riquadro vuoto. */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("font/atkinson-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("font/atkinson-700.woff2") format("woff2");
+}
+
 :root {
-  --inchiostro:        #14171c;  /* su bianco: 15.2:1 */
-  --inchiostro-tenue:  #3d444e;  /* su bianco:  9.1:1 — il grigio piu' chiaro ammesso */
-  --sfondo:            #ffffff;
-  --sfondo-tenue:      #f2f4f7;
-  --bordo:             #c8cdd6;
+  /* ── inchiostro e superfici ── */
+  --inchiostro:        #14171c;  /* su bianco 15.2:1 · sul fondo pagina 14.1:1 */
+  --inchiostro-tenue:  #3d444e;  /* su bianco  9.1:1 · sul fondo pagina  8.4:1 */
+  --sfondo:            #ffffff;  /* le schede */
+  --pagina:            #eaedf3;  /* il fondo: mai bianco, vedi nota in testa */
+  --sfondo-tenue:      #f1f3f7;
+  --bordo:             #d3d8e2;
+  --bordo-forte:       #aeb6c4;
 
-  --verde:        #0d6b2f;  /* 6.9:1 su bianco, 8.4:1 sul suo fondo tenue */
-  --verde-fondo:  #e6f4ea;
-  --giallo:       #7a4e00;  /* il testo e' marrone scuro: il giallo puro non arriva a 7:1 */
-  --giallo-fondo: #fdf3d9;
-  --rosso:        #a3121b;
-  --rosso-fondo:  #fdeaea;
+  /* ── semaforo: verdetti di sicurezza ── */
+  --verde:        #0a5e28;  /* 7.9:1 su bianco · 7.1:1 sul proprio fondo */
+  --verde-fondo:  #e8f5ec;
+  --verde-bordo:  #9ccfae;
+  --giallo:       #6f4600;  /* marrone scuro: il giallo puro non arriva a 7:1 */
+  --giallo-fondo: #fdf4dd;
+  --giallo-bordo: #dfb974;
+  --rosso:        #99101a;  /* 8.1:1 su bianco */
+  --rosso-fondo:  #fdebeb;
+  --rosso-bordo:  #e39a9a;
 
-  --accento:      #5b21b6;
-  --accento-fondo:#f3ecff;
+  /* ── accento ── */
+  --accento:       #5b21b6;  /* 8.9:1 su bianco */
+  --accento-scuro: #43156e;
+  --accento-fondo: #f4eeff;
+  --accento-bordo: #c3a3f2;
 
-  /* Stato della pratica — deliberatamente fuori dalla scala del semaforo. */
-  --blu:          #14507d;  /* 7.4:1 su bianco — «l'ha chiusa lei» */
-  --blu-fondo:    #e7f1fa;
-  --attesa:       #6b3a8f;  /* 7.6:1 su bianco — «sta aspettando qualcuno» */
-  --attesa-fondo: #f2e9fb;
+  /* ── stato della pratica — fuori dalla scala del semaforo ── */
+  --blu:          #14507d;  /* 7.4:1 — «l'ha chiusa lei» */
+  --blu-fondo:    #e8f2fa;
+  --blu-bordo:    #8fb9d8;
+  --attesa:       #69388d;  /* 8.2:1 su bianco · 7.1:1 sul proprio fondo */
+  --attesa-fondo: #f4ebfc;
+  --attesa-bordo: #bf9ada;
 
-  --raggio: 12px;
-  --tocco: 48px;           /* 44 e' il minimo; 48 lascia margine al tremore */
+  /* ── forma ── */
+  --raggio:       14px;
+  --raggio-picc:  10px;
+  --tocco:        48px;   /* 44 e' il minimo; 48 lascia margine al tremore */
+  --tocco-largo:  56px;   /* i pulsanti premuti piu' spesso */
+  --colonna:      780px;
+
+  /* Ombre appena percettibili: servono a separare i piani, non a decorare. */
+  --ombra-1: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 6px rgba(16, 24, 40, 0.05);
+  --ombra-2: 0 2px 4px rgba(16, 24, 40, 0.05), 0 8px 20px rgba(16, 24, 40, 0.08);
+  --ombra-su: 0 4px 10px rgba(16, 24, 40, 0.08), 0 14px 32px rgba(16, 24, 40, 0.10);
 }
 
 * { box-sizing: border-box; }
+
+/* ─────────── icone ───────────
+
+   SVG a tratto, mai emoji: le emoji cambiano forma da un sistema all'altro,
+   su Windows molte diventano glifi piatti, non ereditano il colore del testo
+   e non si ingrandiscono con precisione. Queste sono dimensionate in `em`,
+   quindi crescono insieme al testo — anche quando l'utente ingrandisce la
+   pagina — e prendono il colore del pulsante che le contiene.
+
+   Ogni icona ha `aria-hidden`: accanto c'e' sempre la parola. */
+
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.ico {
+  inline-size: 1.15em; block-size: 1.15em; flex: none;
+  fill: none; stroke: currentColor;
+  stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round;
+  vertical-align: -0.18em;
+}
+.ico-piena { fill: currentColor; stroke: none; }
 
 /* `hidden` deve vincere su qualunque `display` di classe.
    Senza questa riga un elemento con `display: flex` nel suo selettore resta
@@ -53,12 +136,20 @@ html { font-size: 20px; }
 
 body {
   margin: 0;
-  background: var(--sfondo-tenue);
+  background: var(--pagina);
   color: var(--inchiostro);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.6;
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* ★ WCAG 2.2 AAA 2.4.12 «Focus Not Obscured».
+   La barra della voce e' fissata in basso: tabulando verso il fondo pagina il
+   fuoco finirebbe **dietro** la barra, e il criterio AAA vuole che resti
+   interamente visibile. `scroll-padding-bottom` dice al browser di fermare lo
+   scorrimento piu' in alto, cosi' l'elemento a fuoco non ci va mai sotto. */
+html:has(body.voce-attiva) { scroll-padding-bottom: 124px; }
 
 /* ─────────── scorciatoia per la tastiera ─────────── */
 
@@ -67,51 +158,75 @@ body {
   left: -9999px;
   background: var(--accento);
   color: #fff;
-  padding: 12px 20px;
+  padding: 14px 22px;
+  border-radius: 0 0 var(--raggio-picc) 0;
+  font-weight: 700;
   z-index: 100;
 }
-.salta-al-contenuto:focus { left: 8px; top: 8px; }
+.salta-al-contenuto:focus { left: 0; top: 0; }
 
 /* ─────────── testata ─────────── */
 
 .testata {
   background: var(--sfondo);
-  border-bottom: 3px solid var(--accento);
+  border-bottom: 1px solid var(--bordo);
+  box-shadow: var(--ombra-1);
+  /* Filo di marca: l'unico gradiente della pagina, spesso quanto basta a
+     leggersi come deliberato e non come un artefatto. */
+  border-top: 5px solid var(--accento);
 }
-.testata-interno { max-width: 760px; margin: 0 auto; padding: 20px 20px 16px; }
-.logo { margin: 0; font-size: 1.7rem; letter-spacing: -0.01em; }
-.sottotitolo { margin: 2px 0 10px; color: var(--inchiostro-tenue); font-size: 0.95rem; }
-.autonomia {
+.testata-interno {
+  max-width: var(--colonna);
+  margin: 0 auto;
+  padding: 22px 22px 20px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.logo {
   margin: 0;
-  display: inline-block;
-  background: var(--accento-fondo);
-  color: #43156e;
-  border: 2px solid #c9aef5;
-  border-radius: 999px;
-  padding: 6px 16px;
-  font-size: 0.95rem;
+  font-size: 1.75rem; font-weight: 800; letter-spacing: -0.025em;
+  line-height: 1.1;
 }
+.sottotitolo {
+  margin: 3px 0 0;
+  color: var(--inchiostro-tenue); font-size: 0.92rem;
+}
+/* Il contatore va in fondo alla riga e ci resta: e' il numero che cresce, e
+   Maria deve poterlo ritrovare sempre nello stesso punto. */
+.autonomia {
+  margin: 0 0 0 auto;
+  display: inline-flex; align-items: baseline; gap: 8px;
+  background: var(--accento-fondo);
+  color: var(--accento-scuro);
+  border: 2px solid var(--accento-bordo);
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: 0.92rem; font-weight: 600;
+}
+.autonomia strong { font-size: 1.3rem; font-weight: 800; }
 
 /* ─────────── impianto ─────────── */
 
-.contenuto { max-width: 760px; margin: 0 auto; padding: 24px 20px 60px; }
-h2 { font-size: 1.5rem; margin: 0 0 6px; }
-h3 { font-size: 1.15rem; margin: 0 0 12px; }
-h4 { font-size: 1.05rem; margin: 0 0 6px; }
-.aiuto { color: var(--inchiostro-tenue); font-size: 0.95rem; margin: 0 0 16px; }
+.contenuto { max-width: var(--colonna); margin: 0 auto; padding: 28px 22px 72px; }
+
+h2 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 6px; }
+h3 { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 12px; }
+h4 { font-size: 1.05rem; font-weight: 700; margin: 0 0 6px; }
+
+.aiuto { color: var(--inchiostro-tenue); font-size: 0.95rem; margin: 0 0 18px; }
 
 .scheda {
   background: var(--sfondo);
-  border: 2px solid var(--bordo);
+  border: 1px solid var(--bordo);
   border-radius: var(--raggio);
-  padding: 20px;
+  box-shadow: var(--ombra-1);
+  padding: 24px;
   margin-bottom: 18px;
 }
 
 /* ─────────── elenco email ─────────── */
 
 .elenco { list-style: none; padding: 0; margin: 0; }
-.caricamento { color: var(--inchiostro-tenue); }
+.caricamento { color: var(--inchiostro-tenue); padding: 8px 2px; }
 
 .voce {
   width: 100%;
@@ -119,31 +234,54 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
   display: block;
   text-align: left;
   background: var(--sfondo);
-  border: 2px solid var(--bordo);
+  border: 1px solid var(--bordo);
+  border-left: 6px solid var(--bordo-forte);
   border-radius: var(--raggio);
-  padding: 16px 18px;
-  margin-bottom: 12px;
+  box-shadow: var(--ombra-1);
+  padding: 18px 20px;
+  margin-bottom: 14px;
   font: inherit;
   color: inherit;
   cursor: pointer;
 }
-.voce:hover { border-color: var(--accento); }
-.voce-secondo-piano { opacity: 0.75; }
+/* Il puntatore non serve, ma se c'e' deve rispondere: su tablet non cambia
+   nulla, su un portatile conferma che la riga e' premibile. */
+.voce:hover { border-color: var(--accento-bordo); box-shadow: var(--ombra-2); }
+.voce:hover { border-left-color: var(--accento); }
+.voce-secondo-piano { opacity: 0.72; }
 
-.voce-alto { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
-.voce-mittente { font-weight: 700; }
-.voce-oggetto { display: block; color: var(--inchiostro-tenue); }
-.voce-data { margin-left: auto; color: var(--inchiostro-tenue); font-size: 0.85rem; }
-
-.pallino {
-  display: inline-flex; align-items: center; gap: 6px;
-  border-radius: 999px; padding: 3px 12px;
-  font-size: 0.8rem; font-weight: 700; border: 2px solid;
+.voce-alto { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.voce-mittente { font-weight: 800; font-size: 1.05rem; letter-spacing: -0.01em; }
+.voce-oggetto { display: block; color: var(--inchiostro-tenue); line-height: 1.5; }
+.voce-data {
+  margin-left: auto; color: var(--inchiostro-tenue);
+  font-size: 0.82rem; font-variant-numeric: tabular-nums; white-space: nowrap;
 }
-.pallino-verde  { background: var(--verde-fondo);  color: var(--verde);  border-color: var(--verde); }
-.pallino-giallo { background: var(--giallo-fondo); color: var(--giallo); border-color: var(--giallo); }
-.pallino-rosso  { background: var(--rosso-fondo);  color: var(--rosso);  border-color: var(--rosso); }
+
+/* Pastiglie di stato: sempre pallino + parola, mai il solo colore.
+   Il pallino e' disegnato dal CSS e non e' un carattere: un glifo tipografico
+   cambia peso e allineamento da un carattere all'altro, un cerchio no. */
+.pallino {
+  display: inline-flex; align-items: center; gap: 8px;
+  border-radius: 999px; padding: 4px 14px;
+  font-size: 0.8rem; font-weight: 800; letter-spacing: 0.01em;
+  border: 2px solid;
+}
+.pallino::before {
+  content: ""; flex: none;
+  width: 0.62em; height: 0.62em; border-radius: 999px;
+  background: currentColor;
+}
+.pallino-verde  { background: var(--verde-fondo);  color: var(--verde);  border-color: var(--verde-bordo); }
+.pallino-giallo { background: var(--giallo-fondo); color: var(--giallo); border-color: var(--giallo-bordo); }
+.pallino-rosso  { background: var(--rosso-fondo);  color: var(--rosso);  border-color: var(--rosso-bordo); }
 .pallino-attesa { background: var(--sfondo-tenue); color: var(--inchiostro-tenue); border-color: var(--bordo); }
+
+/* Il filo colorato a sinistra ripete il verdetto sulla riga intera: si vede
+   con la coda dell'occhio, scorrendo, senza dover leggere la pastiglia. */
+.voce:has(.pallino-verde)  { border-left-color: var(--verde); }
+.voce:has(.pallino-giallo) { border-left-color: var(--giallo); }
+.voce:has(.pallino-rosso)  { border-left-color: var(--rosso); }
 
 /* ─────────── cartelle ───────────
 
@@ -153,30 +291,37 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
    cui si trova e' marcata con aria-current, non solo col colore. */
 
 .cartelle {
-  display: flex; flex-wrap: wrap; gap: 10px;
-  margin-bottom: 22px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 26px;
+  padding: 7px;
+  background: var(--sfondo);
+  border: 1px solid var(--bordo);
+  border-radius: calc(var(--raggio) + 5px);
+  box-shadow: var(--ombra-1);
 }
 .cartella {
   min-height: var(--tocco);
   flex: 1 1 auto;
-  background: var(--sfondo);
-  color: var(--inchiostro);
-  border: 2px solid var(--bordo);
-  border-radius: var(--raggio);
-  padding: 10px 18px;
+  background: transparent;
+  color: var(--inchiostro-tenue);
+  border: 2px solid transparent;
+  border-radius: var(--raggio-picc);
+  padding: 10px 16px;
   font: inherit; font-weight: 700;
   cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
 }
+.cartella:hover { background: var(--sfondo-tenue); color: var(--inchiostro); }
 .cartella[aria-current="page"] {
   background: var(--accento); color: #fff; border-color: var(--accento);
+  box-shadow: var(--ombra-2);
 }
 .conteggio {
   background: var(--sfondo-tenue); color: var(--inchiostro-tenue);
-  border-radius: 999px; padding: 1px 10px;
-  font-size: 0.8rem;
+  border-radius: 999px; padding: 2px 11px;
+  font-size: 0.78rem; font-weight: 800; font-variant-numeric: tabular-nums;
 }
-.cartella[aria-current="page"] .conteggio { background: #ffffff; color: #43156e; }
+.cartella[aria-current="page"] .conteggio { background: rgba(255,255,255,0.92); color: var(--accento-scuro); }
 .conteggio:empty { display: none; }
 
 /* ─────────── stato della pratica ───────────
@@ -188,176 +333,248 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
    d'occhio, che e' esattamente il compito che stiamo cercando di togliere.
 
      blu   = l'ha chiusa lei          -> Gia' risposto
-     viola = sta aspettando qualcuno  -> Luca sta verificando
+     viola = sta aspettando qualcuno  -> Guada sta verificando
 
    Nessuno dei due e' affidato al solo colore: c'e' il simbolo e c'e' la
    parola, e lo stato e' anche nel nome accessibile della riga. */
 
 .risposto, .in-verifica {
-  display: inline-flex; align-items: center; gap: 6px;
-  border-radius: 999px; padding: 2px 12px;
-  font-size: 0.78rem; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 7px;
+  border-radius: 999px; padding: 4px 14px;
+  font-size: 0.8rem; font-weight: 800;
   border: 2px solid;
 }
-.risposto    { background: var(--blu-fondo);   color: var(--blu);    border-color: var(--blu); }
-.in-verifica { background: var(--attesa-fondo); color: var(--attesa); border-color: var(--attesa); }
+.risposto    { background: var(--blu-fondo);    color: var(--blu);    border-color: var(--blu-bordo); }
+.in-verifica { background: var(--attesa-fondo); color: var(--attesa); border-color: var(--attesa-bordo); }
 
 .stato-risposta, .stato-verifica {
+  /* `gap`: in flex l'icona e il testo sono due item distinti e lo spazio
+     bianco del sorgente non li separa piu'. */
+  display: flex; align-items: center; gap: 11px;
   border-radius: var(--raggio);
-  padding: 12px 16px;
+  padding: 15px 20px;
   font-weight: 700;
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   border: 2px solid;
 }
-.stato-risposta { background: var(--blu-fondo);    color: var(--blu);    border-color: var(--blu); }
-.stato-verifica { background: var(--attesa-fondo); color: var(--attesa); border-color: var(--attesa); }
+.stato-risposta { background: var(--blu-fondo);    color: var(--blu);    border-color: var(--blu-bordo); }
+.stato-verifica { background: var(--attesa-fondo); color: var(--attesa); border-color: var(--attesa-bordo); }
 
-.voce-verifica { border-left: 6px solid var(--attesa); }
-.azioni-cartella { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.voce-risposta { border-left-color: var(--blu); }
+.voce-verifica { border-left-color: var(--attesa); }
 
-/* ─────────── allegare un documento o una foto ───────────
+/* ★ Il rosso vince su ogni stato della pratica, anche sul filo laterale.
+   E' l'ultima riga di difesa: se tutto il resto svanisce, quel filo rosso
+   resta a dire che quella riga non va toccata. */
+.voce-rossa { border-left-color: var(--rosso) !important; }
 
-   Le due strade hanno lo stesso aspetto e la stessa dimensione: quale sia
-   piu' comoda dipende dal momento della persona, non da una nostra
-   preferenza. L'<input type=file> nativo e' un target minuscolo con
-   un'etichetta che non si puo' riscrivere, quindi lo si nasconde alla vista
-   ma non alla tastiera, e il <label> fa da pulsante grande. */
+.azioni-cartella { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
 
-.allega { margin-top: 18px; }
-.allega h5 { margin: 0 0 10px; font-size: 1rem; }
-.allega-scelte { display: flex; flex-wrap: wrap; gap: 12px; }
+/* ─────────── semaforo ───────────
 
-/* Fondo tenue e bordo pieno: su una scheda bianca un pulsante bianco con
-   bordo grigio chiaro non si legge come un pulsante, si legge come testo. */
-.bottone-allega {
-  background: var(--accento-fondo); color: #43156e;
-  border-color: #a97ef0;
-  min-height: 56px;
-  display: inline-flex; align-items: center; gap: 10px;
+   E' il primo verdetto che Maria legge, e deve pesare piu' di tutto il resto
+   della schermata. Barra di colore piena in alto, pastiglia grande, messaggio
+   in corpo maggiore. Il cerchio a sinistra del messaggio e' decorativo: lo
+   stato e' gia' scritto a parole, come ovunque. */
+
+.semaforo {
+  border: 2px solid;
+  border-radius: var(--raggio);
+  box-shadow: var(--ombra-2);
+  padding: 22px 24px;
+  margin-bottom: 22px;
   position: relative;
-  cursor: pointer;
+  overflow: hidden;
 }
-/* Non `display:none`: sparirebbe anche dal percorso di tabulazione. */
-.bottone-allega input[type="file"] {
-  position: absolute; width: 1px; height: 1px;
-  opacity: 0; overflow: hidden;
+.semaforo::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 7px;
+  background: currentColor;
 }
-/* Il fuoco sta sull'input nascosto: l'anello va disegnato sul label. */
-.bottone-allega:focus-within { outline: 4px solid var(--accento); outline-offset: 3px; }
+.semaforo-verde  { background: var(--verde-fondo);  border-color: var(--verde-bordo);  color: var(--verde); }
+.semaforo-giallo { background: var(--giallo-fondo); border-color: var(--giallo-bordo); color: var(--giallo); }
+.semaforo-rosso  { background: var(--rosso-fondo);  border-color: var(--rosso-bordo);  color: var(--rosso); }
 
-/* La vista della fotocamera. Anteprima grande: chi ha la cataratta deve
-   potersi accorgere *prima* di scattare che il foglio è storto o tagliato. */
-.fotocamera {
-  margin-top: 14px; padding: 14px;
-  background: #101318; border: 2px solid var(--accento);
-  border-radius: var(--raggio);
+.semaforo-messaggio {
+  display: flex; align-items: center; gap: 15px;
+  margin: 8px 0 12px;
+  font-size: 1.35rem; font-weight: 800; letter-spacing: -0.015em; line-height: 1.3;
 }
-.fotocamera video {
-  display: block; width: 100%; max-height: 46vh;
-  background: #000; border-radius: 10px;
+.semaforo-messaggio::before {
+  content: ""; flex: none;
+  width: 26px; height: 26px; border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.75);
 }
-.fotocamera .aiuto { color: #e8eaf0; margin: 12px 0; }
-.fotocamera-comandi { display: flex; flex-wrap: wrap; gap: 12px; }
-.bottone-scatta {
-  background: var(--rosso); color: #fff;
-  min-height: 56px; min-width: 180px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-}
-
-.allegato-scelto {
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  margin-top: 14px; padding: 12px 16px;
-  background: var(--sfondo-tenue); border: 2px solid var(--bordo);
-  border-radius: var(--raggio);
-}
-.anteprima-foto {
-  width: 84px; height: 84px; object-fit: cover;
-  border-radius: 10px; border: 2px solid var(--bordo);
-}
-.allegato-testo { flex: 1 1 200px; min-width: 0; }
-.allegato-nome {
-  display: block; font-weight: 700;
-  overflow-wrap: anywhere;      /* un nome lungo non deve allargare la scheda */
-}
-.allegato-peso { display: block; color: var(--inchiostro-tenue); font-size: 0.9rem; }
-.allegato-errore {
-  margin: 12px 0 0; padding: 12px 16px; font-weight: 700;
-  background: var(--rosso-fondo); border: 2px solid var(--rosso);
-  color: var(--rosso); border-radius: var(--raggio);
-}
-
-/* ─────────── chiedere aiuto ───────────
-
-   Sempre presente, in ogni email, qualunque sia il semaforo. E' la via
-   d'uscita umana: deve essere trovabile senza cercarla, e non deve sembrare
-   una resa. Per questo ha il colore dell'accento e non quello di un avviso. */
-
-.scheda-aiuto { border-color: #a97ef0; background: var(--accento-fondo); }
-.bottone-aiuto {
-  background: var(--accento); color: #fff;
-  min-height: 56px;
-  display: inline-flex; align-items: center; gap: 10px;
-  margin-top: 6px;
-}
-.conferma-aiuto {
-  margin: 14px 0 0;
-  background: var(--verde-fondo); border: 2px solid var(--verde);
-  color: var(--verde); border-radius: var(--raggio);
-  padding: 12px 16px; font-weight: 700;
-}
-
-/* La voce gia' risposta resta leggibile: si distingue, non si spegne. */
-.voce-risposta { border-left: 6px solid var(--blu); }
-
-/* ─────────── posta inviata ─────────── */
-
-.voce-inviata .voce-mittente::before { content: "A: "; font-weight: 400; color: var(--inchiostro-tenue); }
-.anteprima {
-  display: block; margin-top: 6px;
-  color: var(--inchiostro-tenue); font-size: 0.9rem;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.vuota {
-  background: var(--sfondo); border: 2px dashed var(--bordo);
-  border-radius: var(--raggio); padding: 28px 20px;
-  text-align: center; color: var(--inchiostro-tenue);
-}
-
-/* ─────────── semaforo ─────────── */
-
-.semaforo { border: 3px solid; border-radius: var(--raggio); padding: 20px; margin-bottom: 18px; }
-.semaforo-verde  { background: var(--verde-fondo);  border-color: var(--verde); }
-.semaforo-giallo { background: var(--giallo-fondo); border-color: var(--giallo); }
-.semaforo-rosso  { background: var(--rosso-fondo);  border-color: var(--rosso); }
-
-.semaforo-messaggio { margin: 0 0 10px; font-size: 1.25rem; font-weight: 700; }
 .semaforo-verde  .semaforo-messaggio { color: var(--verde); }
 .semaforo-giallo .semaforo-messaggio { color: var(--giallo); }
 .semaforo-rosso  .semaforo-messaggio { color: var(--rosso); }
 
-.semaforo-segnali { margin: 0 0 16px; padding-left: 22px; }
-.semaforo-segnali li { margin-bottom: 4px; }
+.semaforo-segnali {
+  margin: 0 0 18px; padding: 0; list-style: none;
+  color: var(--inchiostro);
+}
+.semaforo-segnali li {
+  position: relative; padding-left: 26px; margin-bottom: 7px;
+  font-size: 0.96rem; line-height: 1.55;
+}
+.semaforo-segnali li::before {
+  content: ""; position: absolute; left: 6px; top: 0.62em;
+  width: 8px; height: 8px; border-radius: 999px; background: currentColor;
+}
+.semaforo-verde  .semaforo-segnali li::before { background: var(--verde); }
+.semaforo-giallo .semaforo-segnali li::before { background: var(--giallo); }
+.semaforo-rosso  .semaforo-segnali li::before { background: var(--rosso); }
+.semaforo-segnali:empty { display: none; }
 
 /* ─────────── bottoni ─────────── */
 
 .bottone {
   min-height: var(--tocco);
-  border-radius: var(--raggio);
-  padding: 12px 22px;
+  border-radius: var(--raggio-picc);
+  padding: 13px 24px;
   font: inherit;
   font-weight: 700;
+  letter-spacing: -0.005em;
   cursor: pointer;
   border: 2px solid transparent;
+  box-shadow: var(--ombra-1);
 }
-.bottone-azione     { background: var(--accento); color: #fff; width: 100%; }
-.bottone-invia      { background: var(--verde); color: #fff; }
-.bottone-secondario { background: var(--sfondo); color: var(--inchiostro); border-color: var(--bordo); }
-.bottone-indietro   { background: none; border: none; color: var(--accento);
-                      padding: 12px 0; text-decoration: underline; }
-.bottone-demo       { background: #7a4e00; color: #fff; }
+/* Il pulsante si abbassa alla pressione: una conferma fisica che il tocco e'
+   arrivato, utile quando il tremore fa dubitare di aver premuto davvero. */
+.bottone:active { transform: translateY(1px); box-shadow: none; }
+
+.bottone-azione {
+  background: var(--accento); color: #fff; width: 100%;
+  min-height: var(--tocco-largo); font-size: 1.05rem;
+  box-shadow: var(--ombra-2);
+}
+.bottone-invia {
+  background: var(--verde); color: #fff;
+  min-height: var(--tocco-largo); font-size: 1.05rem;
+  box-shadow: var(--ombra-2);
+}
+.bottone-secondario {
+  background: var(--sfondo); color: var(--inchiostro); border-color: var(--bordo-forte);
+}
+.bottone-secondario:hover { border-color: var(--inchiostro-tenue); background: var(--sfondo-tenue); }
+.bottone-indietro {
+  background: none; border: none; box-shadow: none;
+  color: var(--accento); font-weight: 700;
+  padding: 12px 4px 12px 0; margin-bottom: 4px;
+  text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px;
+}
+.bottone-indietro:hover { color: var(--accento-scuro); }
+.bottone-demo { background: #6f4600; color: #fff; }
 
 /* Il focus e' sempre visibile e non dipende dal puntatore. */
-:focus-visible { outline: 4px solid var(--accento); outline-offset: 3px; }
+:focus-visible { outline: 4px solid var(--accento); outline-offset: 3px; border-radius: var(--raggio-picc); }
+
+/* ─────────── riassunto e testo ───────────
+
+   «In breve» e' cio' che Maria legge per primo, e in molti casi l'unica cosa
+   che legge. Percio' non e' una scheda come le altre: fondo dell'accento,
+   filo spesso a sinistra, risposte in corpo maggiore del testo normale. */
+
+#scheda-riassunto {
+  background: var(--accento-fondo);
+  border-color: var(--accento-bordo);
+  border-left: 7px solid var(--accento);
+  box-shadow: var(--ombra-2);
+}
+#scheda-riassunto h3 { color: var(--accento-scuro); }
+
+.riassunto { margin: 0; }
+.riassunto dt {
+  font-weight: 800; color: var(--accento-scuro); font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.09em; margin-top: 18px;
+}
+.riassunto dt:first-child { margin-top: 0; }
+.riassunto dd { margin: 3px 0 0; font-size: 1.15rem; line-height: 1.5; font-weight: 600; }
+
+.oggetto { margin: 4px 0 4px; font-size: 1.5rem; letter-spacing: -0.02em; line-height: 1.25; }
+.mittente { margin: 0 0 20px; color: var(--inchiostro-tenue); font-size: 0.95rem; }
+
+/* Misura di riga: oltre i ~65 caratteri l'occhio fatica a ritrovare l'inizio
+   della riga successiva, e con una vista ridotta il salto sbagliato costa la
+   rilettura dell'intero paragrafo. `min()` la tiene fluida sotto zoom. */
+.testo { white-space: pre-wrap; margin-bottom: 18px; line-height: 1.7; max-inline-size: min(100%, 65ch); }
+.testo-originale {
+  background: var(--sfondo-tenue);
+  border-left: 6px solid var(--bordo-forte);
+  padding: 18px 20px;
+  border-radius: 0 var(--raggio-picc) var(--raggio-picc) 0;
+  margin-top: 16px;
+  line-height: 1.7;
+}
+.leggibilita {
+  color: var(--inchiostro-tenue); font-size: 0.85rem; margin: 0 0 16px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--bordo);
+}
+
+.scheda-avviso {
+  border-color: var(--giallo-bordo); background: var(--giallo-fondo);
+  border-left: 7px solid var(--giallo);
+}
+.scheda-avviso h3 { color: var(--giallo); display: flex; align-items: center; gap: 11px; }
+.scheda-avviso ul { margin: 12px 0 0; padding-left: 24px; }
+.scheda-avviso li { margin-bottom: 6px; }
+
+/* ─────────── allegati ricevuti ─────────── */
+
+.allegati { list-style: none; padding: 0; margin: 0; }
+.allegati li {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 0; border-top: 1px solid var(--bordo);
+}
+.allegati li:first-child { border-top: none; padding-top: 0; }
+.allegati .nome { font-weight: 700; flex: 1 1 200px; }
+
+/* ─────────── risposta guidata ───────────
+
+   E' il punto in cui Maria oggi si ferma, quindi e' la scheda che deve
+   sembrare piu' invitante di tutte. */
+
+.scheda-risposta { border-color: var(--accento-bordo); border-top: 5px solid var(--accento); }
+
+.intenti { display: flex; flex-direction: column; gap: 12px; }
+.intento {
+  min-height: var(--tocco-largo);
+  text-align: left;
+  background: var(--accento-fondo);
+  border: 2px solid var(--accento-bordo);
+  border-radius: var(--raggio-picc);
+  box-shadow: var(--ombra-1);
+  padding: 17px 22px;
+  font: inherit; font-weight: 700; font-size: 1.05rem;
+  color: var(--accento-scuro); cursor: pointer;
+}
+.intento:hover { border-color: var(--accento); box-shadow: var(--ombra-2); }
+.intento[aria-pressed="true"] {
+  background: var(--accento); color: #fff; border-color: var(--accento);
+  box-shadow: var(--ombra-2);
+}
+.intento:active { transform: translateY(1px); }
+
+.bozza { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--bordo); }
+textarea {
+  width: 100%; font: inherit; line-height: 1.7;
+  border: 2px solid var(--bordo-forte); border-radius: var(--raggio-picc);
+  padding: 18px; resize: vertical;
+  color: var(--inchiostro); background: var(--sfondo);
+  box-shadow: inset 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+textarea:focus { border-color: var(--accento); }
+
+.azioni-bozza {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--bordo);
+}
+.conferma-invio {
+  margin-top: 18px; padding: 15px 20px;
+  background: var(--verde-fondo); border: 2px solid var(--verde-bordo);
+  border-radius: var(--raggio-picc);
+  color: var(--verde); font-weight: 800; font-size: 1.05rem;
+}
 
 /* ─────────── voce ───────────
 
@@ -370,23 +587,28 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
    piu' spesso, e il tremore peggiora quando la mano e' gia' stanca. */
 
 .bottone-voce, .bottone-microfono {
-  min-height: 56px;
-  display: inline-flex; align-items: center; gap: 10px;
-  margin-top: 14px;
+  min-height: var(--tocco-largo);
+  display: inline-flex; align-items: center; gap: 11px;
+  margin-top: 16px;
 }
-.bottone-voce      { background: var(--accento-fondo); color: #43156e; border-color: #a97ef0; }
+.bottone-voce {
+  background: var(--sfondo); color: var(--accento-scuro); border-color: var(--accento-bordo);
+}
+.bottone-voce:hover { background: var(--accento-fondo); border-color: var(--accento); }
 .bottone-microfono { background: var(--accento); color: #fff; }
 
 /* Mentre parla o ascolta, il pulsante lo dice da solo: chi non sente bene si
    accorge dallo stato del pulsante, non dall'audio. */
-.bottone-voce[aria-pressed="true"] { background: var(--accento); color: #fff; border-color: var(--accento); }
+.bottone-voce[aria-pressed="true"] {
+  background: var(--accento); color: #fff; border-color: var(--accento);
+}
 .bottone-microfono[aria-pressed="true"] { background: var(--rosso); border-color: var(--rosso); }
 
 .voce-strumenti { display: flex; flex-wrap: wrap; gap: 12px; }
 
 .voce-stato {
-  margin: 12px 0 0;
-  min-height: 1.6em;           /* riservato: il testo che appare non sposta i pulsanti sotto */
+  margin: 14px 0 0;
+  min-height: 1.65em;          /* riservato: il testo che appare non sposta i pulsanti sotto */
   font-weight: 700;
   color: var(--accento);
 }
@@ -395,114 +617,217 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
 
 /* Avviso sulla dettatura: compare una volta sola, prima del primo uso. */
 .voce-avviso {
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   background: var(--giallo-fondo);
-  border: 2px solid var(--giallo);
+  border: 2px solid var(--giallo-bordo);
+  border-left: 7px solid var(--giallo);
   color: var(--giallo);
-  border-radius: var(--raggio);
-  padding: 14px 16px;
+  border-radius: var(--raggio-picc);
+  padding: 17px 20px;
   font-size: 0.95rem;
 }
-.voce-avviso p { margin: 0 0 12px; }
+.voce-avviso p { margin: 0 0 14px; line-height: 1.6; }
 .voce-avviso .azioni { display: flex; flex-wrap: wrap; gap: 10px; }
 
 /* La barra per fermare la lettura resta a portata ovunque si sia scorso. */
 .barra-voce {
   position: fixed; left: 0; right: 0; bottom: 0;
   background: var(--sfondo);
-  border-top: 3px solid var(--accento);
-  padding: 12px 20px;
+  border-top: 2px solid var(--accento);
+  box-shadow: 0 -4px 20px rgba(16, 24, 40, 0.12);
+  padding: 14px 20px;
   display: flex; justify-content: center;
   z-index: 50;
 }
-.bottone-ferma { background: var(--rosso); color: #fff; min-width: 260px; }
+.bottone-ferma {
+  background: var(--rosso); color: #fff;
+  min-width: 280px; min-height: var(--tocco-largo);
+  display: inline-flex; align-items: center; justify-content: center; gap: 11px;
+}
 
 /* Con la barra aperta, l'ultimo pezzo di pagina resta raggiungibile. */
-body.voce-attiva .contenuto { padding-bottom: 96px; }
+body.voce-attiva .contenuto { padding-bottom: 110px; }
 
 @media (prefers-reduced-motion: no-preference) {
   .bottone-microfono[aria-pressed="true"] { animation: pulsa 1.4s ease-in-out infinite; }
+  .voce, .bottone, .intento, .cartella { transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
 }
 @keyframes pulsa {
-  50% { box-shadow: 0 0 0 8px rgba(163, 18, 27, 0.18); }
+  50% { box-shadow: 0 0 0 9px rgba(153, 16, 26, 0.18); }
 }
 
-/* ─────────── riassunto e testo ─────────── */
+/* ─────────── allegare un documento o una foto ───────────
 
-.riassunto { margin: 0; }
-.riassunto dt { font-weight: 700; color: var(--inchiostro-tenue); font-size: 0.9rem;
-                text-transform: uppercase; letter-spacing: 0.04em; margin-top: 14px; }
-.riassunto dt:first-child { margin-top: 0; }
-.riassunto dd { margin: 2px 0 0; font-size: 1.1rem; }
+   Le due strade hanno lo stesso aspetto e la stessa dimensione: quale sia
+   piu' comoda dipende dal momento della persona, non da una nostra
+   preferenza. L'<input type=file> nativo e' un target minuscolo con
+   un'etichetta che non si puo' riscrivere, quindi lo si nasconde alla vista
+   ma non alla tastiera, e il <label> fa da pulsante grande. */
 
-.oggetto { margin: 6px 0 2px; }
-.mittente { margin: 0 0 18px; color: var(--inchiostro-tenue); }
-
-.testo { white-space: pre-wrap; margin-bottom: 16px; }
-.testo-originale {
-  background: var(--sfondo-tenue);
-  border-left: 5px solid var(--bordo);
-  padding: 16px;
-  border-radius: 0 var(--raggio) var(--raggio) 0;
-  margin-top: 14px;
+.allega {
+  margin-top: 22px; padding-top: 20px;
+  border-top: 1px solid var(--bordo);
 }
-.leggibilita { color: var(--inchiostro-tenue); font-size: 0.9rem; margin: 0 0 12px; }
+.allega h5 { margin: 0 0 12px; font-size: 1.05rem; font-weight: 700; }
+.allega-scelte { display: flex; flex-wrap: wrap; gap: 12px; }
 
-.scheda-avviso { border-color: var(--giallo); background: var(--giallo-fondo); }
-.scheda-avviso h3 { color: var(--giallo); }
-.scheda-avviso ul { margin: 10px 0 0; padding-left: 22px; }
-
-/* ─────────── allegati ─────────── */
-
-.allegati { list-style: none; padding: 0; margin: 0; }
-.allegati li {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  padding: 12px 0; border-top: 1px solid var(--bordo);
+/* Fondo tenue e bordo pieno: su una scheda bianca un pulsante bianco con
+   bordo grigio chiaro non si legge come un pulsante, si legge come testo. */
+.bottone-allega {
+  background: var(--accento-fondo); color: var(--accento-scuro);
+  border-color: var(--accento-bordo);
+  min-height: var(--tocco-largo);
+  display: inline-flex; align-items: center; gap: 11px;
+  position: relative;
+  cursor: pointer;
 }
-.allegati li:first-child { border-top: none; }
-.allegati .nome { font-weight: 700; }
+.bottone-allega:hover { border-color: var(--accento); box-shadow: var(--ombra-2); }
+/* Non `display:none`: sparirebbe anche dal percorso di tabulazione. */
+.bottone-allega input[type="file"] {
+  position: absolute; width: 1px; height: 1px;
+  opacity: 0; overflow: hidden;
+}
+/* Il fuoco sta sull'input nascosto: l'anello va disegnato sul label. */
+.bottone-allega:focus-within { outline: 4px solid var(--accento); outline-offset: 3px; }
 
-/* ─────────── risposta guidata ─────────── */
-
-.scheda-risposta { border-color: var(--accento); }
-.intenti { display: flex; flex-direction: column; gap: 12px; }
-.intento {
-  min-height: var(--tocco);
-  text-align: left;
-  background: var(--accento-fondo);
-  border: 2px solid #c9aef5;
+/* La vista della fotocamera. Anteprima grande: chi ha la cataratta deve
+   potersi accorgere *prima* di scattare che il foglio e' storto o tagliato. */
+.fotocamera {
+  margin-top: 16px; padding: 16px;
+  background: #0f1216; border: 2px solid var(--accento);
   border-radius: var(--raggio);
-  padding: 16px 20px;
-  font: inherit; font-weight: 700; color: #43156e; cursor: pointer;
+  box-shadow: var(--ombra-su);
 }
-.intento[aria-pressed="true"] { background: var(--accento); color: #fff; border-color: var(--accento); }
-
-.bozza { margin-top: 20px; }
-textarea {
-  width: 100%; font: inherit; line-height: 1.6;
-  border: 2px solid var(--bordo); border-radius: var(--raggio);
-  padding: 16px; resize: vertical; color: var(--inchiostro); background: var(--sfondo);
+.fotocamera video {
+  display: block; width: 100%; max-height: 46vh;
+  background: #000; border-radius: var(--raggio-picc);
 }
-.azioni-bozza { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
-.conferma-invio { margin-top: 16px; color: var(--verde); font-weight: 700; font-size: 1.1rem; }
+.fotocamera .aiuto { color: #e9ebf1; margin: 14px 0; font-size: 0.98rem; }
+.fotocamera-comandi { display: flex; flex-wrap: wrap; gap: 12px; }
+.bottone-scatta {
+  background: var(--rosso); color: #fff;
+  min-height: var(--tocco-largo); min-width: 190px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 11px;
+}
 
-/* ─────────── ragionamento e demo ─────────── */
+.allegato-scelto {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin-top: 16px; padding: 14px 18px;
+  background: var(--sfondo-tenue); border: 2px solid var(--bordo);
+  border-radius: var(--raggio-picc);
+}
+.anteprima-foto {
+  width: 88px; height: 88px; object-fit: cover;
+  border-radius: var(--raggio-picc); border: 2px solid var(--bordo-forte);
+}
+.allegato-testo { flex: 1 1 200px; min-width: 0; }
+.allegato-nome {
+  display: block; font-weight: 700;
+  overflow-wrap: anywhere;      /* un nome lungo non deve allargare la scheda */
+}
+.allegato-peso { display: block; color: var(--inchiostro-tenue); font-size: 0.88rem; }
+.allegato-errore {
+  margin: 14px 0 0; padding: 14px 18px; font-weight: 700;
+  background: var(--rosso-fondo); border: 2px solid var(--rosso-bordo);
+  border-left: 7px solid var(--rosso);
+  color: var(--rosso); border-radius: var(--raggio-picc);
+}
+
+/* ─────────── chiedere aiuto ───────────
+
+   Sempre presente, in ogni email, qualunque sia il semaforo. E' la via
+   d'uscita umana: deve essere trovabile senza cercarla, e non deve sembrare
+   una resa. Per questo ha il colore dell'accento e non quello di un avviso. */
+
+.scheda-aiuto {
+  border-color: var(--accento-bordo);
+  background: var(--accento-fondo);
+}
+.scheda-aiuto h3 { color: var(--accento-scuro); }
+.bottone-aiuto {
+  background: var(--accento); color: #fff;
+  min-height: var(--tocco-largo);
+  display: inline-flex; align-items: center; gap: 11px;
+  margin-top: 8px;
+  box-shadow: var(--ombra-2);
+}
+.conferma-aiuto {
+  margin: 16px 0 0;
+  background: var(--verde-fondo); border: 2px solid var(--verde-bordo);
+  color: var(--verde); border-radius: var(--raggio-picc);
+  padding: 14px 18px; font-weight: 800;
+}
+
+/* ─────────── posta inviata ─────────── */
+
+.voce-inviata { border-left-color: var(--blu); }
+.voce-inviata .voce-mittente::before {
+  content: "A: "; font-weight: 500; color: var(--inchiostro-tenue);
+}
+/* Due righe, non una troncata con i puntini.
+   Tagliare il testo a meta' riga e' accettabile solo se esiste una via al
+   dettaglio completo: qui c'e' (si apre la risposta), ma su una riga sola si
+   perdeva quasi tutto. Due righe mostrano la frase, non il suo inizio. */
+.anteprima {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 8px;
+  color: var(--inchiostro-tenue); font-size: 0.9rem; line-height: 1.5;
+}
+.vuota {
+  background: var(--sfondo); border: 2px dashed var(--bordo-forte);
+  border-radius: var(--raggio); padding: 40px 24px;
+  text-align: center; color: var(--inchiostro-tenue); font-size: 1.05rem;
+}
+
+/* ─────────── ragionamento e demo (solo modo tecnico) ─────────── */
 
 .scheda-ragionamento summary {
-  cursor: pointer; font-weight: 700; min-height: var(--tocco);
+  cursor: pointer; font-weight: 800; min-height: var(--tocco);
   display: flex; align-items: center;
 }
-.tracce { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-.tracce th, .tracce td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--bordo); vertical-align: top; }
-.tracce th { color: var(--inchiostro-tenue); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.04em; }
+.tracce { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 12px; }
+.tracce th, .tracce td {
+  text-align: left; padding: 8px 10px;
+  border-bottom: 1px solid var(--bordo); vertical-align: top;
+}
+.tracce th {
+  color: var(--inchiostro-tenue); text-transform: uppercase;
+  font-size: 0.7rem; letter-spacing: 0.08em;
+}
 .tracce .nota { color: var(--inchiostro-tenue); }
 
-.scheda-demo { border-style: dashed; }
+.scheda-demo { border-style: dashed; border-color: var(--bordo-forte); }
 
-.pie { max-width: 760px; margin: 0 auto; padding: 0 20px 40px;
-       color: var(--inchiostro-tenue); font-size: 0.85rem; }
+.pie {
+  max-width: var(--colonna); margin: 0 auto; padding: 8px 22px 48px;
+  color: var(--inchiostro-tenue); font-size: 0.82rem;
+}
+.pie p { margin: 0 0 4px; }
+
+/* ─────────── schermi stretti ─────────── */
+
+@media (max-width: 560px) {
+  html { font-size: 19px; }
+  .testata-interno { padding: 18px 16px 16px; }
+  .autonomia { margin-left: 0; }
+  .contenuto { padding: 22px 16px 64px; }
+  .scheda { padding: 20px 18px; }
+  .cartella { flex: 1 1 100%; }
+  .bottone, .intento { width: 100%; justify-content: center; }
+  .bottone-indietro { width: auto; justify-content: flex-start; }
+}
+
+/* Chi ha impostato «piu' contrasto» nel sistema ne riceve ancora di piu':
+   i bordi si induriscono e le ombre spariscono. */
+@media (prefers-contrast: more) {
+  :root { --bordo: #6b7280; --bordo-forte: #374151; }
+  .scheda, .voce, .cartelle, .semaforo { box-shadow: none; }
+  .voce, .scheda { border-width: 2px; }
+}
 
 /* Chi preferisce meno movimento non ne riceve. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+  .bottone:active, .intento:active { transform: none; }
 }

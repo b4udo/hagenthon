@@ -16,7 +16,7 @@ Con `LLM_MODE=off` — cioè clonando il repository ed eseguendo senza configura
 | `em-02` Comune di Torino | **0** |
 | `em-03` finta Poste Italiane | **0** |
 | `em-04` INPS | **0** |
-| `em-05` Luca | **0** |
+| `em-05` Guada | **0** |
 | `em-06` newsletter | **0** |
 | **Casella completa** | **0** |
 
@@ -72,7 +72,7 @@ Sono valutate **prima** di attraversare la seam, e sono codice: `orchestrator._s
 | `em-02` Comune di Torino | ● | ● | ● | 3 |
 | `em-03` finta Poste | ● | — *rosso* | — *rosso* | 1 |
 | `em-04` INPS | ● | ● | ● | 3 |
-| `em-05` Luca | ● | — *in rubrica* | ● | 2 |
+| `em-05` Guada | ● | — *in rubrica* | ● | 2 |
 | `em-06` newsletter | ● | — *commerciale* | — *commerciale* | 1 |
 | | 6 / 6 | **3 / 6** | 4 / 6 | **13** |
 
@@ -121,7 +121,7 @@ Valori in token, arrotondati, input + output. Una cella vuota è una regola di n
 | `em-02` Comune di Torino | ≈ 905 | ≈ 1 415 | ≈ 1 465 | **≈ 3 785** |
 | `em-03` finta Poste | ≈ 836 | — | — | **≈ 836** |
 | `em-04` INPS | ≈ 857 | ≈ 1 448 | ≈ 971 | **≈ 3 276** |
-| `em-05` Luca | ≈ 607 | — | ≈ 931 | **≈ 1 538** |
+| `em-05` Guada | ≈ 607 | — | ≈ 931 | **≈ 1 538** |
 | `em-06` newsletter | ≈ 722 | — | — | **≈ 722** |
 | **Casella completa (6 email)** | | | | **≈ 13 544** |
 | **Media per email** | | | | **≈ 2 257** |

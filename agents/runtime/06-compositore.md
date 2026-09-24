@@ -2,7 +2,7 @@
 
 > Esiste perché **è il punto esatto in cui Maria si ferma.** Ha aperto l'email della dottoressa,
 > ha premuto Rispondi, e si è trovata davanti a un riquadro bianco vuoto. Non sa cosa scrivere né
-> dove. Chiude tutto e aspetta domenica, quando viene Luca.
+> dove. Chiude tutto e aspetta domenica, quando viene Guada.
 
 **Implementazione:** `app/backend/agents/compositore.py`
 **Modalità di default:** regole · **Seam LLM:** sì, Sonnet (vedi [`routing.md`](routing.md))

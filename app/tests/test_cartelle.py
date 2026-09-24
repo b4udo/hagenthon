@@ -164,7 +164,7 @@ def test_si_puo_chiedere_aiuto_su_qualunque_email(cliente: TestClient):
         assert risposta.status_code == 200, email_id
         corpo = risposta.json()
         assert corpo["inoltrata"] is True
-        assert corpo["a_chi"] == "Luca"
+        assert corpo["a_chi"] == "Guada"
 
 
 def test_la_richiesta_di_aiuto_viene_registrata(cliente: TestClient):
@@ -247,7 +247,7 @@ def test_del_file_si_conservano_solo_i_metadati(cliente: TestClient):
     assert set(salvato) == {"nome", "tipo", "dimensione"}
 
 
-# ───────────────────── «Luca sta verificando» ─────────────────────
+# ───────────────────── «Guada sta verificando» ─────────────────────
 
 
 def test_una_email_inoltrata_risulta_in_verifica(cliente: TestClient):

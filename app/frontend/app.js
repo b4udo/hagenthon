@@ -55,7 +55,13 @@ function modoTecnico() {
 }
 
 const ETICHETTE_SEMAFORO = { verde: "Può rispondere", giallo: "Da controllare", rosso: "Attenzione" };
-const SIMBOLI = { verde: "●", giallo: "●", rosso: "●" };
+
+/* Icona SVG dallo sprite in index.html. Mai emoji: cambiano forma da un
+   sistema all'altro, non ereditano il colore del testo e su Windows molte
+   diventano glifi piatti. Sempre accanto a una parola, mai da sole. */
+const ICO = (n, pieno) =>
+  `<svg class="ico${pieno ? " ico-piena" : ""}" aria-hidden="true" focusable="false">` +
+  `<use href="#i-${n}"></use></svg>`;
 
 // ───────────────────────────── rete locale ─────────────────────────────
 
@@ -101,28 +107,29 @@ function voceRicevuta(email) {
   const bottone = document.createElement("button");
   bottone.type = "button";
 
-  // Un'email gia' risposta mostra **solo** «Già risposto».
+  // Due marcature diverse, e una regola sola a governarle.
   //
-  // «Può rispondere» e «Già risposto» insieme sono due stati che si
-  // contraddicono a colpo d'occhio: il primo invita a fare una cosa che il
-  // secondo dice essere gia' fatta. Su una riga sola, con due pastiglie verdi
-  // quasi identiche, e' rumore. Il semaforo ha gia' fatto il suo lavoro
-  // quando serviva, cioe' prima della risposta.
-  // Precedenza: ha risposto > l'ha girata a Luca > il semaforo.
-  // Un marcatore solo per riga. Sono stati successivi della stessa pratica,
-  // e mostrarne due insieme costringe a capire quale conta.
-  let marcatore;
-  if (email.gia_risposto) {
-    marcatore = '<span class="risposto" data-risposto>✓ Già risposto</span>';
-  } else if (email.inoltrata) {
-    marcatore = '<span class="in-verifica" data-verifica>⏳ Luca sta verificando</span>';
-  } else {
-    marcatore = '<span class="pallino pallino-attesa" data-pallino>· da controllare</span>';
-  }
+  // «Può rispondere» e «Già risposto» insieme si contraddicono a colpo
+  // d'occhio: il primo invita a fare una cosa che il secondo dice gia' fatta.
+  // Due pastiglie quasi uguali sulla stessa riga sono rumore, quindi lo stato
+  // della pratica copre il verdetto del semaforo.
+  //
+  // ★ Con una sola eccezione, e non e' negoziabile: il **rosso** non si copre
+  //   mai. Aver girato una truffa a Guada non la rende meno truffa, e se la
+  //   riga smette di dire «Attenzione» Maria puo' riaprirla e fidarsi. La
+  //   sicurezza non e' uno stato della pratica: e' una proprieta' dell'email.
+  //   Percio' il pallino esiste sempre nel DOM, e `valutaInSecondoPiano`
+  //   decide se mostrarlo una volta noto il verdetto.
+  const statoPratica = email.gia_risposto
+    ? `<span class="risposto" data-risposto>${ICO("fatto")} Già risposto</span>`
+    : email.inoltrata
+    ? `<span class="in-verifica" data-verifica>${ICO("attesa")} Guada sta verificando</span>`
+    : "";
 
   bottone.innerHTML = `
     <span class="voce-alto">
-      ${marcatore}
+      <span class="pallino pallino-attesa" data-pallino${statoPratica ? " hidden" : ""}>da controllare</span>
+      ${statoPratica}
       <span class="voce-mittente"></span>
       <span class="voce-data"></span>
     </span>
@@ -134,7 +141,7 @@ function voceRicevuta(email) {
 
   let stato_detto = "";
   if (email.gia_risposto) stato_detto = " Già risposto.";
-  else if (email.inoltrata) stato_detto = " Luca sta verificando.";
+  else if (email.inoltrata) stato_detto = " Guada sta verificando.";
 
   bottone.className =
     "voce" +
@@ -163,7 +170,7 @@ function voceInviata(invio) {
 
   bottone.innerHTML = `
     <span class="voce-alto">
-      <span class="risposto">✓ Inviata</span>
+      <span class="risposto">${ICO("fatto")} Inviata</span>
       <span class="voce-mittente"></span>
       <span class="voce-data"></span>
     </span>
@@ -174,7 +181,7 @@ function voceInviata(invio) {
   bottone.querySelector(".voce-oggetto").textContent = invio.oggetto;
   bottone.querySelector(".voce-data").textContent = oraItaliana(invio.inviato_il);
   bottone.querySelector(".anteprima").textContent =
-    (invio.allegato ? `📎 ${invio.allegato.nome} · ` : "") + anteprima(invio.testo);
+    (invio.allegato ? `${invio.allegato.nome} · ` : "") + anteprima(invio.testo);
   bottone.setAttribute(
     "aria-label",
     `Risposta inviata a ${invio.destinatario_nome}. ${invio.oggetto}. Apri per rileggerla.`
@@ -231,7 +238,16 @@ async function valutaInSecondoPiano(id, bottone) {
     if (pallino) {
       const s = r.sicurezza.semaforo;
       pallino.className = `pallino pallino-${s}`;
-      pallino.textContent = `${SIMBOLI[s]} ${ETICHETTE_SEMAFORO[s]}`;
+      pallino.textContent = ETICHETTE_SEMAFORO[s];
+
+      // Il rosso riappare anche se la pratica ha gia' un suo stato: una
+      // truffa resta una truffa dopo che l'hai girata a Guada.
+      const haStato = Boolean(bottone.querySelector("[data-risposto], [data-verifica]"));
+      pallino.hidden = haStato && s !== "rosso";
+
+      // E il filo colorato a sinistra segue la sicurezza, non la pratica:
+      // e' il segnale che si coglie scorrendo, senza leggere.
+      if (s === "rosso") bottone.classList.add("voce-rossa");
     }
     if (r.triage && r.triage.priorita === "secondo_piano") {
       bottone.classList.add("voce-secondo-piano");
@@ -305,7 +321,7 @@ function disegnaStatoCartella(r) {
   // se non fosse successo niente e' il modo piu' rapido di far inviare due
   // volte la stessa cosa a chi non ricorda di averlo gia' fatto.
   $("stato-risposta").hidden = !r.gia_risposto;
-  // Stessa ragione per l'attesa: se l'ha gia' girata a Luca deve ricordarselo
+  // Stessa ragione per l'attesa: se l'ha gia' girata a Guada deve ricordarselo
   // invece di girargliela una seconda volta.
   $("stato-verifica").hidden = !r.inoltrata || r.gia_risposto;
 
@@ -339,7 +355,7 @@ function disegnaSemaforo(sicurezza) {
       // Il numero viene dalla tabella statica del backend, mai dall'email.
       window.location.href = `tel:${String(azione.valore).replace(/\s/g, "")}`;
     } else if (azione.tipo === "inoltra") {
-      alert("Ho preparato l'inoltro a Luca.\n(In questo prototipo l'invio è simulato.)");
+      alert("Ho preparato l'inoltro a Guada.\n(In questo prototipo l'invio è simulato.)");
     } else {
       const risposta = $("scheda-risposta");
       if (!risposta.hidden) {
@@ -504,9 +520,11 @@ async function inviaRisposta() {
   });
 
   $("bozza").hidden = true;
-  $("conferma-invio").textContent = dati.allegato
-    ? `✓ Risposta inviata, con «${dati.allegato}» allegato.`
-    : "✓ Risposta inviata.";
+  $("conferma-invio").innerHTML =
+    `${ICO("fatto")} ` +
+    (dati.allegato
+      ? `Risposta inviata, con «${dati.allegato}» allegato.`
+      : "Risposta inviata.");
   $("conferma-invio").hidden = false;
   togliAllegato();
   aggiornaContatore(dati.completate_da_sola);
@@ -520,7 +538,7 @@ async function chiediAiuto() {
   if (!stato.emailCorrente) return;
   const esito = await chiedi(`/api/email/${stato.emailCorrente.id}/aiuto`, { method: "POST" });
   const conferma = $("conferma-aiuto");
-  conferma.textContent = `✓ ${esito.messaggio}`;
+  conferma.innerHTML = `${ICO("fatto")} ${esito.messaggio}`;
   conferma.hidden = false;
   // Da adesso l'email e' in attesa: lo dice qui e lo dira' nell'elenco.
   if (stato.risultato) stato.risultato.inoltrata = true;
@@ -825,7 +843,7 @@ function avviaDettatura() {
   const inizialeLunghezza = area.value.length;
 
   bottone.setAttribute("aria-pressed", "true");
-  bottone.innerHTML = '<span aria-hidden="true">■</span> Ho finito di parlare';
+  bottone.innerHTML = `${ICO("ferma", true)} Ho finito di parlare`;
   statoVoce("La sto ascoltando. Parli pure con calma.");
 
   const partito = Voce.ascolta({
@@ -837,7 +855,7 @@ function avviaDettatura() {
     },
     alFine: (testo) => {
       bottone.setAttribute("aria-pressed", "false");
-      bottone.innerHTML = '<span aria-hidden="true">🎤</span> Aggiunga con la voce';
+      bottone.innerHTML = `${ICO("microfono")} Aggiunga con la voce`;
       statoVoce(testo ? "Ho scritto quello che ha detto. Lo rilegga pure." : "");
     },
     alErrore: (messaggio) => statoVoce(messaggio, true),

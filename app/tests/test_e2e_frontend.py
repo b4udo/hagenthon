@@ -185,7 +185,7 @@ def test_la_truffa_e_rossa_e_non_propone_di_rispondere(page: Page):
 
 def test_il_nipote_in_rubrica_e_verde(page: Page):
     page.wait_for_selector(".voce")
-    page.locator(".voce", has_text="Luca").first.click()
+    page.locator(".voce", has_text="Guada").first.click()
     expect(page.locator("#semaforo")).to_have_class(re.compile(r"semaforo-verde"))
 
 
@@ -522,7 +522,7 @@ def test_chiedere_aiuto_conferma_a_schermo(page: Page):
 
     conferma = page.locator("#conferma-aiuto")
     expect(conferma).to_be_visible()
-    expect(conferma).to_contain_text("Luca")
+    expect(conferma).to_contain_text("Guada")
 
     # Aprendo un'altra email la conferma non resta appiccicata.
     page.locator("#btn-indietro").click()
@@ -544,13 +544,38 @@ def test_una_email_gia_risposta_non_mostra_anche_il_semaforo(page: Page):
     page.wait_for_selector(".voce:has([data-risposto])")
 
     riga = page.locator('.voce:has-text("Bianchi")').first
-    expect(riga.locator("[data-risposto]")).to_have_count(1)
-    expect(riga.locator("[data-pallino]")).to_have_count(0)
+    expect(riga.locator("[data-risposto]")).to_be_visible()
+    # Il pallino resta nel DOM ma nascosto: serve a `valutaInSecondoPiano` per
+    # poter riesporre il **rosso**, che nessuno stato di pratica puo' coprire.
+    expect(riga.locator("[data-pallino]")).to_be_hidden()
 
     # Su un'email non ancora risposta il semaforo resta al suo posto.
     # «Spesa Conveniente» e' pubblicita': il compositore non le genera bozze,
     # quindi nessun test puo' averla risposta e il controllo non dipende
     # dall'ordine di esecuzione.
     altra = page.locator('.voce:has-text("Spesa Conveniente")').first
-    expect(altra.locator("[data-pallino]")).to_have_count(1)
+    expect(altra.locator("[data-pallino]")).to_be_visible()
     expect(altra.locator("[data-risposto]")).to_have_count(0)
+
+
+def test_il_rosso_non_viene_mai_coperto_da_uno_stato_di_pratica(page: Page):
+    """Aver girato una truffa a Guada non la rende meno truffa.
+
+    Lo stato della pratica copre il verdetto del semaforo — «Può rispondere» e
+    «Già risposto» insieme si contraddicono — ma il **rosso** e' l'eccezione:
+    se la riga smette di dire «Attenzione», Maria puo' riaprirla e fidarsi.
+    """
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Poste").first.click()
+    page.wait_for_selector("#btn-aiuto")
+    page.locator("#btn-aiuto").click()
+    expect(page.locator("#conferma-aiuto")).to_be_visible()
+
+    page.locator("#btn-indietro").click()
+    page.wait_for_selector(".voce:has([data-verifica])")
+
+    riga = page.locator('.voce:has-text("Poste")').first
+    # Entrambi: lo stato della pratica **e** il verdetto di sicurezza.
+    expect(riga.locator("[data-verifica]")).to_be_visible()
+    expect(riga.locator(".pallino-rosso")).to_be_visible()
+    assert "Attenzione" in riga.inner_text()

@@ -39,7 +39,7 @@ Per questo la soglia è **deliberatamente prudenziale**:
 - Uno sconosciuto innocuo è **giallo, mai verde**. Il verde è riservato a chi è in rubrica o a un dominio istituzionale verificato senza segnali negativi.
 - Il fallback del controllo, se l'agente va in errore, è **giallo**: un controllo che non è riuscito non è un controllo superato.
 - Il sistema dice *«può rispondere»*, che è un'affermazione sull'azione. **Non dice mai «è sicura»**, che sarebbe una garanzia sul mittente.
-- Sul giallo l'azione è *«Chieda a Luca prima di rispondere»*: l'escalation a una persona di fiducia è un esito **legittimo**, non un errore del sistema.
+- Sul giallo l'azione è *«Chieda a Guada prima di rispondere»*: l'escalation a una persona di fiducia è un esito **legittimo**, non un errore del sistema.
 
 Il costo di un falso verde (Maria si fida di una truffa) non è paragonabile al costo di un falso giallo (Maria chiede al nipote). La soglia è tarata su quell'asimmetria.
 

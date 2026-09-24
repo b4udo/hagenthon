@@ -13,9 +13,9 @@ python -m pytest -q
 
 | Ambiente | Comando | Risultato |
 |---|---|---|
-| **Clone pulito**, sole dipendenze di `requirements.txt` | `python -m pytest -q` | **78 passati · 1 saltato** |
-| Macchina di sviluppo, con Playwright installato | `python -m pytest -q` | **106 passati · 0 saltati** |
-| Sola suite principale, Playwright escluso a mano | `python -m pytest -q --ignore=app/tests/test_e2e_frontend.py` | **78 passati** |
+| **Clone pulito**, sole dipendenze di `requirements.txt` | `python -m pytest -q` | **98 passati · 1 saltato** |
+| Macchina di sviluppo, con Playwright installato | `python -m pytest -q` | **127 passati · 0 saltati** |
+| Sola suite principale, Playwright escluso a mano | `python -m pytest -q --ignore=app/tests/test_e2e_frontend.py` | **98 passati** |
 
 Il saltato del primo caso è la suite end-to-end del browser (`app/tests/test_e2e_frontend.py`): dipende da **Playwright**, che è una dipendenza facoltativa e **non è in `requirements.txt`**. Senza Playwright il modulo si salta invece di fallire, perché la suite principale non deve dipendere da un pacchetto opzionale. Con Playwright installato, quella suite avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium vero: **13 test in più, tutti verdi**.
 
@@ -38,6 +38,7 @@ I test sono scritti **dai contratti**, non dall'implementazione: `test-engineer`
 | `test_gulpease.py` | La metrica su cui poggia il §3 di questo documento | La formula `89 + (300·frasi − 10·lettere)/parole` su un testo noto; testo vuoto → `0.0`, nessuna divisione per zero |
 | `test_api.py` | Il contratto HTTP che il frontend consuma | `/api/salute` dichiara `chiave_api_richiesta: false`; la mailbox contiene sei email; `elabora` restituisce le tracce; email inesistente → `404`; **l'invio incrementa il contatore di autonomia** |
 | `test_plain_rules.py` | Che il semplificatore **non legga al contrario** | ★ **«si prega di non rispondere» non diventa «Le chiedono di rispondere»**; una richiesta vera resta tale anche se altrove c'è un verbo negato; `«Cedolino pensione»` → `foglio della pensione`, non `foglio della pensione pensione` |
+| `test_contrasto.py` | Che il **7:1 dichiarato** sia vero, non affermato | Ogni coppia testo/fondo che l'interfaccia mette davvero insieme, calcolata secondo WCAG **leggendo i colori da `style.css`**: se qualcuno schiarisce `--verde` di mezzo tono, la suite diventa rossa. Più la base a 20px e i target a 48px, che vengono dagli stessi vincoli |
 | `test_cartelle.py` | Le tre cartelle e lo stato **«già risposto»** | `gia_risposto` è **derivato** dalla tabella `invio`, non memorizzato: togliendo l'invio sparisce da solo; rispondere a un'email non segna le altre; ★ **eliminare sposta, non cancella** — l'email esiste ancora e si ripristina; la posta inviata eredita destinatario e oggetto dal messaggio originale; `Re:` non si accumula; cartella sconosciuta → `400` |
 | `test_e2e_frontend.py` *(facoltativo)* | Che il percorso di Maria funzioni **in un browser vero** | La casella mostra sei email; ogni email riceve un semaforo; **percorso completo dal medico alla risposta inviata**; nessun invio senza un click; la truffa è rossa e non propone di rispondere; il nipote è verde; **il rifiuto dell'email avvelenata compare a schermo**; `lang="it"`; **target ≥ 44px**; **base ≥ 20px**; si apre un'email **con la sola tastiera**; il fuoco si sposta sulla vista di lettura; i cambi di stato passano da una regione `aria-live`; ★ **Maria non vede i pannelli tecnici**, la giuria sì con `?tecnico=1`; i comandi della voce esistono e sono ≥ 44px; ★ **la dettatura avvisa prima che la voce esca dal dispositivo, e si può rifiutare**; la barra di arresto compare solo mentre legge; le tre cartelle sono sempre visibili; **dopo l'invio l'email è marcata «già risposto», anche nel nome accessibile**; eliminare sposta nel cestino e si torna indietro |
 
@@ -119,7 +120,7 @@ Il riassunto è di **12 parole e 77 lettere**. Di queste, *«INPS - Istituto Naz
 
 | Prova | Esito | Dove si rifà |
 |---|---|---|
-| Test automatici | **78 passati, 1 saltato** su un clone pulito · **106 passati** con Playwright installato | `python -m pytest -q` |
+| Test automatici | **98 passati, 1 saltato** su un clone pulito · **127 passati** con Playwright installato | `python -m pytest -q` |
 | Zero codice di rete in `app/` | ✅ verificato staticamente sull'AST di ogni sorgente | `pytest app/tests/test_llm_modes.py -q` |
 | Contratti allineati agli schema pubblicati | ✅ | `pytest app/tests/test_contracts_sync.py -q` |
 | Checklist accessibilità, 27 voci | ✅ su entrambe le schermate, due valori da rimisurare in proiezione | `agents/build-time/commands/verifica-a11y.md` |

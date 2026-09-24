@@ -41,7 +41,7 @@ depositati come file binari.
 ## ★ Le sei email
 
 `OGGI` è **martedì 6 ottobre 2026**. Tutte le date del corpus sono coerenti con quell'ancora: la
-visita del 14 ottobre cade di **mercoledì**, la domenica di Luca è l'**11**.
+visita del 14 ottobre cade di **mercoledì**, la domenica di Guada è l'**11**.
 
 | # | `id` | Mittente | Contenuto | Esiste per mostrare |
 |---|---|---|---|---|
@@ -49,7 +49,7 @@ visita del 14 ottobre cade di **mercoledì**, la domenica di Luca è l'**11**.
 | 2 | `e02-comune` | Comune di Torino | Certificato di residenza, **PDF allegato**, burocratese pesante con articoli e commi | Allegati in chiaro + traduzione del burocratese |
 | 3 | `e03-poste-falsa` | «Poste Italiane» da `no-reply@poste-sicurezza-clienti.info` | *"Conto bloccato, verifica entro 24 ore"*, link mascherato | ★ Semaforo **rosso** + azione: il numero verde ufficiale |
 | 4 | `e04-inps` | INPS | Cedolino della pensione, importo **€ 1.247,83** | ★ FactGuard e l'**email avvelenata** |
-| 5 | `e05-luca` | Luca, nipote, **in rubrica** | *"Nonna, domenica vengo a pranzo"* | Semaforo **verde** — il contrasto che rende credibile il rosso |
+| 5 | `e05-Guada` | Guada, nipote, **in rubrica** | *"Nonna, domenica vengo a pranzo"* | Semaforo **verde** — il contrasto che rende credibile il rosso |
 | 6 | `e06-newsletter` | Newsletter di un supermercato | Promozioni della settimana | Triage: `commerciale`, in secondo piano |
 
 ### ★ La coppia 3 + 4 è il cuore della demo
@@ -135,7 +135,7 @@ smette di corrispondere al comportamento.
 
 - [ ] `app/backend/data/mailbox.json` contiene esattamente **6** record, tutti validi contro `Email`.
 - [ ] Nessun campo fuori dal contratto; `allegati` popolato solo su `e02-comune`, `in_rubrica: true`
-      solo su `e05-luca`.
+      solo su `e05-Guada`.
 - [ ] Ogni data del corpus è coerente con `OGGI = 2026-10-06`: il 14 ottobre è mercoledì, l'11 è
       domenica.
 - [ ] `e04-inps` contiene la stringa `€ 1.247,83` **una sola volta** e in quella forma.

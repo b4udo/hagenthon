@@ -11,7 +11,7 @@ import os
 from datetime import date
 
 # Martedi' 6 ottobre 2026. Scelto perche' rende coerente tutto il corpus:
-# la visita del 14 ottobre cade di mercoledi', la domenica di Luca e' l'11.
+# la visita del 14 ottobre cade di mercoledi', la domenica di Guada e' l'11.
 OGGI_DEFAULT = date(2026, 10, 6)
 
 

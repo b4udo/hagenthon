@@ -39,7 +39,39 @@ FRASI_DI_PURA_FORMULA = (
     "informativa sul trattamento dei dati",
     "il presente messaggio e' riservato",
     "il presente messaggio è riservato",
+    # ── formule di rito degli enti: dicono zero a chi deve agire ──
+    "secondo quanto previsto dalla normativa vigente",
+    "normativa vigente in materia",
+    "generata automaticamente",
+    "si prega di non rispondere",
+    "non rispondere a questo indirizzo",
+    "per assistenza è possibile rivolgersi",
+    "per assistenza e' possibile rivolgersi",
+    "restando a disposizione",
+    "si coglie l'occasione",
+    "cordiali saluti",
+    "distinti saluti",
+    "la ringraziamo per la",
+    "ringraziando per la collaborazione",
+    "la presente comunicazione",
+    "ove non gia' provveduto",
+    "ove non già provveduto",
+    "si rammenta che l'istituto",
+    "previa autenticazione con le credenziali",
+    "consultabile e scaricabile accedendo",
+    "salvo diversa comunicazione",
+    "a tal fine si precisa",
 )
+
+# Una frase di rito si butta **solo se non contiene cifre**.
+#
+# Le formule e i fatti a volte convivono nella stessa frase: «il pagamento
+# avverrà secondo quanto previsto dalla normativa vigente entro il 3 novembre
+# 2026» è per meta' rito e per meta' l'unica data che conta. Buttarla farebbe
+# scattare FactGuard, che rifiuterebbe tutta la semplificazione e mostrerebbe
+# l'originale — cioe' il contrario di quello che serve. Le cifre sono il
+# segnale piu' economico e piu' affidabile che in quella frase c'e' un fatto.
+RE_CIFRA = re.compile(r"\d")
 
 # ── 2 · locuzioni autonome, sostituite per intero ──
 # Ordine: dalla piu' lunga alla piu' corta, cosi' la specifica vince sulla
@@ -187,8 +219,9 @@ def _semplifica_riga(riga: str) -> str:
 
     tenute = []
     for frase in re.split(r"(?<=[.!?])\s+", riga):
-        if any(m in frase.lower() for m in FRASI_DI_PURA_FORMULA):
-            continue  # pura formula: non aggiunge nulla
+        minuscola = frase.lower()
+        if any(m in minuscola for m in FRASI_DI_PURA_FORMULA) and not RE_CIFRA.search(frase):
+            continue  # pura formula, e nessun fatto dentro: non aggiunge nulla
         frase = _spezza_se_lunga(frase).strip()
         if frase:
             tenute.append(frase)

@@ -11,7 +11,7 @@ from __future__ import annotations
 from ..contracts import AzioneSuggerita, EsitoSicurezza, Semaforo, TipoAzione
 from ..engines import phishing_rules
 
-NOME_PERSONA_FIDUCIA = "Luca"
+NOME_PERSONA_FIDUCIA = "Guada"
 
 MESSAGGI = {
     "rosso": "Non risponda a questa email. Sembra una truffa.",

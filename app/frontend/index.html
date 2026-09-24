@@ -8,6 +8,48 @@
 </head>
 <body>
 
+<!-- ═══ icone ═══════════════════════════════════════════════════════════════
+     Disegni vettoriali, non emoji. Le emoji cambiano forma da un sistema
+     all'altro, su Windows molte diventano glifi monocromatici piatti, non
+     ereditano il colore del testo e non si possono ingrandire con precisione:
+     tutto ciò che serve a chi ha una vista ridotta. Questi sono SVG a tratto,
+     dimensionati in `em` e colorati con `currentColor`, quindi crescono col
+     testo e col contrasto del pulsante che li contiene.
+
+     Ogni icona è `aria-hidden`: accanto c'è sempre la parola, mai l'icona da
+     sola. Tracciati in stile Lucide (licenza MIT), ridisegnati qui. -->
+<svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    <symbol id="i-ascolta" viewBox="0 0 24 24">
+      <path d="M11 5 6 9H2v6h4l5 4V5Z" /><path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M19 5a10 10 0 0 1 0 14" />
+    </symbol>
+    <symbol id="i-microfono" viewBox="0 0 24 24">
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2" /><path d="M12 19v3" />
+    </symbol>
+    <symbol id="i-ferma" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></symbol>
+    <symbol id="i-graffetta" viewBox="0 0 24 24">
+      <path d="m21.4 11-9.2 9.2a6 6 0 0 1-8.5-8.5l8.6-8.5A4 4 0 1 1 18 8.8l-8.6 8.6a2 2 0 0 1-2.8-2.9l8.5-8.4" />
+    </symbol>
+    <symbol id="i-fotocamera" viewBox="0 0 24 24">
+      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z" />
+      <circle cx="12" cy="13" r="3" />
+    </symbol>
+    <symbol id="i-scatta" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /></symbol>
+    <symbol id="i-aiuto" viewBox="0 0 24 24">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.9" /><path d="M16 3.1a4 4 0 0 1 0 7.8" />
+    </symbol>
+    <symbol id="i-fatto" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+    <symbol id="i-attesa" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+    <symbol id="i-avviso" viewBox="0 0 24 24">
+      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+      <path d="M12 9v4" /><path d="M12 17h.01" />
+    </symbol>
+  </defs>
+</svg>
+
 <a class="salta-al-contenuto" href="#contenuto">Vai al contenuto</a>
 
 <header class="testata">
@@ -56,11 +98,11 @@
     <p class="mittente" id="mittente"></p>
 
     <p class="stato-risposta" id="stato-risposta" hidden role="status">
-      ✓ A questa email ha già risposto.
+      <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-fatto"></use></svg> A questa email ha già risposto.
     </p>
 
     <p class="stato-verifica" id="stato-verifica" hidden role="status">
-      ⏳ Luca sta verificando questo messaggio. La richiamerà lui.
+      <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-attesa"></use></svg> Guada sta verificando questo messaggio. Le risponderà al più presto.
     </p>
 
     <div class="azioni-cartella">
@@ -88,13 +130,13 @@
         <dt>Entro quando</dt><dd id="entro-quando"></dd>
       </dl>
       <button type="button" class="bottone bottone-voce" id="btn-ascolta-riassunto">
-        <span aria-hidden="true">🔊</span> Ascolta il riassunto
+        <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ascolta"></use></svg> Ascolta il riassunto
       </button>
     </div>
 
     <!-- avviso di verifica fallita -->
     <div class="scheda scheda-avviso" id="scheda-verifica" hidden role="alert">
-      <h3>⚠ Non le mostro la versione semplificata</h3>
+      <h3><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-avviso"></use></svg> Non le mostro la versione semplificata</h3>
       <p>Il controllo automatico ha trovato una differenza rispetto all'originale,
          quindi le mostro il testo così come è arrivato.</p>
       <ul id="problemi-verifica"></ul>
@@ -106,7 +148,7 @@
       <p class="leggibilita" id="leggibilita"></p>
       <div class="testo" id="testo-messaggio"></div>
       <button type="button" class="bottone bottone-voce" id="btn-ascolta-messaggio">
-        <span aria-hidden="true">🔊</span> Ascolta il messaggio
+        <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ascolta"></use></svg> Ascolta il messaggio
       </button>
       <button type="button" class="bottone bottone-secondario" id="btn-originale">
         Mostra il testo originale
@@ -134,10 +176,10 @@
         <!-- voce: riascoltare prima di inviare, e aggiungere parlando -->
         <div class="voce-strumenti">
           <button type="button" class="bottone bottone-voce" id="btn-ascolta-bozza">
-            <span aria-hidden="true">🔊</span> Ascolta la risposta
+            <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ascolta"></use></svg> Ascolta la risposta
           </button>
           <button type="button" class="bottone bottone-microfono" id="btn-detta">
-            <span aria-hidden="true">🎤</span> Aggiunga con la voce
+            <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-microfono"></use></svg> Aggiunga con la voce
           </button>
         </div>
         <p class="voce-stato" id="voce-stato" role="status" aria-live="polite"></p>
@@ -151,17 +193,17 @@
           <h5 id="titolo-allega">Vuole allegare qualcosa?</h5>
           <div class="allega-scelte" role="group" aria-labelledby="titolo-allega">
             <label class="bottone bottone-allega" for="file-documento">
-              <span aria-hidden="true">📎</span> Scelga un documento
+              <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-graffetta"></use></svg> Scelga un documento
               <input type="file" id="file-documento"
                      accept=".pdf,.jpg,.jpeg,.png,.heic,image/*,application/pdf" />
             </label>
             <button type="button" class="bottone bottone-allega" id="btn-fotocamera">
-              <span aria-hidden="true">📷</span> Scatti una foto
+              <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-fotocamera"></use></svg> Scatti una foto
             </button>
             <!-- Ripiego se la fotocamera non è disponibile o viene negata:
                  su telefono `capture` apre comunque l'app fotocamera. -->
             <label class="bottone bottone-allega" for="file-foto" id="ripiego-foto" hidden>
-              <span aria-hidden="true">📷</span> Scatti una foto
+              <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-fotocamera"></use></svg> Scatti una foto
               <input type="file" id="file-foto" accept="image/*" capture="environment" />
             </label>
           </div>
@@ -175,7 +217,7 @@
             </p>
             <div class="fotocamera-comandi">
               <button type="button" class="bottone bottone-scatta" id="btn-scatta">
-                <span aria-hidden="true">⬤</span> Scatta
+                <svg class="ico ico-piena" aria-hidden="true" focusable="false"><use href="#i-scatta"></use></svg> Scatta
               </button>
               <button type="button" class="bottone bottone-secondario" id="btn-chiudi-fotocamera">
                 Annulla
@@ -207,7 +249,7 @@
       </div>
 
       <p class="conferma-invio" id="conferma-invio" hidden role="status" aria-live="polite">
-        ✓ Risposta inviata.
+        <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-fatto"></use></svg> Risposta inviata.
       </p>
     </div>
 
@@ -221,7 +263,7 @@
         Non è un errore: è la cosa giusta da fare quando qualcosa non le torna.
       </p>
       <button type="button" class="bottone bottone-aiuto" id="btn-aiuto">
-        <span aria-hidden="true">🤝</span> Chieda aiuto a Luca
+        <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-aiuto"></use></svg> Chieda aiuto a Guada
       </button>
       <p class="conferma-aiuto" id="conferma-aiuto" hidden role="status" aria-live="polite"></p>
     </div>
@@ -265,7 +307,7 @@
      ovunque sia arrivato scorrendo la pagina. -->
 <div class="barra-voce" id="barra-voce" hidden>
   <button type="button" class="bottone bottone-ferma" id="btn-ferma-voce">
-    <span aria-hidden="true">■</span> Ferma la lettura
+    <svg class="ico ico-piena" aria-hidden="true" focusable="false"><use href="#i-ferma"></use></svg> Ferma la lettura
   </button>
 </div>
 

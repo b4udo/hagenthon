@@ -5,8 +5,8 @@
   },
   "rubrica": [
     {
-      "nome": "Luca Rossi",
-      "email": "luca.rossi92@gmail.com"
+      "nome": "Guada Rossi",
+      "email": "guada.rossi92@gmail.com"
     },
     {
       "nome": "Studio medico dott.ssa Giulia Bianchi",
@@ -84,10 +84,10 @@
     },
     {
       "id": "em-05",
-      "mittente_nome": "Luca Rossi",
-      "mittente_email": "luca.rossi92@gmail.com",
+      "mittente_nome": "Guada Rossi",
+      "mittente_email": "guada.rossi92@gmail.com",
       "oggetto": "Ciao nonna, domenica vengo a pranzo!",
-      "corpo": "Ciao nonna,\n\ncome stai? Ti scrivo al volo dal treno.\n\nDomenica 11 ottobre vengo a pranzo da te, arrivo verso mezzogiorno. Non metterti a cucinare mezzo mondo come l'ultima volta, mi basta la tua pasta al forno!\n\nIl dolce lo porto io. Ti faccio vedere anche le foto della gita in montagna, te ne allego una intanto.\n\nSe ti serve che passi al supermercato prima di venire, scrivimi pure o chiamami quando vuoi.\n\nUn abbraccio forte,\nLuca",
+      "corpo": "Ciao nonna,\n\ncome stai? Ti scrivo al volo dal treno.\n\nDomenica 11 ottobre vengo a pranzo da te, arrivo verso mezzogiorno. Non metterti a cucinare mezzo mondo come l'ultima volta, mi basta la tua pasta al forno!\n\nIl dolce lo porto io. Ti faccio vedere anche le foto della gita in montagna, te ne allego una intanto.\n\nSe ti serve che passi al supermercato prima di venire, scrivimi pure o chiamami quando vuoi.\n\nUn abbraccio forte,\nGuada",
       "data_ricezione": "2026-10-04",
       "allegati": [
         {

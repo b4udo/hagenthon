@@ -68,7 +68,7 @@ Due segnali `+1` o più, senza un dominio verificato → **rosso**.
 | Semaforo | Messaggio | Azione |
 |---|---|---|
 | 🔴 **rosso** | "Non rispondere a questa email." | `telefono` — il numero verde **ufficiale** dell'ente impersonato, preso da una tabella statica nel codice, mai dall'email |
-| 🟡 **giallo** | "Non sono sicuro. Chiedi a una persona di fiducia." | `inoltra` — "Manda a Luca" |
+| 🟡 **giallo** | "Non sono sicuro. Chiedi a una persona di fiducia." | `inoltra` — "Manda a Guada" |
 | 🟢 **verde** | "Puoi rispondere tranquillamente." | `rispondi` — porta alla risposta guidata |
 
 ## Vincoli

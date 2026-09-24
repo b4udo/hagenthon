@@ -89,8 +89,8 @@ def test_richiesta_esplicita_di_credenziali_e_rossa():
 
 def test_mittente_in_rubrica_e_verde():
     semaforo, _, _ = phishing_rules.valuta(
-        "Luca Rossi",
-        "luca.rossi92@gmail.com",
+        "Guada Rossi",
+        "guada.rossi92@gmail.com",
         "Ciao nonna, domenica vengo a pranzo!",
         "Ciao nonna, come stai? Domenica vengo a pranzo da te.",
         in_rubrica=True,

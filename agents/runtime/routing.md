@@ -48,7 +48,7 @@ Regole valutate **prima** di attraversare la seam. Ognuna è un test in `app/tes
 | Budget dell'email esaurito (`> 4000` token) | tutti | Si degrada a regole. La pipeline non si interrompe mai per budget |
 | Semaforo **rosso** | 4, 6 | Su phishing non si semplifica e non si compone. Non ha senso spendere token per un testo che l'utente non deve leggere né a cui deve rispondere |
 | Categoria `commerciale` | 4 | Una newsletter va messa in secondo piano, non tradotta |
-| Corpo < 200 caratteri | 4 | Il messaggio di Luca ("nonna, domenica vengo a pranzo") è già italiano semplice. Semplificarlo è spesa netta |
+| Corpo < 200 caratteri | 4 | Il messaggio di Guada ("nonna, domenica vengo a pranzo") è già italiano semplice. Semplificarlo è spesa netta |
 | Nessun fatto estratto e corpo < 400 caratteri | 4 | Non c'è niente da preservare né da chiarire |
 | Il mittente è in rubrica | 4 | Una persona conosciuta non scrive in burocratese |
 

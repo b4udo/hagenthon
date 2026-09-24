@@ -48,11 +48,67 @@ def _a_regole(
 ) -> EsitoSemplificazione:
     return EsitoSemplificazione(
         chi_scrive=_chi_scrive(mittente_nome, categoria),
-        cosa_vogliono=plain_rules.azione_richiesta(corpo)
-        or "Le danno un'informazione. Non deve fare nulla.",
+        cosa_vogliono=_cosa_vogliono(corpo, fatti),
         entro_quando=_entro_quando(fatti),
         testo_semplificato=plain_rules.semplifica_testo(corpo),
     )
+
+
+def _cosa_vogliono(corpo: str, fatti: list[Fatto]) -> str:
+    """La richiesta, e **a cosa si riferisce**.
+
+    «Le chiedono di confermare.» e' vero e inutile: confermare cosa? La riga
+    che Maria legge per prima deve bastare da sola, senza costringerla a
+    scendere nel testo per capire di che appuntamento si parla.
+
+    I complementi vengono **solo dai fatti gia' estratti e ancorati**: data,
+    orario, importo. Nessuna inferenza sul contenuto, quindi nessun rischio di
+    aggiungere qualcosa che nell'originale non c'e'.
+    """
+    azione = plain_rules.azione_richiesta(corpo)
+    if azione is None:
+        base = "Le danno un'informazione. Non deve fare nulla."
+        importo = _primo(fatti, "importo")
+        # Un'informativa su un importo senza dire l'importo non informa.
+        return f"{base} Riguarda {importo}." if importo else base
+
+    pezzi: list[str] = []
+    data = _primo_normalizzato(fatti, "data")
+    orario = _primo(fatti, "orario")
+    importo = _primo(fatti, "importo")
+
+    if data:
+        pezzi.append(f"del {normalize.formatta_data_italiana(data)}")
+    if orario:
+        pezzi.append(f"alle {orario}")
+    if importo:
+        pezzi.append(f"per {importo}")
+
+    if not pezzi:
+        return azione
+    # ★ Frase a parte, non complemento attaccato al verbo.
+    #
+    # «Le chiedono di confermare del 14 ottobre» e' italiano rotto: il
+    # complemento giusto dipende dal verbo («confermare **l'appuntamento**
+    # del…», «ritirare **il documento** del…»), e il verbo qui e' una variabile.
+    # Una seconda frase autonoma regge con qualunque azione senza doverne
+    # conoscere l'oggetto — la stessa ragione per cui il semplificatore lavora
+    # su locuzioni intere invece che su singole parole.
+    return f"{azione} Si tratta {' '.join(pezzi)}."
+
+
+def _primo(fatti: list[Fatto], tipo: str) -> str | None:
+    for fatto in fatti:
+        if fatto.tipo.value == tipo:
+            return fatto.testo_originale
+    return None
+
+
+def _primo_normalizzato(fatti: list[Fatto], tipo: str) -> str | None:
+    for fatto in fatti:
+        if fatto.tipo.value == tipo:
+            return fatto.valore_normalizzato
+    return None
 
 
 def _chi_scrive(mittente_nome: str, categoria: Categoria) -> str:

@@ -66,7 +66,7 @@ Tutti hanno un proprietario dichiarato in [`../../README.md` §3](../../README.m
    `dev-pipeline` può partire.
 2. **`clock.py`.** `OGGI_DEFAULT = date(2026, 10, 6)` — martedì. La scelta non è arbitraria: rende
    coerente tutto il corpus, perché la visita del 14 ottobre cade di **mercoledì** e la domenica di
-   Luca è l'**11**. `oggi()` legge `POSTA_CHIARA_OGGI` (formato ISO) e ricade sul default se la
+   Guada è l'**11**. `oggi()` legge `POSTA_CHIARA_OGGI` (formato ISO) e ricade sul default se la
    variabile manca o è illeggibile.
 3. **`normalize.py`.** Tre funzioni pure: data → `AAAA-MM-GG`, importo → decimale con punto,
    orario → `HH:MM` a due cifre. I dodici mesi italiani sono una tabella scritta a mano. Il caso

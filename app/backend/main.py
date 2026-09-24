@@ -245,7 +245,9 @@ def chiedi_aiuto(email_id: str) -> dict:
     return {
         "inoltrata": True,
         "a_chi": a_chi,
-        "messaggio": f"Ho girato il messaggio a {a_chi}. La richiamerà lui.",
+        # Senza pronome: il nome della persona di fiducia e' configurabile, e
+        # «lui» darebbe per scontato un genere che il sistema non conosce.
+        "messaggio": f"Ho girato il messaggio a {a_chi}. Le risponderà al più presto.",
         "aiuti": db.conteggio_aiuti(),
     }
 
