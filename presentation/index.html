@@ -186,6 +186,16 @@
   .rifiuto del { color: rgba(255,255,255,0.45); text-decoration-color: var(--rose); }
   .rifiuto .ok { color: var(--purple-light); }
 
+  /* Schermate vere del prodotto, generate da scripts/cattura_schermate.py.
+     max-height in vh: la slide non deve mai andare in scroll durante la demo. */
+  /* width:auto e non 100%: le schermate hanno proporzioni diverse fra loro,
+     e forzarne la larghezza lascerebbe bande vuote ai lati. */
+  .schermata {
+    display: block; width: auto; max-width: 100%; height: auto;
+    max-height: 34vh;
+    border: 1px solid rgba(255,255,255,0.14); border-radius: 12px;
+  }
+
   .frase {
     border-left: 3px solid var(--purple); padding: 2px 0 2px 16px; margin: 0 0 12px;
     font-size: clamp(15px, 1.35vw, 22px); color: #fff; font-weight: 600; letter-spacing: -0.01em;
@@ -348,7 +358,12 @@
           </ul>
         </div>
       </div>
-      <p class="frase" style="margin-top:clamp(12px,2.4vh,24px)">Nel prodotto Maria vede un contatore: <span class="grad">&laquo;Risposte inviate da sola&raquo;</span>. L'autonomia è misurata, non promessa.</p>
+      <div class="g2" style="margin-top:clamp(10px,1.8vh,20px);align-items:center">
+        <img class="schermata" src="img/08-riassunto-dettaglio.png"
+             alt="Schermata del prodotto, riquadro «In breve»: Chi le scrive, Cosa le
+                  chiedono, Entro quando — le tre righe che sostituiscono il burocratese." />
+        <p class="frase" style="margin:0">Nel prodotto Maria vede un contatore: <span class="grad">&laquo;Risposte inviate da sola&raquo;</span>. L'autonomia è misurata, non promessa.</p>
+      </div>
     </div>
     <aside class="nota">Il prima non è una schermata brutta: è un fallimento, l'email non parte e si aspetta il nipote. Il dopo è una risposta effettivamente inviata. E nel prodotto c'è un contatore visibile a Maria, "Risposte inviate da sola": l'autonomia la misuriamo dentro l'applicazione, non in una slide.</aside>
   </section>
@@ -424,12 +439,12 @@
       <h1>Il motore propone, il verificatore controlla, <span class="grad">la persona decide</span>.</h1>
       <div class="g23" style="margin-top:clamp(8px,1.6vh,18px)">
         <div>
-          <div class="rifiuto">
-            <span class="w">&#9888; Verifica fallita: l'importo non corrisponde all'originale.</span><br />
-            &nbsp;&nbsp;&nbsp;Originale: <span class="ok">&euro;&nbsp;1.247,83</span> &nbsp;·&nbsp; Semplificata: <del>&euro;&nbsp;1.247</del><br />
-            &nbsp;&nbsp;&nbsp;&rarr; Semplificazione <span class="w">rifiutata</span>. Mostro il testo originale.
-          </div>
-          <p style="margin-top:12px"><span class="badge viva">DAL VIVO</span> <span style="color:var(--tenue);font-size:clamp(12px,1vw,16px)">Il pulsante da presentatore &laquo;E se l'AI sbaglia?&raquo; inietta la corruzione mentre guardate.</span></p>
+          <img class="schermata" src="img/06-factguard-dettaglio.png"
+               alt="Avviso nel prodotto: «Non le mostro la versione semplificata.
+                    Il controllo automatico ha trovato una differenza rispetto
+                    all'originale, quindi le mostro il testo così come è arrivato.
+                    L'importo non corrisponde all'originale: € 1.247,83 è diventato € 1.247.»" />
+          <p style="margin-top:12px"><span class="badge viva">DAL VIVO</span> <span style="color:var(--tenue);font-size:clamp(12px,1vw,16px)">Schermata vera del prodotto. Il pulsante da presentatore &laquo;E se l'AI sbaglia?&raquo; inietta la corruzione mentre guardate.</span></p>
         </div>
         <ul class="bullets">
           <li><strong>Il verificatore non è un LLM: è codice deterministico.</strong> Un verificatore che allucina dà una garanzia falsa.</li>

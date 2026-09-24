@@ -83,6 +83,10 @@ def cattura() -> None:
             pagina.wait_for_selector("#testo-bozza")
             pagina.locator("#scheda-risposta").scroll_into_view_if_needed()
             salva(pagina, "03-risposta-guidata.png")
+            # Ritaglio stretto: la schermata intera, dentro una slide, diventa
+            # una striscia illeggibile. Per il deck serve il solo riquadro.
+            ritaglia(pagina, "#scheda-risposta", "07-risposta-dettaglio.png")
+            ritaglia(pagina, "#scheda-riassunto", "08-riassunto-dettaglio.png")
 
             # Semaforo rosso con il numero ufficiale
             pagina.goto(base)
