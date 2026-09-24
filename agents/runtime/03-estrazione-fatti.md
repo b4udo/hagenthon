@@ -4,7 +4,10 @@
 > tradirlo. Questo agente produce la lista dei fatti che la versione semplificata dovrà
 > conservare intatti.
 
-**Implementazione:** `app/backend/agents/estrazione_fatti.py` + `app/backend/engines/fact_extract.py`
+**Implementazione:** `app/backend/engines/fact_extract.py`, chiamato direttamente
+dall'orchestratore (traccia `03-estrazione-fatti`). Non ha un modulo in
+`app/backend/agents/`: essendo **interamente deterministico e senza seam**, un involucro che
+si limitasse a inoltrare la chiamata sarebbe un file in più da tenere allineato e nient'altro.
 **Modalità:** regole · **Seam LLM: nessuna, mai** (vedi [`routing.md`](routing.md) §2)
 
 ---

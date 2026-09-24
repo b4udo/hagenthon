@@ -79,17 +79,24 @@ nell'interfaccia — e la ragione per cui il sistema è ispezionabile invece che
 
 ## Stato esternalizzato
 
-**Dove:** `app/backend/state/data/<email_id>.json`
+**Dove:** tabella `stato_pipeline` del database SQLite in memoria (`app/backend/db.py`)
 **Chi lo scrive:** `app/backend/state/store.py`
+**Come si guarda:** `GET /api/debug/stato`
 
-Contiene il `RisultatoPipeline` serializzato più `aggiornato_il`. Tre conseguenze concrete:
+Una riga per email: il `RisultatoPipeline` serializzato più `aggiornato_il`. Tre conseguenze
+concrete:
 
-1. **Riprendibilità** — se il processo muore a metà, ripartendo si rilegge il checkpoint invece
-   di rifare tutto.
+1. **Riprendibilità** — se la pipeline si interrompe a metà, ripartendo si rilegge il checkpoint
+   invece di rifare tutto.
 2. **Costo marginale zero** — ri-aprire la stessa email non ri-esegue la pipeline. Vedi
    [`routing.md`](routing.md).
-3. **Ispezionabilità** — in demo si apre il file e si mostra cosa ha deciso ogni agente. Lo stato
-   non è una variabile in memoria di cui fidarsi sulla parola.
+3. **Ispezionabilità** — in demo si apre `GET /api/debug/stato` e si mostra cosa ha deciso ogni
+   agente. Lo stato non è una variabile in memoria di cui fidarsi sulla parola: è una tabella
+   che si interroga in SQL.
+
+> **Perché in memoria e non su disco.** Il database è SQLite `:memory:`: nessuna dipendenza in
+> più (`sqlite3` è nella libreria standard), nessun residuo fra un avvio e l'altro, e lo stato
+> resta **interrogabile in SQL** invece che sparso in file JSON. La demo riparte sempre pulita.
 
 La cartella è in `.gitignore`: è stato di runtime, non un artefatto di consegna.
 

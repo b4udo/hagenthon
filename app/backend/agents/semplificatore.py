@@ -24,10 +24,18 @@ def esegui(
     categoria: Categoria,
     fatti: list[Fatto],
     feedback: str | None = None,
+    solo_regole: bool = False,
 ) -> tuple[EsitoSemplificazione, int]:
-    risposta = _prova_seam(mittente_nome, oggetto, corpo, fatti, feedback)
-    if risposta is not None:
-        return risposta
+    """`solo_regole` e' come l'orchestratore fa rispettare il budget di token.
+
+    Senza questo interruttore il budget sarebbe misurabile ma non vincolante:
+    l'orchestratore ne annotava il superamento e poi attraversava la seam
+    lo stesso. Un limite che non limita non e' un limite.
+    """
+    if not solo_regole:
+        risposta = _prova_seam(mittente_nome, oggetto, corpo, fatti, feedback)
+        if risposta is not None:
+            return risposta
 
     return _a_regole(mittente_nome, corpo, categoria, fatti), 0
 

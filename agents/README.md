@@ -82,7 +82,7 @@ modelli Pydantic in `app/backend/contracts.py` e ri-verificati dal test
 | — | Orchestratore | [`runtime/orchestrator.md`](runtime/orchestrator.md) | `app/backend/orchestrator.py` | mai |
 | 1 | Triage | [`runtime/01-triage.md`](runtime/01-triage.md) | `app/backend/agents/triage.py` | seam (Haiku) |
 | 2 | Sicurezza | [`runtime/02-sicurezza.md`](runtime/02-sicurezza.md) | `app/backend/agents/sicurezza.py` | **mai — per scelta** |
-| 3 | Estrazione fatti | [`runtime/03-estrazione-fatti.md`](runtime/03-estrazione-fatti.md) | `app/backend/agents/estrazione_fatti.py` | **mai — per scelta** |
+| 3 | Estrazione fatti | [`runtime/03-estrazione-fatti.md`](runtime/03-estrazione-fatti.md) | `app/backend/engines/fact_extract.py` (nessun involucro: è deterministico e senza seam) | **mai — per scelta** |
 | 4 | Semplificatore | [`runtime/04-semplificatore.md`](runtime/04-semplificatore.md) | `app/backend/agents/semplificatore.py` | seam (Sonnet) |
 | 5 | Verificatore | [`runtime/05-verificatore.md`](runtime/05-verificatore.md) | `app/backend/agents/verificatore.py` | **mai — per progetto** |
 | 6 | Compositore | [`runtime/06-compositore.md`](runtime/06-compositore.md) | `app/backend/agents/compositore.py` | seam (Sonnet) |

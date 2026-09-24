@@ -106,7 +106,7 @@ posta-chiara/
 | [`app/backend/`](app/backend/) | `main.py` (API, `StaticFiles` montato per ultimo) · `orchestrator.py` (ordine, limiti, budget, stato) · `contracts.py` (i modelli Pydantic su ogni confine) · `clock.py` («oggi» costante) · `db.py` (SQLite in memoria, seminato da `data/mailbox.json`) · `agents/` (triage, sicurezza, semplificatore, verificatore, compositore) · `engines/` (`normalize`, `fact_extract`, `phishing_rules`, `plain_rules`, `gulpease`) · `llm/` (la seam) · `state/` (checkpoint esternalizzato) |
 | [`app/frontend/`](app/frontend/) | Una pagina, tre viste. Base 20px, target 48px, contrasto AAA, `aria-live`, tastiera completa. Nessun passo di build: si apre e funziona |
 | [`app/tests/`](app/tests/) | La suite. Include il test statico «zero rete» e i test end-to-end del percorso di Maria |
-| [`agents/`](agents/) | I due sistemi agentici, tenuti separati: `build-time/` (chi ha costruito) e `runtime/` (chi gira nel prodotto). I **prompt in `runtime/prompts/` sono caricati dal codice**, non descritti da esso |
+| [`agents/`](agents/) | I due sistemi agentici, tenuti separati: `build-time/` (chi ha costruito — agenti, [comandi](agents/build-time/commands/), [skill condivise](agents/build-time/skills/), [stato di build](agents/build-time/state/progress.json)) e `runtime/` (chi gira nel prodotto — specifiche, [prompt](agents/runtime/prompts/), [schema](agents/runtime/contracts/), [routing](agents/runtime/routing.md)). I **prompt di `runtime/prompts/` sono caricati dal codice**, non descritti da esso |
 | [`presentation/`](presentation/) | Il deck HTML in 11 slide, brandizzato Accenture |
 | [`docs/`](docs/) | I quattro deliverable richiesti dal bando + validazione + efficienza |
 
@@ -178,7 +178,7 @@ La mappa che un giurato deve trovare senza cercarla. Ogni riga punta a file che 
 | 03 | **Robustezza** | **15%** | Fallback dichiarato per ogni agente nel proprio file `runtime/0*.md` e applicato in `orchestrator._Corsa.esegui` · `MAX_SIMPLIFY_RETRIES = 2`, `TIMEOUT_AGENTE_MS = 2000`, `BUDGET_TOKEN_EMAIL = 4000` · **HITL su due livelli**: nel prodotto nessun invio parte senza il click di Maria (`POST /api/email/{id}/invia`), nella build nessuna fase avanza senza un gate umano registrato in [`agents/build-time/state/progress.json`](agents/build-time/state/progress.json) · FactGuard: [`app/backend/agents/verificatore.py`](app/backend/agents/verificatore.py) |
 | 04 | **Efficienza dei token** | **12%** | [`agents/runtime/routing.md`](agents/runtime/routing.md) — per ogni agente è scritto **quando NON chiamare un LLM** · **0 token per email** nel default, misurati · cache sullo stato esternalizzato: ri-aprire la stessa email costa 0 · numeri affiancati in [`docs/TOKEN-EFFICIENCY.md`](docs/TOKEN-EFFICIENCY.md) |
 | 05 | **Qualità tecnica** | **12%** | Error handling centralizzato in `orchestrator._Corsa.esegui` (un'eccezione degrada, non uccide) e handler globale in [`main.py`](app/backend/main.py) · timeout per agente · retry con feedback sul ciclo semplifica/verifica · **secrets ed env**: nessuna chiave esiste, [`.env.example`](.env.example) documenta le due sole variabili, entrambe facoltative · **model tiering** dichiarato in `routing.md` e implementato in [`llm/client.py`](app/backend/llm/client.py) (`MODELLO_TRIAGE` Haiku, `MODELLO_LINGUA` Sonnet) |
-| 06 | **Adeguatezza degli strumenti** | **11%** | [`agents/README.md`](agents/README.md) §3 — 9 agenti di build, ciascuno con una motivazione dichiarata e un **confine di file disgiunto** · **3 agenti di runtime su 6 non hanno una seam LLM, e il perché è scritto** in `routing.md` §2: lo strumento sbagliato nel posto sbagliato costa quanto quello mancante · 5 motori a regole, uno per compito, nessuna libreria aggiunta dove basta la standard library |
+| 06 | **Adeguatezza degli strumenti** | **11%** | [`agents/README.md`](agents/README.md) §3 — 9 agenti di build, ciascuno con una motivazione dichiarata e un **confine di file disgiunto** · **3 agenti di runtime su 6 non hanno una seam LLM, e il perché è scritto** in `routing.md` §2: lo strumento sbagliato nel posto sbagliato costa quanto quello mancante · 3 comandi riutilizzabili in [`agents/build-time/commands/`](agents/build-time/commands/) e 3 skill condivise in [`agents/build-time/skills/`](agents/build-time/skills/), non uno di più · 5 motori a regole, uno per compito, nessuna libreria aggiunta dove basta la standard library |
 | 07 | **Documentazione** | **7%** | Questo README · [`agents/`](agents/) · [`docs/`](docs/): [PERSONA](docs/PERSONA.md) · [PERCORSO-ASSISTITO](docs/PERCORSO-ASSISTITO.md) · [AUTONOMIA-E-LIMITI](docs/AUTONOMIA-E-LIMITI.md) · [PROCESSO-AI](docs/PROCESSO-AI.md) · [VALIDAZIONE](docs/VALIDAZIONE.md) · [TOKEN-EFFICIENCY](docs/TOKEN-EFFICIENCY.md) |
 
 ---
@@ -190,11 +190,11 @@ La mappa che un giurato deve trovare senza cercarla. Ogni riga punta a file che 
 python -m pytest -q
 ```
 
-**Risultato su un clone pulito, con le sole dipendenze di `requirements.txt`: 52 passati, 1 saltato.**
+**Risultato su un clone pulito, con le sole dipendenze di `requirements.txt`: 57 passati, 1 saltato.**
 
 Il saltato è la suite end-to-end del browser ([`app/tests/test_e2e_frontend.py`](app/tests/test_e2e_frontend.py)): usa **Playwright**, che è una dipendenza **facoltativa** e non è in `requirements.txt`. Senza Playwright il modulo si salta invece di fallire, così la suite principale non dipende da un pacchetto opzionale.
 
-Con Playwright installato quella suite gira davvero — avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium — e il totale diventa **65 passati, 0 saltati**. Dettaglio di cosa copre ciascun file: [`docs/VALIDAZIONE.md`](docs/VALIDAZIONE.md).
+Con Playwright installato quella suite gira davvero — avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium — e il totale diventa **70 passati, 0 saltati**. Dettaglio di cosa copre ciascun file: [`docs/VALIDAZIONE.md`](docs/VALIDAZIONE.md).
 
 **Nessun test tocca la rete** — ed è banale rispettarlo, perché nel progetto non esiste codice capace di toccarla. Il primo test di `test_llm_modes.py` lo dimostra invece di assumerlo.
 

@@ -527,9 +527,9 @@
       <span class="eyebrow">Evidenza, non impressione</span>
       <h1><span class="grad">Validazione</span></h1>
       <div class="g3" style="margin-bottom:clamp(10px,2vh,20px)">
-        <div class="card"><div class="kpi viola">65</div><div class="kpi-eti">test superati · 13 nel browser vero</div></div>
+        <div class="card"><div class="kpi viola">70</div><div class="kpi-eti">test superati · 13 nel browser vero</div></div>
         <div class="card"><div class="kpi viola">90,1</div><div class="kpi-eti">Gulpease della sintesi, em-01 (molto facile)</div></div>
-        <div class="card"><div class="kpi rosa">3</div><div class="kpi-eti">falsi positivi reali trovati e corretti</div></div>
+        <div class="card"><div class="kpi rosa">4</div><div class="kpi-eti">falsi positivi reali trovati eseguendo, non leggendo</div></div>
       </div>
       <div class="g23">
         <table>
@@ -543,11 +543,11 @@
         <ul class="bullets fitta">
           <li><strong>Onestà sul dato:</strong> il <em>corpo riscritto</em> guadagna poco &mdash; <strong>57,0 &rarr; 57,3</strong> di media. Un motore a regole non può rifondere le frasi senza rischiare di tradirle.</li>
           <li>Il guadagno vero è nella <strong>sintesi Chi / Cosa / Entro quando</strong>, che è anche ciò che Maria legge per prima.</li>
-          <li>Eseguire la pipeline sul corpus ha fatto emergere <strong>3 falsi positivi veri</strong>: l'email INPS autentica veniva segnalata come phishing perché conteneva &laquo;non richiede mai le credenziali&raquo;.</li>
+          <li>Eseguire la pipeline sul corpus ha fatto emergere <strong>4 falsi positivi veri</strong>, due dei quali della stessa famiglia: <strong>cecità alla negazione</strong>. L'INPS autentico finiva in phishing perché diceva &laquo;non richiede mai le credenziali&raquo;, e la sua scheda diceva &laquo;Le chiedono di rispondere&raquo; perché diceva &laquo;non rispondere&raquo;.</li>
         </ul>
       </div>
     </div>
-    <aside class="nota">65 test verdi, di cui 13 girano in un Chromium vero. Su un clone pulito sono 52 piu' uno saltato, perche' Playwright e' una dipendenza facoltativa e non sta in requirements.txt. Il Gulpease misurato sul corpus: la sintesi sale davvero, fino a 90 su em-01. Il corpo riscritto quasi no, da 57,0 a 57,3 di media, e lo diciamo noi per primi: un motore a regole non rifonde le frasi senza rischiare di tradirle, ed è esattamente per questo che la seam LLM esiste. Eseguire la pipeline sul corpus ha fatto emergere tre falsi positivi veri, poi corretti: l'email INPS autentica finiva in phishing perché diceva "non richiede mai le credenziali".</aside>
+    <aside class="nota">70 test verdi, di cui 13 girano in un Chromium vero. Su un clone pulito sono 57 piu' uno saltato, perche' Playwright e' una dipendenza facoltativa e non sta in requirements.txt. Il Gulpease misurato sul corpus: la sintesi sale davvero, fino a 90 su em-01. Il corpo riscritto quasi no, da 57,0 a 57,3 di media, e lo diciamo noi per primi: un motore a regole non rifonde le frasi senza rischiare di tradirle, ed è esattamente per questo che la seam LLM esiste. Eseguire la pipeline sul corpus ha fatto emergere quattro falsi positivi veri, due della stessa famiglia: la cecita' alla negazione. L'INPS autentico finiva in phishing perche' diceva "non richiede mai le credenziali", e la sua scheda diceva "Le chiedono di rispondere" perche' diceva "non rispondere". Nessuno dei quattro si vedeva leggendo il codice.</aside>
   </section>
 
   <!-- ============ 10 ============ -->

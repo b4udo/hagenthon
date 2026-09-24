@@ -196,18 +196,22 @@ def elabora(
         for tentativo in range(MAX_SIMPLIFY_RETRIES + 1):
             etichetta = f"04-semplificatore (tentativo {tentativo + 1})"
 
-            if not corsa.budget_residuo():
-                corsa.salta(etichetta, "budget di token esaurito, si usano le regole")
+            # Il budget si fa rispettare qui, non si annota soltanto: esaurito
+            # il budget la seam non viene attraversata e l'agente gira a
+            # regole. La traccia lo dichiara, cosi' il pannello «Come ha
+            # ragionato» mostra *perche'* quel tentativo e' costato zero.
+            a_secco = not corsa.budget_residuo()
 
             semplificazione = corsa.esegui(
                 etichetta,
-                lambda f=feedback: semplificatore.esegui(
+                lambda f=feedback, r=a_secco: semplificatore.esegui(
                     email.mittente_nome,
                     email.oggetto,
                     email.corpo,
                     esito_triage.categoria,
                     fatti,
                     f,
+                    solo_regole=r,
                 ),
                 lambda: EsitoSemplificazione(
                     chi_scrive=email.mittente_nome,
@@ -215,6 +219,7 @@ def elabora(
                     entro_quando=None,
                     testo_semplificato=email.corpo,
                 ),
+                nota="budget di token esaurito: seam non attraversata" if a_secco else "",
             )
 
             testo = semplificazione.testo_semplificato
@@ -254,11 +259,16 @@ def elabora(
     elif esito_triage.categoria is Categoria.COMMERCIALE:
         corsa.salta("06-compositore", "a una pubblicita' non si risponde")
     else:
-        fatti_verificati = fatti if mostrata else fatti
+        # I fatti passati al compositore sono sempre quelli estratti
+        # dall'**originale**, anche quando FactGuard ha rifiutato la
+        # semplificazione. Non e' una svista: l'agente 05 non filtra i fatti,
+        # verifica che il testo semplificato li abbia conservati. Se il testo
+        # e' stato rifiutato, i fatti dell'originale restano gli unici veri —
+        # ed e' esattamente da li' che deve venire la data della risposta.
         bozze = corsa.esegui(
             "06-compositore",
             lambda: compositore.esegui(
-                email.mittente_nome, esito_triage.categoria, fatti_verificati, nome_utente
+                email.mittente_nome, esito_triage.categoria, fatti, nome_utente
             ),
             lambda: [],
         )

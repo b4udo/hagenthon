@@ -55,11 +55,15 @@ Esito e orario reale di ogni gate sono registrati in [`../agents/build-time/stat
 
 ## 3. Cosa una persona ha rivisto e corretto
 
-Questa è la parte che conta: gli agenti hanno scritto quasi tutto il codice, ma **cinque correzioni sostanziali sono nate da una revisione umana su output reali**, non da un test che diventava rosso. Tutte e cinque hanno lasciato una traccia nel codice, sotto forma di commento che spiega l'errore — perché un vincolo senza la sua ragione viene rimosso al primo refactoring.
+Questa è la parte che conta: gli agenti hanno scritto quasi tutto il codice, ma **sei correzioni sostanziali sono nate da una revisione umana su output reali**, non da un test che diventava rosso. Tutte hanno lasciato una traccia nel codice, sotto forma di commento che spiega l'errore — perché un vincolo senza la sua ragione viene rimosso al primo refactoring.
 
-### ★ Tre falsi positivi trovati eseguendo la pipeline sul corpus
+### ★ Quattro falsi positivi trovati eseguendo la pipeline sul corpus
 
 Non sono ipotesi: sono comportamenti osservati facendo girare la pipeline sulle sei email vere.
+**Nessuno dei quattro si vedeva leggendo il codice**, e due appartengono alla stessa famiglia —
+la cecità alla negazione — il che è la ragione per cui vale la pena contarli invece di
+correggerli in silenzio: una classe di errore che si ripresenta è un difetto di metodo, non
+una svista.
 
 #### (a) L'email autentica dell'INPS classificata come phishing
 
@@ -99,6 +103,29 @@ Il bug era concettuale, non sintattico. Il verificatore confrontava i valori tro
 > **«Inventato» significa: non c'è nell'originale. Non significa: non è fra i fatti protetti.**
 
 **Correzione.** `verificatore.verifica()` riceve un parametro in più, `testo_originale`, e i candidati «inventati» vengono confrontati con **tutto ciò che il testo originale contiene davvero**, non con la lista ristretta. La distinzione è scritta per esteso nel commento del codice, perché è il tipo di dettaglio che verrebbe «semplificato via» da chi legge la funzione fra sei mesi.
+
+#### (d) «Le chiedono di rispondere» su un'email che dice di non rispondere
+
+Ancora `em-04`, e ancora la negazione — stavolta nel semplificatore. La chiusura di rito di
+quasi ogni comunicazione automatica di un ente è:
+
+> *«La presente comunicazione è generata automaticamente: si prega di **non rispondere** a
+> questo indirizzo.»*
+
+`plain_rules.azione_richiesta` cercava la sottostringa `rispondere` e restituiva
+**«Le chiedono di rispondere.»** — nella scheda *Cosa le chiedono*, cioè la prima riga che Maria
+legge, su una comunicazione puramente informativa che le chiede l'esatto contrario.
+
+È **la stessa classe di errore di (a)**, in un altro motore: una regola che cerca una parola
+chiave e non guarda se è negata. Che si sia ripresentata dopo essere stata corretta una volta è
+il motivo per cui ora è documentata come *famiglia* e non come caso isolato.
+
+**Correzione.** `RE_NEGAZIONE_AZIONE` in `engines/plain_rules.py`: si scorrono **tutte** le
+occorrenze del verbo e si scarta quella preceduta da una negazione nei 24 caratteri precedenti.
+Scorrere tutte le occorrenze, e non solo la prima, è ciò che impedisce alla correzione di
+introdurre il falso positivo opposto: se un'email dicesse *«si presenti allo sportello»* **e**
+*«non risponda a questo indirizzo»*, la richiesta vera deve comunque emergere. I tre casi sono
+in `app/tests/test_plain_rules.py`.
 
 ### Due riscritture nate da output palesemente sbagliati
 

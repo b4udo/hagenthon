@@ -20,7 +20,14 @@ La risposta si **sceglie**, non si scrive.
 
 ## Input
 
-`Email`, `EsitoTriage`, e i `Fatto` **verificati** — cioè quelli sopravvissuti all'agente 05.
+`Email`, `EsitoTriage`, e i `Fatto` estratti dall'agente 3 **dal testo originale**.
+
+> ★ **Precisazione che conta.** L'agente 05 non filtra i fatti: verifica che il *testo
+> semplificato* li abbia conservati. I fatti restano dunque quelli dell'originale anche quando
+> FactGuard rifiuta la semplificazione — ed è giusto così, perché la data da mettere nella
+> risposta dev'essere quella vera, non quella sopravvissuta a una riscrittura. «Slot riempiti
+> solo con fatti verificati» qui significa **estratti e ancorati dall'agente 3**, mai dedotti
+> dal modello.
 
 ## Output
 

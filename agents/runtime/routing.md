@@ -44,7 +44,7 @@ Regole valutate **prima** di attraversare la seam. Ognuna è un test in `app/tes
 | Regola | Agente | Motivo |
 |---|---|---|
 | `LLM_MODE=off` | tutti | Default. Il progetto è completo e dimostrabile senza mai attraversare la seam |
-| Esiste un checkpoint in `state/data/<id>.json` | tutti | Ri-processare la stessa email costa **0**. La cache non è un'ottimizzazione: è il caso normale in demo |
+| Esiste un checkpoint nella tabella `stato_pipeline` | tutti | Ri-processare la stessa email costa **0**. La cache non è un'ottimizzazione: è il caso normale in demo |
 | Budget dell'email esaurito (`> 4000` token) | tutti | Si degrada a regole. La pipeline non si interrompe mai per budget |
 | Semaforo **rosso** | 4, 6 | Su phishing non si semplifica e non si compone. Non ha senso spendere token per un testo che l'utente non deve leggere né a cui deve rispondere |
 | Categoria `commerciale` | 4 | Una newsletter va messa in secondo piano, non tradotta |
@@ -52,9 +52,18 @@ Regole valutate **prima** di attraversare la seam. Ognuna è un test in `app/tes
 | Nessun fatto estratto e corpo < 400 caratteri | 4 | Non c'è niente da preservare né da chiarire |
 | Il mittente è in rubrica | 4 | Una persona conosciuta non scrive in burocratese |
 
-L'effetto combinato sul corpus di demo: in `replay`, **2 email su 6** attraversano davvero una
-seam. Le altre 4 sono servite dalle regole a costo zero. Questo numero è in
-`docs/TOKEN-EFFICIENCY.md` e non è un'ipotesi: è ciò che fanno le regole qui sopra.
+L'effetto combinato sul corpus di demo, **misurato eseguendo la pipeline** e non stimato:
+
+| Seam | Email che la attraversano | Fermate dalle regole |
+|---|---:|---|
+| 1 · triage | 6 su 6 | — |
+| 4 · semplificatore | 3 su 6 | em-03 (rosso), em-05 (in rubrica, corpo breve), em-06 (commerciale) |
+| 6 · compositore | 4 su 6 | em-03 (rosso), em-06 (commerciale) |
+
+**13 attraversate su 18 possibili**: le regole ne eliminano 5, cioè **≈ 28% dei token evitati**.
+Solo `em-03` e `em-06` non attraversano **nessuna seam di linguaggio** — sono le due email su cui
+il costo marginale è davvero zero. I conti per esteso sono in
+[`../../docs/TOKEN-EFFICIENCY.md`](../../docs/TOKEN-EFFICIENCY.md).
 
 ---
 

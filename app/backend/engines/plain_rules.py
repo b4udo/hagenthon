@@ -146,6 +146,9 @@ LOCUZIONI: tuple[tuple[str, str], ...] = (
     (r"\bcodesto\s+ufficio\b", "il nostro ufficio"),
     (r"\bquesto\s+ufficio\b", "il nostro ufficio"),
     (r"\bsportello\s+n\.\s*(\d+)", r"sportello numero \1"),
+    # Prima le locuzioni intere: «cedolino pensione» e' il nome del servizio.
+    # Sostituendo il solo «cedolino» resterebbe «foglio della pensione pensione».
+    (r"\bcedolino\s+(?:della\s+)?pensione\b", "foglio della pensione"),
     (r"\bil\s+cedolino\b", "il foglio della pensione"),
     (r"\bcedolino\b", "foglio della pensione"),
 )
@@ -295,9 +298,35 @@ AZIONI = (
 )
 
 
+# Un verbo negato non e' una richiesta. «si prega di non rispondere a questo
+# indirizzo» e' l'esatto contrario di «Le chiedono di rispondere», ed e' la
+# chiusura di rito di quasi ogni comunicazione automatica di un ente.
+#
+# E' la stessa cecita' alla negazione gia' corretta in phishing_rules: li'
+# faceva passare per truffa l'INPS autentico, qui trasforma una comunicazione
+# informativa in una che pretende una risposta. La scheda «Cosa le chiedono»
+# e' la prima cosa che Maria legge: sbagliarla e' peggio che tacere.
+RE_NEGAZIONE_AZIONE = re.compile(
+    r"\bnon\s+(?:le\s+|vi\s+|ci\s+|ti\s+|si\s+)?$"
+    r"|\bdi\s+non\s+$"
+    r"|\bnessun[ao]?\s+\S*\s*$",
+    re.IGNORECASE,
+)
+
+
+def _negata(minuscolo: str, inizio: int) -> bool:
+    """Vero se il verbo che comincia a `inizio` e' preceduto da una negazione.
+
+    Si guarda solo la manciata di caratteri precedenti: «non rispondere» e
+    «prega di non rispondere» sono negati, «risponda entro il 10» no.
+    """
+    return bool(RE_NEGAZIONE_AZIONE.search(minuscolo[max(0, inizio - 24):inizio]))
+
+
 def azione_richiesta(testo: str) -> str | None:
     minuscolo = testo.lower()
     for parola, frase in AZIONI:
-        if parola in minuscolo:
-            return frase
+        for trovato in re.finditer(rf"\b{re.escape(parola)}", minuscolo):
+            if not _negata(minuscolo, trovato.start()):
+                return frase
     return None
