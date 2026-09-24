@@ -248,16 +248,27 @@ def valuta(
     if grave:
         return "rosso", segnali, ente_impersonato
 
-    if len(urgenze) >= 2:
-        return "rosso", segnali, ente_impersonato
-
     if in_rubrica:
         return "verde", segnali, None
 
+    # ★ Il dominio verificato viene PRIMA dell'urgenza, non dopo.
+    #
+    # La spec (02-sicurezza.md) dice: «due segnali +1 o piu', **senza un
+    # dominio verificato** -> rosso». Il codice controllava l'urgenza per
+    # prima, quindi una comunicazione autentica da inps.it che dicesse «entro
+    # 24 ore» e «ultimo avviso» finiva rossa.
+    #
+    # E' la terza volta che lo stesso errore si presenta in questo motore: un
+    # segnale letto senza guardare **chi lo manda** o **se e' negato**. Un ente
+    # vero ha tutto il diritto di mettere fretta: e' il mittente a dire se la
+    # fretta e' legittima, non la parola.
     if any(dominio == d.lstrip(".") or dominio.endswith(d) for d in DOMINI_ISTITUZIONALI):
         if urgenze:
             return "giallo", segnali, None
         return "verde", segnali, None
+
+    if len(urgenze) >= 2:
+        return "rosso", segnali, ente_impersonato
 
     # Uno sconosciuto innocuo e' giallo, mai verde. Il costo di un falso verde
     # (Maria si fida di una truffa) non e' paragonabile a quello di un falso

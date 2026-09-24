@@ -44,5 +44,8 @@ def test_l_invio_incrementa_il_contatore_di_autonomia(client_api):
     )
 
     assert risposta.status_code == 200
-    assert risposta.json() == {"inviata": True, "completate_da_sola": 1}
+    corpo = risposta.json()
+    assert corpo["inviata"] is True
+    assert corpo["completate_da_sola"] == 1
+    assert corpo["allegato"] is None       # senza allegato, il campo c'e' ed e' nullo
     assert client_api.get("/api/autonomia").json()["completate_da_sola"] == 1

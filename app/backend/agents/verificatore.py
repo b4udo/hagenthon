@@ -98,8 +98,14 @@ def verifica(
     # nell'originale compare come "con valuta 1 ottobre 2026" non e' un fatto
     # — ma esiste, e denunciarla come inventata e' un falso positivo.
     # Il confronto va fatto contro il testo originale, non contro la lista.
+    # La scansione dell'originale serve **solo** se e' rimasto qualche orfano
+    # da giudicare. Sul percorso felice — verifica superata, nessun orfano —
+    # non c'e' niente da confrontare, e rileggere tutto l'originale per non
+    # usarne il risultato e' lavoro buttato, per giunta dentro il ciclo di
+    # retry, dove l'originale non cambia mai.
     nell_originale: dict[str, set[str]] = {}
-    if testo_originale is not None:
+    ci_sono_orfani = any(orfani.get(tipo) for tipo in TIPI_CON_INVENZIONE)
+    if testo_originale is not None and ci_sono_orfani:
         nell_originale = {
             tipo: {v for _, v in valori}
             for tipo, valori in fact_extract.estrai_valori_grezzi(

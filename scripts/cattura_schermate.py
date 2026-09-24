@@ -95,8 +95,12 @@ def cattura() -> None:
             pagina.wait_for_selector("#semaforo")
             salva(pagina, "04-truffa-semaforo-rosso.png")
 
-            # FactGuard che rifiuta, dal vivo
-            pagina.goto(base)
+            # FactGuard che rifiuta, dal vivo.
+            # ?tecnico=1 e' obbligatorio: il pulsante «E se l'AI sbaglia?» e'
+            # uno strumento da presentatore e sta dietro il modo tecnico, dove
+            # Maria non lo trova. Senza il parametro resta nascosto e il click
+            # va in timeout.
+            pagina.goto(f"{base}/?tecnico=1")
             pagina.wait_for_selector(".voce")
             pagina.locator(".voce", has_text="INPS").first.click()
             pagina.wait_for_selector("#semaforo")

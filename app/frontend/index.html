@@ -59,6 +59,10 @@
       ✓ A questa email ha già risposto.
     </p>
 
+    <p class="stato-verifica" id="stato-verifica" hidden role="status">
+      ⏳ Luca sta verificando questo messaggio. La richiamerà lui.
+    </p>
+
     <div class="azioni-cartella">
       <button type="button" class="bottone bottone-secondario" id="btn-elimina">
         Sposta nella posta eliminata
@@ -137,6 +141,60 @@
           </button>
         </div>
         <p class="voce-stato" id="voce-stato" role="status" aria-live="polite"></p>
+
+        <!-- allegato: un documento già salvato, oppure una foto scattata ora.
+             Due strade equivalenti, presentate con lo stesso peso: quale sia
+             più comoda dipende dal momento, non da noi. Gli <input> restano
+             fuori dal flusso visivo ma raggiungibili: sono i <label> a fare
+             da pulsanti, così l'area di tocco è grande e il testo è chiaro. -->
+        <div class="allega">
+          <h5 id="titolo-allega">Vuole allegare qualcosa?</h5>
+          <div class="allega-scelte" role="group" aria-labelledby="titolo-allega">
+            <label class="bottone bottone-allega" for="file-documento">
+              <span aria-hidden="true">📎</span> Scelga un documento
+              <input type="file" id="file-documento"
+                     accept=".pdf,.jpg,.jpeg,.png,.heic,image/*,application/pdf" />
+            </label>
+            <button type="button" class="bottone bottone-allega" id="btn-fotocamera">
+              <span aria-hidden="true">📷</span> Scatti una foto
+            </button>
+            <!-- Ripiego se la fotocamera non è disponibile o viene negata:
+                 su telefono `capture` apre comunque l'app fotocamera. -->
+            <label class="bottone bottone-allega" for="file-foto" id="ripiego-foto" hidden>
+              <span aria-hidden="true">📷</span> Scatti una foto
+              <input type="file" id="file-foto" accept="image/*" capture="environment" />
+            </label>
+          </div>
+
+          <!-- vista fotocamera: si apre solo quando serve -->
+          <div class="fotocamera" id="fotocamera" hidden>
+            <video id="video-fotocamera" playsinline muted
+                   aria-label="Anteprima della fotocamera"></video>
+            <p class="aiuto" id="aiuto-fotocamera">
+              Appoggi il foglio sul tavolo e lo inquadri tutto. Quando si vede bene, prema Scatta.
+            </p>
+            <div class="fotocamera-comandi">
+              <button type="button" class="bottone bottone-scatta" id="btn-scatta">
+                <span aria-hidden="true">⬤</span> Scatta
+              </button>
+              <button type="button" class="bottone bottone-secondario" id="btn-chiudi-fotocamera">
+                Annulla
+              </button>
+            </div>
+          </div>
+
+          <div class="allegato-scelto" id="allegato-scelto" hidden>
+            <img class="anteprima-foto" id="anteprima-foto" alt="" hidden />
+            <div class="allegato-testo">
+              <span class="allegato-nome" id="allegato-nome"></span>
+              <span class="allegato-peso" id="allegato-peso"></span>
+            </div>
+            <button type="button" class="bottone bottone-secondario" id="btn-togli-allegato">
+              Togli
+            </button>
+          </div>
+          <p class="allegato-errore" id="allegato-errore" hidden role="alert"></p>
+        </div>
 
         <div class="azioni-bozza">
           <button type="button" class="bottone bottone-invia" id="btn-invia">

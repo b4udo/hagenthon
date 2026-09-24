@@ -29,6 +29,12 @@
   --accento:      #5b21b6;
   --accento-fondo:#f3ecff;
 
+  /* Stato della pratica — deliberatamente fuori dalla scala del semaforo. */
+  --blu:          #14507d;  /* 7.4:1 su bianco — «l'ha chiusa lei» */
+  --blu-fondo:    #e7f1fa;
+  --attesa:       #6b3a8f;  /* 7.6:1 su bianco — «sta aspettando qualcuno» */
+  --attesa-fondo: #f2e9fb;
+
   --raggio: 12px;
   --tocco: 48px;           /* 44 e' il minimo; 48 lascia margine al tremore */
 }
@@ -173,27 +179,112 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
 .cartella[aria-current="page"] .conteggio { background: #ffffff; color: #43156e; }
 .conteggio:empty { display: none; }
 
-/* ─────────── già risposto ───────────
+/* ─────────── stato della pratica ───────────
 
-   Lo stato non e' affidato al solo colore: c'e' la spunta e c'e' la parola. */
+   Due stati che non sono verdetti di sicurezza, e che percio' non devono
+   usare i colori del semaforo: verde, giallo e rosso significano gia'
+   «e' sicura», «controlla», «e' una truffa». Riusarli per dire «fatto» o
+   «in attesa» costringerebbe a distinguere due verdi diversi a colpo
+   d'occhio, che e' esattamente il compito che stiamo cercando di togliere.
 
-.risposto {
+     blu   = l'ha chiusa lei          -> Gia' risposto
+     viola = sta aspettando qualcuno  -> Luca sta verificando
+
+   Nessuno dei due e' affidato al solo colore: c'e' il simbolo e c'e' la
+   parola, e lo stato e' anche nel nome accessibile della riga. */
+
+.risposto, .in-verifica {
   display: inline-flex; align-items: center; gap: 6px;
-  background: var(--verde-fondo); color: var(--verde);
-  border: 2px solid var(--verde);
   border-radius: 999px; padding: 2px 12px;
   font-size: 0.78rem; font-weight: 700;
+  border: 2px solid;
 }
-.stato-risposta {
-  background: var(--verde-fondo);
-  border: 2px solid var(--verde);
-  color: var(--verde);
+.risposto    { background: var(--blu-fondo);   color: var(--blu);    border-color: var(--blu); }
+.in-verifica { background: var(--attesa-fondo); color: var(--attesa); border-color: var(--attesa); }
+
+.stato-risposta, .stato-verifica {
   border-radius: var(--raggio);
   padding: 12px 16px;
   font-weight: 700;
   margin: 0 0 16px;
+  border: 2px solid;
 }
+.stato-risposta { background: var(--blu-fondo);    color: var(--blu);    border-color: var(--blu); }
+.stato-verifica { background: var(--attesa-fondo); color: var(--attesa); border-color: var(--attesa); }
+
+.voce-verifica { border-left: 6px solid var(--attesa); }
 .azioni-cartella { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+
+/* ─────────── allegare un documento o una foto ───────────
+
+   Le due strade hanno lo stesso aspetto e la stessa dimensione: quale sia
+   piu' comoda dipende dal momento della persona, non da una nostra
+   preferenza. L'<input type=file> nativo e' un target minuscolo con
+   un'etichetta che non si puo' riscrivere, quindi lo si nasconde alla vista
+   ma non alla tastiera, e il <label> fa da pulsante grande. */
+
+.allega { margin-top: 18px; }
+.allega h5 { margin: 0 0 10px; font-size: 1rem; }
+.allega-scelte { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Fondo tenue e bordo pieno: su una scheda bianca un pulsante bianco con
+   bordo grigio chiaro non si legge come un pulsante, si legge come testo. */
+.bottone-allega {
+  background: var(--accento-fondo); color: #43156e;
+  border-color: #a97ef0;
+  min-height: 56px;
+  display: inline-flex; align-items: center; gap: 10px;
+  position: relative;
+  cursor: pointer;
+}
+/* Non `display:none`: sparirebbe anche dal percorso di tabulazione. */
+.bottone-allega input[type="file"] {
+  position: absolute; width: 1px; height: 1px;
+  opacity: 0; overflow: hidden;
+}
+/* Il fuoco sta sull'input nascosto: l'anello va disegnato sul label. */
+.bottone-allega:focus-within { outline: 4px solid var(--accento); outline-offset: 3px; }
+
+/* La vista della fotocamera. Anteprima grande: chi ha la cataratta deve
+   potersi accorgere *prima* di scattare che il foglio è storto o tagliato. */
+.fotocamera {
+  margin-top: 14px; padding: 14px;
+  background: #101318; border: 2px solid var(--accento);
+  border-radius: var(--raggio);
+}
+.fotocamera video {
+  display: block; width: 100%; max-height: 46vh;
+  background: #000; border-radius: 10px;
+}
+.fotocamera .aiuto { color: #e8eaf0; margin: 12px 0; }
+.fotocamera-comandi { display: flex; flex-wrap: wrap; gap: 12px; }
+.bottone-scatta {
+  background: var(--rosso); color: #fff;
+  min-height: 56px; min-width: 180px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+.allegato-scelto {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 14px; padding: 12px 16px;
+  background: var(--sfondo-tenue); border: 2px solid var(--bordo);
+  border-radius: var(--raggio);
+}
+.anteprima-foto {
+  width: 84px; height: 84px; object-fit: cover;
+  border-radius: 10px; border: 2px solid var(--bordo);
+}
+.allegato-testo { flex: 1 1 200px; min-width: 0; }
+.allegato-nome {
+  display: block; font-weight: 700;
+  overflow-wrap: anywhere;      /* un nome lungo non deve allargare la scheda */
+}
+.allegato-peso { display: block; color: var(--inchiostro-tenue); font-size: 0.9rem; }
+.allegato-errore {
+  margin: 12px 0 0; padding: 12px 16px; font-weight: 700;
+  background: var(--rosso-fondo); border: 2px solid var(--rosso);
+  color: var(--rosso); border-radius: var(--raggio);
+}
 
 /* ─────────── chiedere aiuto ───────────
 
@@ -216,7 +307,7 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
 }
 
 /* La voce gia' risposta resta leggibile: si distingue, non si spegne. */
-.voce-risposta { border-left: 6px solid var(--verde); }
+.voce-risposta { border-left: 6px solid var(--blu); }
 
 /* ─────────── posta inviata ─────────── */
 

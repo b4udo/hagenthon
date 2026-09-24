@@ -188,3 +188,85 @@ def test_chiedere_aiuto_non_conta_come_risposta_inviata(cliente: TestClient):
     assert cliente.get("/api/autonomia").json()["completate_da_sola"] == 0
     dati = cliente.get("/api/mailbox").json()
     assert all(e["gia_risposto"] is False for e in dati["email"])
+
+
+# ───────────────────── allegati alla risposta ─────────────────────
+
+
+def test_si_puo_allegare_un_documento_alla_risposta(cliente: TestClient):
+    cliente.post("/api/email/em-02/elabora")
+    risposta = cliente.post(
+        "/api/email/em-02/invia",
+        json={
+            "intento": "conferma",
+            "testo": "Ecco il documento richiesto.",
+            "allegato": {
+                "nome": "carta_identita.jpg",
+                "tipo": "image/jpeg",
+                "dimensione": 218_000,
+            },
+        },
+    )
+    assert risposta.status_code == 200
+    assert risposta.json()["allegato"] == "carta_identita.jpg"
+
+    inviata = cliente.get("/api/mailbox?cartella=inviata").json()["email"][0]
+    assert inviata["allegato"]["nome"] == "carta_identita.jpg"
+    assert inviata["allegato"]["tipo"] == "image/jpeg"
+    assert inviata["allegato"]["dimensione"] == 218_000
+
+
+def test_l_allegato_e_facoltativo(cliente: TestClient):
+    cliente.post("/api/email/em-01/elabora")
+    risposta = cliente.post(
+        "/api/email/em-01/invia", json={"intento": "conferma", "testo": "Confermo."}
+    )
+    assert risposta.status_code == 200
+    assert risposta.json()["allegato"] is None
+    assert cliente.get("/api/mailbox?cartella=inviata").json()["email"][0]["allegato"] is None
+
+
+def test_del_file_si_conservano_solo_i_metadati(cliente: TestClient):
+    """I byte non arrivano mai al server, e il contratto non li prevede.
+
+    È posta sanitaria e previdenziale: un documento d'identità finito su un
+    disco perché «serviva per la demo» è esattamente ciò che non deve
+    succedere.
+    """
+    cliente.post("/api/email/em-02/elabora")
+    cliente.post(
+        "/api/email/em-02/invia",
+        json={
+            "intento": "conferma",
+            "testo": "Allegato.",
+            "allegato": {"nome": "foto.jpg", "tipo": "image/jpeg", "dimensione": 900},
+            "contenuto": "QUESTI-BYTE-NON-DEVONO-ENTRARE",
+        },
+    )
+    salvato = cliente.get("/api/mailbox?cartella=inviata").json()["email"][0]["allegato"]
+    assert set(salvato) == {"nome", "tipo", "dimensione"}
+
+
+# ───────────────────── «Luca sta verificando» ─────────────────────
+
+
+def test_una_email_inoltrata_risulta_in_verifica(cliente: TestClient):
+    dati = cliente.get("/api/mailbox").json()
+    assert all(e["inoltrata"] is False for e in dati["email"])
+
+    cliente.post("/api/email/em-03/aiuto")
+
+    per_id = {e["id"]: e for e in cliente.get("/api/mailbox").json()["email"]}
+    assert per_id["em-03"]["inoltrata"] is True
+    assert per_id["em-01"]["inoltrata"] is False
+
+    # Serve anche alla vista di lettura, che non passa dall'elenco.
+    assert cliente.post("/api/email/em-03/elabora").json()["inoltrata"] is True
+
+
+def test_inoltrata_e_gia_risposto_sono_stati_indipendenti(cliente: TestClient):
+    cliente.post("/api/email/em-01/elabora")
+    cliente.post("/api/email/em-01/aiuto")
+    per_id = {e["id"]: e for e in cliente.get("/api/mailbox").json()["email"]}
+    assert per_id["em-01"]["inoltrata"] is True
+    assert per_id["em-01"]["gia_risposto"] is False

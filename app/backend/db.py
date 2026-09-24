@@ -66,7 +66,10 @@ CREATE TABLE IF NOT EXISTS invio (
     email_id   TEXT NOT NULL,
     intento    TEXT NOT NULL,
     testo      TEXT NOT NULL,
-    inviato_il TEXT NOT NULL
+    inviato_il TEXT NOT NULL,
+    -- Solo i metadati dell'allegato (nome, tipo, dimensione), mai i byte:
+    -- il file resta nel browser. JSON, oppure NULL se non c'era allegato.
+    allegato   TEXT
 );
 
 -- Le volte in cui Maria ha girato un messaggio a una persona di fiducia.
@@ -198,10 +201,12 @@ def elenco_email(cartella: str = IN_ARRIVO) -> list[dict[str, Any]]:
         (cartella,),
     )
     risposte = id_con_risposta()
+    inoltrate = id_con_aiuto()
     elenco = []
     for r in righe:
         email = _riga_a_email(r)
         email["gia_risposto"] = email["id"] in risposte
+        email["inoltrata"] = email["id"] in inoltrate
         elenco.append(email)
     return elenco
 
@@ -211,17 +216,25 @@ def id_con_risposta() -> set[str]:
     return {r["email_id"] for r in interroga("SELECT DISTINCT email_id FROM invio")}
 
 
+def ha_risposto(email_id: str) -> bool:
+    """Una sola email, senza materializzare l'insieme di tutte le altre."""
+    return bool(interroga("SELECT 1 FROM invio WHERE email_id = ? LIMIT 1", (email_id,)))
+
+
 def conteggi_cartelle() -> dict[str, int]:
-    in_arrivo = interroga(
-        "SELECT COUNT(*) AS n FROM email WHERE cartella = ?", (IN_ARRIVO,)
-    )[0]["n"]
-    eliminate = interroga(
-        "SELECT COUNT(*) AS n FROM email WHERE cartella = ?", (ELIMINATA,)
-    )[0]["n"]
+    """Una sola scansione della tabella email invece di due COUNT separate.
+
+    Ogni interrogazione prende il lock globale: contarle e' contare
+    acquisizioni, non solo query.
+    """
+    per_cartella = {
+        r["cartella"]: int(r["n"])
+        for r in interroga("SELECT cartella, COUNT(*) AS n FROM email GROUP BY cartella")
+    }
     return {
-        IN_ARRIVO: int(in_arrivo),
+        IN_ARRIVO: per_cartella.get(IN_ARRIVO, 0),
         INVIATA: conteggio_invii(),
-        ELIMINATA: int(eliminate),
+        ELIMINATA: per_cartella.get(ELIMINATA, 0),
     }
 
 
@@ -303,12 +316,25 @@ def stati_salvati() -> list[dict[str, str]]:
 # ───────────────────────────── invii ─────────────────────────────
 
 
-def registra_invio(email_id: str, intento: str, testo: str, quando: str) -> None:
+def registra_invio(
+    email_id: str,
+    intento: str,
+    testo: str,
+    quando: str,
+    allegato: dict[str, Any] | None = None,
+) -> None:
     conn = connessione()
     with _lock:
         conn.execute(
-            "INSERT INTO invio (email_id, intento, testo, inviato_il) VALUES (?, ?, ?, ?)",
-            (email_id, intento, testo, quando),
+            """INSERT INTO invio (email_id, intento, testo, inviato_il, allegato)
+               VALUES (?, ?, ?, ?, ?)""",
+            (
+                email_id,
+                intento,
+                testo,
+                quando,
+                json.dumps(allegato, ensure_ascii=False) if allegato else None,
+            ),
         )
         conn.commit()
 
@@ -343,6 +369,13 @@ def id_con_aiuto() -> set[str]:
     return {r["email_id"] for r in interroga("SELECT DISTINCT email_id FROM richiesta_aiuto")}
 
 
+def e_inoltrata(email_id: str) -> bool:
+    """Una sola email, senza costruire l'insieme di tutte le altre."""
+    return bool(
+        interroga("SELECT 1 FROM richiesta_aiuto WHERE email_id = ? LIMIT 1", (email_id,))
+    )
+
+
 def conteggio_aiuti() -> int:
     return int(interroga("SELECT COUNT(*) AS n FROM richiesta_aiuto")[0]["n"])
 
@@ -355,7 +388,7 @@ def posta_inviata() -> list[dict[str, Any]]:
     join invece di duplicarli nella tabella `invio`, dove potrebbero divergere.
     """
     righe = interroga(
-        """SELECT i.id, i.email_id, i.intento, i.testo, i.inviato_il,
+        """SELECT i.id, i.email_id, i.intento, i.testo, i.inviato_il, i.allegato,
                   e.mittente_nome, e.mittente_email, e.oggetto
            FROM invio i
            LEFT JOIN email e ON e.id = i.email_id
@@ -371,6 +404,7 @@ def posta_inviata() -> list[dict[str, Any]]:
             "testo": r["testo"],
             "intento": r["intento"],
             "inviato_il": r["inviato_il"],
+            "allegato": json.loads(r["allegato"]) if r["allegato"] else None,
         }
         for r in righe
     ]

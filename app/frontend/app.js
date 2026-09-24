@@ -16,6 +16,9 @@ const stato = {
   bozzaScelta: null,
   dettaturaAccettata: false,  // l'avviso sulla dettatura si mostra una volta sola
   cartella: "in_arrivo",
+  allegato: null,             // il File scelto, che resta nel browser
+  urlAnteprima: null,         // object URL da revocare quando si cambia
+  flussoVideo: null,          // MediaStream aperto: va sempre fermato
 };
 
 const TITOLI_CARTELLA = {
@@ -97,7 +100,6 @@ function voceRicevuta(email) {
   const voce = document.createElement("li");
   const bottone = document.createElement("button");
   bottone.type = "button";
-  bottone.className = "voce" + (email.gia_risposto ? " voce-risposta" : "");
 
   // Un'email gia' risposta mostra **solo** «Già risposto».
   //
@@ -106,9 +108,17 @@ function voceRicevuta(email) {
   // secondo dice essere gia' fatta. Su una riga sola, con due pastiglie verdi
   // quasi identiche, e' rumore. Il semaforo ha gia' fatto il suo lavoro
   // quando serviva, cioe' prima della risposta.
-  const marcatore = email.gia_risposto
-    ? '<span class="risposto" data-risposto>✓ Già risposto</span>'
-    : '<span class="pallino pallino-attesa" data-pallino>· da controllare</span>';
+  // Precedenza: ha risposto > l'ha girata a Luca > il semaforo.
+  // Un marcatore solo per riga. Sono stati successivi della stessa pratica,
+  // e mostrarne due insieme costringe a capire quale conta.
+  let marcatore;
+  if (email.gia_risposto) {
+    marcatore = '<span class="risposto" data-risposto>✓ Già risposto</span>';
+  } else if (email.inoltrata) {
+    marcatore = '<span class="in-verifica" data-verifica>⏳ Luca sta verificando</span>';
+  } else {
+    marcatore = '<span class="pallino pallino-attesa" data-pallino>· da controllare</span>';
+  }
 
   bottone.innerHTML = `
     <span class="voce-alto">
@@ -122,11 +132,17 @@ function voceRicevuta(email) {
   bottone.querySelector(".voce-oggetto").textContent = email.oggetto;
   bottone.querySelector(".voce-data").textContent = dataItaliana(email.data_ricezione);
 
+  let stato_detto = "";
+  if (email.gia_risposto) stato_detto = " Già risposto.";
+  else if (email.inoltrata) stato_detto = " Luca sta verificando.";
+
+  bottone.className =
+    "voce" +
+    (email.gia_risposto ? " voce-risposta" : email.inoltrata ? " voce-verifica" : "");
+
   bottone.setAttribute(
     "aria-label",
-    `${email.mittente_nome}. ${email.oggetto}.` +
-      (email.gia_risposto ? " Già risposto." : "") +
-      " Apri per leggere."
+    `${email.mittente_nome}. ${email.oggetto}.${stato_detto} Apri per leggere.`
   );
 
   bottone.addEventListener("click", () => apri(email.id));
@@ -157,7 +173,8 @@ function voceInviata(invio) {
   bottone.querySelector(".voce-mittente").textContent = invio.destinatario_nome;
   bottone.querySelector(".voce-oggetto").textContent = invio.oggetto;
   bottone.querySelector(".voce-data").textContent = oraItaliana(invio.inviato_il);
-  bottone.querySelector(".anteprima").textContent = anteprima(invio.testo);
+  bottone.querySelector(".anteprima").textContent =
+    (invio.allegato ? `📎 ${invio.allegato.nome} · ` : "") + anteprima(invio.testo);
   bottone.setAttribute(
     "aria-label",
     `Risposta inviata a ${invio.destinatario_nome}. ${invio.oggetto}. Apri per rileggerla.`
@@ -176,9 +193,10 @@ function anteprima(testo) {
 }
 
 function mostraInviata(invio) {
+  const allegato = invio.allegato ? `\nAllegato: ${invio.allegato.nome}` : "";
   alert(
     `A: ${invio.destinatario_nome}\n` +
-      `Oggetto: ${invio.oggetto}\n\n${invio.testo}`
+      `Oggetto: ${invio.oggetto}${allegato}\n\n${invio.testo}`
   );
 }
 
@@ -245,6 +263,7 @@ async function apri(id, avvelena = false) {
   // rapido di confondersi su quale messaggio si sta ascoltando.
   Voce.fermaLettura();
   Voce.fermaAscolto();
+  chiudiFotocamera();
 
   const percorso = `/api/email/${id}/elabora` + (avvelena ? "?avvelena=true" : "");
   const [email, risultato] = await Promise.all([
@@ -286,6 +305,9 @@ function disegnaStatoCartella(r) {
   // se non fosse successo niente e' il modo piu' rapido di far inviare due
   // volte la stessa cosa a chi non ricorda di averlo gia' fatto.
   $("stato-risposta").hidden = !r.gia_risposto;
+  // Stessa ragione per l'attesa: se l'ha gia' girata a Luca deve ricordarselo
+  // invece di girargliela una seconda volta.
+  $("stato-verifica").hidden = !r.inoltrata || r.gia_risposto;
 
   const eliminata = r.cartella === "eliminata";
   $("btn-elimina").hidden = eliminata;
@@ -454,6 +476,7 @@ function scegliIntento(bozza, contenitore, bottone) {
   $("testo-bozza").value = bozza.testo;
   $("bozza").hidden = false;
   $("conferma-invio").hidden = true;
+  togliAllegato();
   statoVoce("");
   const avviso = $("bozza").querySelector(".voce-avviso");
   if (avviso) avviso.remove();
@@ -470,11 +493,22 @@ async function inviaRisposta() {
     body: JSON.stringify({
       intento: stato.bozzaScelta.intento,
       testo: $("testo-bozza").value,
+      allegato: stato.allegato
+        ? {
+            nome: stato.allegato.name,
+            tipo: stato.allegato.type || "sconosciuto",
+            dimensione: stato.allegato.size,
+          }
+        : null,
     }),
   });
 
   $("bozza").hidden = true;
+  $("conferma-invio").textContent = dati.allegato
+    ? `✓ Risposta inviata, con «${dati.allegato}» allegato.`
+    : "✓ Risposta inviata.";
   $("conferma-invio").hidden = false;
+  togliAllegato();
   aggiornaContatore(dati.completate_da_sola);
 
   // Da adesso questa email e' "gia' risposto", qui e nell'elenco.
@@ -488,6 +522,9 @@ async function chiediAiuto() {
   const conferma = $("conferma-aiuto");
   conferma.textContent = `✓ ${esito.messaggio}`;
   conferma.hidden = false;
+  // Da adesso l'email e' in attesa: lo dice qui e lo dira' nell'elenco.
+  if (stato.risultato) stato.risultato.inoltrata = true;
+  $("stato-verifica").hidden = Boolean(stato.risultato && stato.risultato.gia_risposto);
   // Lo dice anche a voce: chi fa fatica a leggere deve sapere che è partito.
   if (Voce.puoLeggere()) Voce.leggi(esito.messaggio);
 }
@@ -522,6 +559,194 @@ function disegnaTracce(r) {
     r.token_usati === 0
       ? "Questa email è costata 0 token: l'ha elaborata il motore deterministico."
       : `Token usati su questa email: ${r.token_usati}.`;
+}
+
+// ─────────────────────────── allegati ───────────────────────────
+//
+// Un documento gia' salvato, oppure una foto scattata sul momento. Il file
+// **non lascia il browser**: al server arrivano solo nome, tipo e dimensione.
+// Per un prototipo senza trasporto di posta reale, spedire i byte darebbe
+// l'impressione di una spedizione che non avviene.
+
+const MAX_BYTE_ALLEGATO = 10 * 1024 * 1024;
+
+function pesoLeggibile(byte) {
+  if (byte < 1024) return `${byte} byte`;
+  if (byte < 1024 * 1024) return `${Math.round(byte / 1024)} KB`;
+  return `${(byte / (1024 * 1024)).toFixed(1)} MB`.replace(".", ",");
+}
+
+function erroreAllegato(messaggio) {
+  const p = $("allegato-errore");
+  p.textContent = messaggio;
+  p.hidden = !messaggio;
+}
+
+function scegliAllegato(file) {
+  if (!file) return;
+
+  if (file.size > MAX_BYTE_ALLEGATO) {
+    erroreAllegato(
+      `Questo file è troppo grande (${pesoLeggibile(file.size)}). ` +
+        "Il limite è 10 MB."
+    );
+    return;
+  }
+  erroreAllegato("");
+
+  liberaAnteprima();
+  stato.allegato = file;
+
+  $("allegato-nome").textContent = file.name;
+  $("allegato-peso").textContent = pesoLeggibile(file.size);
+
+  const anteprima = $("anteprima-foto");
+  if (file.type && file.type.startsWith("image/")) {
+    // Vedere la foto e' l'unico modo di sapere se e' venuta leggibile.
+    stato.urlAnteprima = URL.createObjectURL(file);
+    anteprima.src = stato.urlAnteprima;
+    anteprima.alt = `Anteprima di ${file.name}`;
+    anteprima.hidden = false;
+  } else {
+    anteprima.hidden = true;
+    anteprima.removeAttribute("src");
+  }
+
+  $("allegato-scelto").hidden = false;
+  $("btn-togli-allegato").focus();
+}
+
+function liberaAnteprima() {
+  if (stato.urlAnteprima) {
+    URL.revokeObjectURL(stato.urlAnteprima);
+    stato.urlAnteprima = null;
+  }
+}
+
+function togliAllegato() {
+  liberaAnteprima();
+  stato.allegato = null;
+  $("allegato-scelto").hidden = true;
+  $("anteprima-foto").hidden = true;
+  $("anteprima-foto").removeAttribute("src");
+  erroreAllegato("");
+  for (const id of ["file-documento", "file-foto"]) $(id).value = "";
+}
+
+// ─────────────── la fotocamera ───────────────
+//
+// `<input capture>` apre la fotocamera **solo su telefono**: su un portatile
+// l'attributo viene ignorato e si apre il solito selettore di file. Per
+// aprire davvero l'obiettivo serve getUserMedia, che richiede un contesto
+// sicuro — `localhost` lo e', quindi la demo funziona senza certificati.
+//
+// Il flusso video non esce dal dispositivo: nessun frame viene inviato da
+// nessuna parte, lo scatto diventa un file che resta nel browser.
+
+function fotocameraDisponibile() {
+  return Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
+
+async function apriFotocamera() {
+  erroreAllegato("");
+  try {
+    stato.flussoVideo = await navigator.mediaDevices.getUserMedia({
+      // `environment` = fotocamera posteriore dove esiste; sul portatile
+      // non c'e' scelta e il browser ignora la preferenza senza fallire.
+      video: { facingMode: "environment", width: { ideal: 1280 } },
+      audio: false,
+    });
+  } catch (errore) {
+    // Negato, occupato o assente: si ripiega sul selettore di file, che su
+    // telefono apre comunque l'app fotocamera.
+    $("fotocamera").hidden = true;
+    $("btn-fotocamera").hidden = true;
+    $("ripiego-foto").hidden = false;
+    erroreAllegato(
+      errore && errore.name === "NotAllowedError"
+        ? "Non ho il permesso di usare la fotocamera. Lo conceda nella barra del browser, oppure scelga un documento già salvato."
+        : "Non riesco ad aprire la fotocamera. Può scegliere un documento già salvato."
+    );
+    return;
+  }
+
+  const video = $("video-fotocamera");
+  video.srcObject = stato.flussoVideo;
+  await video.play().catch(() => {});
+  $("fotocamera").hidden = false;
+  $("btn-scatta").focus();
+}
+
+function chiudiFotocamera() {
+  // Le tracce vanno fermate a mano: senza questo la spia della fotocamera
+  // resta accesa, e su un dispositivo altrui è inaccettabile.
+  if (stato.flussoVideo) {
+    for (const traccia of stato.flussoVideo.getTracks()) traccia.stop();
+    stato.flussoVideo = null;
+  }
+  const video = $("video-fotocamera");
+  video.pause();
+  video.srcObject = null;
+  $("fotocamera").hidden = true;
+}
+
+function scatta() {
+  const video = $("video-fotocamera");
+  const larghezza = video.videoWidth;
+  const altezza = video.videoHeight;
+  if (!larghezza || !altezza) {
+    erroreAllegato("La fotocamera non è ancora pronta. Riprovi fra un istante.");
+    return;
+  }
+
+  const tela = document.createElement("canvas");
+  tela.width = larghezza;
+  tela.height = altezza;
+  tela.getContext("2d").drawImage(video, 0, 0, larghezza, altezza);
+
+  tela.toBlob(
+    (blob) => {
+      if (!blob) {
+        erroreAllegato("Non sono riuscito a salvare la foto. Riprovi.");
+        return;
+      }
+      const adesso = new Date();
+      const due = (n) => String(n).padStart(2, "0");
+      const nome =
+        `foto-${adesso.getFullYear()}${due(adesso.getMonth() + 1)}${due(adesso.getDate())}` +
+        `-${due(adesso.getHours())}${due(adesso.getMinutes())}${due(adesso.getSeconds())}.jpg`;
+      chiudiFotocamera();
+      scegliAllegato(new File([blob], nome, { type: "image/jpeg" }));
+    },
+    "image/jpeg",
+    0.9
+  );
+}
+
+function preparaAllegati() {
+  $("file-documento").addEventListener("change", (e) => scegliAllegato(e.target.files[0]));
+  $("file-foto").addEventListener("change", (e) => scegliAllegato(e.target.files[0]));
+  $("btn-togli-allegato").addEventListener("click", () => {
+    togliAllegato();
+    $("file-documento").focus();
+  });
+
+  if (!fotocameraDisponibile()) {
+    // Browser senza getUserMedia: si mostra subito il ripiego, invece di un
+    // pulsante che promette una fotocamera e non la apre.
+    $("btn-fotocamera").hidden = true;
+    $("ripiego-foto").hidden = false;
+  } else {
+    $("btn-fotocamera").addEventListener("click", () => {
+      apriFotocamera().catch(() => erroreAllegato("Non riesco ad aprire la fotocamera."));
+    });
+  }
+
+  $("btn-scatta").addEventListener("click", scatta);
+  $("btn-chiudi-fotocamera").addEventListener("click", () => {
+    chiudiFotocamera();
+    $("btn-fotocamera").focus();
+  });
 }
 
 // ───────────────────────────── voce ─────────────────────────────
@@ -683,9 +908,11 @@ function preparaVoce() {
 // ───────────────────────────── avvio ─────────────────────────────
 
 function tornaAllElenco() {
-  // La voce non deve continuare a leggere un'email che non e' piu' aperta.
+  // La voce non deve continuare a leggere un'email che non e' piu' aperta,
+  // e la fotocamera non deve restare accesa alle spalle di chi l'ha aperta.
   Voce.fermaLettura();
   Voce.fermaAscolto();
+  chiudiFotocamera();
   statoVoce("");
   $("vista-lettura").hidden = true;
   $("vista-elenco").hidden = false;
@@ -699,6 +926,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   preparaVoce();
+  preparaAllegati();
 
   for (const bottone of document.querySelectorAll(".cartella")) {
     bottone.addEventListener("click", () => apriCartella(bottone.dataset.cartella));

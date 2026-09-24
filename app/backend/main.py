@@ -44,9 +44,24 @@ async def niente_cache(request: Request, call_next):
 # ───────────────────────────── modelli ─────────────────────────────
 
 
+class AllegatoInviato(BaseModel):
+    """I metadati dell'allegato, non i suoi byte.
+
+    Il file resta nel browser. Questo prototipo non ha un trasporto di posta
+    reale: caricare i byte darebbe l'impressione di una spedizione che non
+    avviene, e metterebbe il documento d'identita' di una persona su un disco
+    senza che nessuno l'abbia chiesto.
+    """
+
+    nome: str
+    tipo: str = "sconosciuto"
+    dimensione: int = 0
+
+
 class RichiestaInvio(BaseModel):
     intento: str
     testo: str
+    allegato: AllegatoInviato | None = None
 
 
 # ───────────────────────────── rotte ─────────────────────────────
@@ -80,13 +95,16 @@ def mailbox(cartella: str = db.IN_ARRIVO) -> dict:
         elementi = db.elenco_email(cartella)
         tipo = "ricevuta"
 
+    # `conteggi_cartelle()` conta gia' gli invii: richiederli a parte
+    # ripeterebbe la stessa query, e con lei la stessa presa del lock.
+    conteggi = db.conteggi_cartelle()
     return {
         "proprietario": db.proprietario(),
         "cartella": cartella,
         "tipo": tipo,
         "email": elementi,
-        "conteggi": db.conteggi_cartelle(),
-        "inviate": db.conteggio_invii(),
+        "conteggi": conteggi,
+        "inviate": conteggi[db.INVIATA],
     }
 
 
@@ -137,7 +155,8 @@ def elabora(email_id: str, avvelena: bool = False, ricalcola: bool = False) -> d
     payload["leggibilita"] = _leggibilita(email, risultato)
     # Se Maria ha gia' risposto, l'interfaccia lo dice invece di riproporle le
     # stesse tre scelte come se non fosse successo niente.
-    payload["gia_risposto"] = email_id in db.id_con_risposta()
+    payload["gia_risposto"] = db.ha_risposto(email_id)
+    payload["inoltrata"] = db.e_inoltrata(email_id)
     payload["cartella"] = grezza.get("cartella", db.IN_ARRIVO)
     return payload
 
@@ -195,8 +214,13 @@ def invia(email_id: str, richiesta: RichiestaInvio) -> dict:
         richiesta.intento,
         richiesta.testo,
         datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        allegato=richiesta.allegato.model_dump() if richiesta.allegato else None,
     )
-    return {"inviata": True, "completate_da_sola": db.conteggio_invii()}
+    return {
+        "inviata": True,
+        "completate_da_sola": db.conteggio_invii(),
+        "allegato": richiesta.allegato.nome if richiesta.allegato else None,
+    }
 
 
 @app.post("/api/email/{email_id}/aiuto")

@@ -229,8 +229,14 @@
   }
   .persona .chi { font-size: clamp(16px, 1.4vw, 23px); font-weight: 700; letter-spacing: -0.01em; }
   .persona .ruolo { font-size: clamp(9px, 0.76vw, 11px); text-transform: uppercase; letter-spacing: 0.2em; color: var(--tenue); }
-  .dato { margin-bottom: 11px; }
-  .dato:last-child { margin-bottom: 0; }
+  /* Due colonne: i quattro dati della persona in fila uno sotto l'altro
+     rendevano la scheda piu' alta della slide. */
+  .dati-persona {
+    margin: 0;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(8px, 1.2vh, 14px) clamp(14px, 1.6vw, 24px);
+  }
+  .dato { margin-bottom: 0; }
   .dato dt { font-size: clamp(9px, 0.74vw, 10px); text-transform: uppercase; letter-spacing: 0.2em; color: var(--purple-light); }
   .dato dd { margin: 1px 0 0; font-size: clamp(12px, 1.02vw, 16px); color: var(--testo); }
 
@@ -249,6 +255,25 @@
     color: var(--purple-light); font-size: 12px; font-weight: 700;
   }
   .passi li strong { display: block; }
+
+  /* Striscia dei criteri di accessibilità: un dettaglio, non una slide. */
+  .a11y {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 7px;
+    margin-top: clamp(8px, 1.6vh, 16px);
+    padding-top: clamp(8px, 1.4vh, 14px);
+    border-top: 1px solid var(--bordo);
+  }
+  .a11y-eti {
+    width: 100%; margin-bottom: 2px;
+    font-size: clamp(9px, 0.76vw, 11px); text-transform: uppercase;
+    letter-spacing: 0.2em; color: var(--purple-light);
+  }
+  .a11y .chip {
+    border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04);
+    border-radius: 999px; padding: 3px 12px;
+    font-size: clamp(10px, 0.86vw, 14px); color: var(--testo);
+  }
+  .a11y .chip b { color: #fff; }
 
   .kpi { font-variant-numeric: tabular-nums; font-size: clamp(26px, 3vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
   .kpi.viola { color: var(--purple-light); }
@@ -393,24 +418,36 @@
               <span class="ruolo">Persona target &middot; Torino</span>
             </span>
           </div>
-          <dl style="margin:0">
-            <div class="dato"><dt>Difficolt&agrave;</dt><dd>Cataratta iniziale, tremore alla mano destra, artrosi. Usa i vocali di WhatsApp: sa parlare, non digitare.</dd></div>
-            <div class="dato"><dt>Contesto d&rsquo;uso</dt><dd>La posta dell&rsquo;ASL, del Comune e dell&rsquo;INPS, su un tablet appoggiato al tavolo.</dd></div>
-            <div class="dato"><dt>Blocco tipico</dt><dd>Preme Rispondi alla mail del medico e si ferma davanti al riquadro vuoto. Chiude, e aspetta domenica.</dd></div>
-            <div class="dato"><dt>Cosa vuole</dt><dd>Confermare da sola la visita del 14 ottobre, senza aspettare il nipote.</dd></div>
+          <dl class="dati-persona">
+            <div class="dato"><dt>Difficolt&agrave;</dt><dd>Cataratta iniziale, tremore alla mano, artrosi. Usa i vocali di WhatsApp: <strong>sa parlare, non digitare</strong>.</dd></div>
+            <div class="dato"><dt>Contesto d&rsquo;uso</dt><dd>La posta di ASL, Comune e INPS, su un tablet appoggiato al tavolo.</dd></div>
+            <div class="dato"><dt>Blocco tipico</dt><dd>Preme Rispondi, trova un riquadro vuoto. Chiude, e aspetta domenica.</dd></div>
+            <div class="dato"><dt>Cosa vuole</dt><dd>Confermare da sola la visita del 14 ottobre.</dd></div>
           </dl>
         </div>
+
         <div>
           <h3>La journey coperta dalla demo</h3>
           <ol class="passi">
-            <li><strong>Apre la casella</strong> Ogni messaggio ha gi&agrave; un semaforo: verde, giallo, rosso.</li>
-            <li><strong>Legge in parole semplici</strong> Chi le scrive &middot; Cosa le chiedono &middot; Entro quando.</li>
-            <li><strong>Ascolta ad alta voce</strong> Il riassunto e il messaggio, letti dal dispositivo.</li>
-            <li><strong>Sceglie la risposta</strong> Tre intenti: confermo, chiedo informazioni, non posso.</li>
-            <li><strong>Rilegge e conferma</strong> Pu&ograve; farsela rileggere o aggiungere qualcosa a voce. L&rsquo;invio &egrave; suo.</li>
-            <li><strong>Vede che &egrave; fatta</strong> La mail passa a &laquo;Gi&agrave; risposto&raquo;, la copia sta in Posta inviata.</li>
+            <li><strong>Apre la casella</strong> Ogni messaggio ha gi&agrave; un semaforo.</li>
+            <li><strong>Legge in parole semplici</strong> Chi scrive &middot; Cosa chiedono &middot; Entro quando.</li>
+            <li><strong>Ascolta ad alta voce</strong> Riassunto e messaggio, letti dal dispositivo.</li>
+            <li><strong>Sceglie la risposta</strong> Tre intenti, con documento o foto in allegato.</li>
+            <li><strong>Rilegge e conferma</strong> Se la fa rileggere, detta un&rsquo;aggiunta. L&rsquo;invio &egrave; suo.</li>
+            <li><strong>Oppure gira a Luca</strong> In un tocco. Non un fallimento: un esito.</li>
           </ol>
         </div>
+      </div>
+
+      <div class="card rosa" style="margin-top:clamp(8px,1.6vh,16px)">
+        <h4 style="margin-bottom:6px">La persona di fiducia &mdash; configurabile</h4>
+        <p style="margin:0">
+          <strong>Luca, il nipote.</strong> Ogni email pu&ograve; essergli girata con un pulsante
+          <strong>sempre presente</strong>, non solo quando il semaforo &egrave; giallo: il momento in cui
+          una persona si sente in difficolt&agrave; non &egrave; quello in cui il sistema ha dei dubbi. La mail
+          passa a <strong>&laquo;Luca sta verificando&raquo;</strong>, cos&igrave; Maria sa che non aspetta pi&ugrave; lei.
+          Non conta come autonomia: chiedere aiuto non &egrave; fare da sola.
+        </p>
       </div>
     </div>
     <aside class="nota">La persona e' specifica, non generica: ogni dettaglio qui impone una scelta tecnica. Il tremore impone i target da 48 pixel, la cataratta il contrasto AAA, il fatto che usi i vocali impone la voce. La journey e' di sei fasi e la demo le copre tutte, nessuna saltata.</aside>
@@ -476,6 +513,19 @@
           <img class="schermata" style="max-height:44vh" src="img/08-riassunto-dettaglio.png"
                alt="La scheda In breve: Chi le scrive, Cosa le chiedono, Entro quando, con il pulsante Ascolta il riassunto." />
           <p class="aiuto" style="margin-top:10px">Schermata reale del prodotto</p>
+          <!-- I criteri di accessibilita', in una riga: ogni valore discende da un
+           vincolo della persona qui sopra, non da una linea guida generica. -->
+      <div class="a11y">
+        <span class="a11y-eti">Accessibilit&agrave; &mdash; ogni valore viene da un vincolo di Maria</span>
+        <span class="chip"><b>20px</b> base, interlinea 1,6 &mdash; cataratta</span>
+        <span class="chip">contrasto <b>&ge;7:1</b>, cio&egrave; <b>AAA</b></span>
+        <span class="chip">tocco <b>48px</b> (56 sulla voce) &mdash; tremore</span>
+        <span class="chip">HTML semantico, <b>una colonna</b></span>
+        <span class="chip">tastiera completa, fuoco visibile</span>
+        <span class="chip"><b>aria-live</b> su semaforo, verifica, invio</span>
+        <span class="chip">mai hover, doppio click, trascinamento</span>
+        <span class="chip">mai il <b>colore da solo</b></span>
+      </div>
         </div>
       </div>
     </div>

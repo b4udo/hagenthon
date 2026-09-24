@@ -413,20 +413,28 @@ def test_le_tre_cartelle_sono_sempre_visibili(page: Page):
 
 
 def test_dopo_l_invio_l_email_e_marcata_gia_risposto(page: Page):
+    """Usa l'INPS, non il medico.
+
+    Il server di questo modulo e' condiviso da tutti i test del file e il
+    database non si azzera fra l'uno e l'altro: `em-01` viene gia' risposta
+    altrove, quindi l'asserzione «prima non e' marcata» dipenderebbe
+    dall'ordine di esecuzione. `em-04` non la risponde nessun altro test.
+    """
     page.wait_for_selector(".voce")
-    page.locator(".voce", has_text="Bianchi").first.click()
+    page.locator(".voce", has_text="INPS").first.click()
 
     # Prima di rispondere non c'e' nessuna marcatura.
     expect(page.locator("#stato-risposta")).to_be_hidden()
 
-    page.locator(".intento", has_text="Confermo che vengo").click()
+    page.locator(".intento").first.click()
     page.locator("#btn-invia").click()
     expect(page.locator("#conferma-invio")).to_be_visible()
     expect(page.locator("#stato-risposta")).to_be_visible()
 
     # E la marcatura sopravvive al ritorno nell'elenco.
     page.locator("#btn-indietro").click()
-    riga = page.locator(".voce", has_text="Bianchi").first
+    page.wait_for_selector(".voce:has([data-risposto])")
+    riga = page.locator('.voce:has-text("INPS")').first
     expect(riga.locator("[data-risposto]")).to_be_visible()
     expect(riga.locator("[data-risposto]")).to_contain_text("Già risposto")
     # Anche per chi non vede i colori: lo stato sta nel nome accessibile.
@@ -540,6 +548,9 @@ def test_una_email_gia_risposta_non_mostra_anche_il_semaforo(page: Page):
     expect(riga.locator("[data-pallino]")).to_have_count(0)
 
     # Su un'email non ancora risposta il semaforo resta al suo posto.
-    altra = page.locator('.voce:has-text("INPS")').first
+    # «Spesa Conveniente» e' pubblicita': il compositore non le genera bozze,
+    # quindi nessun test puo' averla risposta e il controllo non dipende
+    # dall'ordine di esecuzione.
+    altra = page.locator('.voce:has-text("Spesa Conveniente")').first
     expect(altra.locator("[data-pallino]")).to_have_count(1)
     expect(altra.locator("[data-risposto]")).to_have_count(0)
