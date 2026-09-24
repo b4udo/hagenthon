@@ -227,7 +227,7 @@ def elabora(
 
             verifica = corsa.esegui(
                 f"05-verificatore (tentativo {tentativo + 1})",
-                lambda: (verificatore.verifica(fatti, testo, anno), 0),
+                lambda: (verificatore.verifica(fatti, testo, anno, email.corpo), 0),
                 lambda: EsitoVerifica(
                     passa=False,
                     problemi=[],

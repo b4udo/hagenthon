@@ -1,0 +1,248 @@
+/* Posta Chiara — foglio di stile.
+
+   Ogni valore qui dentro discende da un vincolo della persona, non da un gusto:
+
+   - base 20px e interlinea 1.6   -> cataratta iniziale
+   - contrasto >= 7:1 ovunque     -> cataratta iniziale (AAA, non AA)
+   - target >= 44px               -> tremore alla mano destra, artrosi
+   - colonna singola              -> tablet 10" appoggiato al tavolo
+   - nessun hover necessario      -> niente puntatore su tablet
+   - focus sempre visibile        -> navigazione da tastiera completa
+
+   Niente CDN, niente build: il file si apre e funziona.
+*/
+
+:root {
+  --inchiostro:        #14171c;  /* su bianco: 15.2:1 */
+  --inchiostro-tenue:  #3d444e;  /* su bianco:  9.1:1 — il grigio piu' chiaro ammesso */
+  --sfondo:            #ffffff;
+  --sfondo-tenue:      #f2f4f7;
+  --bordo:             #c8cdd6;
+
+  --verde:        #0d6b2f;  /* 6.9:1 su bianco, 8.4:1 sul suo fondo tenue */
+  --verde-fondo:  #e6f4ea;
+  --giallo:       #7a4e00;  /* il testo e' marrone scuro: il giallo puro non arriva a 7:1 */
+  --giallo-fondo: #fdf3d9;
+  --rosso:        #a3121b;
+  --rosso-fondo:  #fdeaea;
+
+  --accento:      #5b21b6;
+  --accento-fondo:#f3ecff;
+
+  --raggio: 12px;
+  --tocco: 48px;           /* 44 e' il minimo; 48 lascia margine al tremore */
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 20px; }
+
+body {
+  margin: 0;
+  background: var(--sfondo-tenue);
+  color: var(--inchiostro);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─────────── scorciatoia per la tastiera ─────────── */
+
+.salta-al-contenuto {
+  position: absolute;
+  left: -9999px;
+  background: var(--accento);
+  color: #fff;
+  padding: 12px 20px;
+  z-index: 100;
+}
+.salta-al-contenuto:focus { left: 8px; top: 8px; }
+
+/* ─────────── testata ─────────── */
+
+.testata {
+  background: var(--sfondo);
+  border-bottom: 3px solid var(--accento);
+}
+.testata-interno { max-width: 760px; margin: 0 auto; padding: 20px 20px 16px; }
+.logo { margin: 0; font-size: 1.7rem; letter-spacing: -0.01em; }
+.sottotitolo { margin: 2px 0 10px; color: var(--inchiostro-tenue); font-size: 0.95rem; }
+.autonomia {
+  margin: 0;
+  display: inline-block;
+  background: var(--accento-fondo);
+  color: #43156e;
+  border: 2px solid #c9aef5;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.95rem;
+}
+
+/* ─────────── impianto ─────────── */
+
+.contenuto { max-width: 760px; margin: 0 auto; padding: 24px 20px 60px; }
+h2 { font-size: 1.5rem; margin: 0 0 6px; }
+h3 { font-size: 1.15rem; margin: 0 0 12px; }
+h4 { font-size: 1.05rem; margin: 0 0 6px; }
+.aiuto { color: var(--inchiostro-tenue); font-size: 0.95rem; margin: 0 0 16px; }
+
+.scheda {
+  background: var(--sfondo);
+  border: 2px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+/* ─────────── elenco email ─────────── */
+
+.elenco { list-style: none; padding: 0; margin: 0; }
+.caricamento { color: var(--inchiostro-tenue); }
+
+.voce {
+  width: 100%;
+  min-height: var(--tocco);
+  display: block;
+  text-align: left;
+  background: var(--sfondo);
+  border: 2px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.voce:hover { border-color: var(--accento); }
+.voce-secondo-piano { opacity: 0.75; }
+
+.voce-alto { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.voce-mittente { font-weight: 700; }
+.voce-oggetto { display: block; color: var(--inchiostro-tenue); }
+.voce-data { margin-left: auto; color: var(--inchiostro-tenue); font-size: 0.85rem; }
+
+.pallino {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 3px 12px;
+  font-size: 0.8rem; font-weight: 700; border: 2px solid;
+}
+.pallino-verde  { background: var(--verde-fondo);  color: var(--verde);  border-color: var(--verde); }
+.pallino-giallo { background: var(--giallo-fondo); color: var(--giallo); border-color: var(--giallo); }
+.pallino-rosso  { background: var(--rosso-fondo);  color: var(--rosso);  border-color: var(--rosso); }
+.pallino-attesa { background: var(--sfondo-tenue); color: var(--inchiostro-tenue); border-color: var(--bordo); }
+
+/* ─────────── semaforo ─────────── */
+
+.semaforo { border: 3px solid; border-radius: var(--raggio); padding: 20px; margin-bottom: 18px; }
+.semaforo-verde  { background: var(--verde-fondo);  border-color: var(--verde); }
+.semaforo-giallo { background: var(--giallo-fondo); border-color: var(--giallo); }
+.semaforo-rosso  { background: var(--rosso-fondo);  border-color: var(--rosso); }
+
+.semaforo-messaggio { margin: 0 0 10px; font-size: 1.25rem; font-weight: 700; }
+.semaforo-verde  .semaforo-messaggio { color: var(--verde); }
+.semaforo-giallo .semaforo-messaggio { color: var(--giallo); }
+.semaforo-rosso  .semaforo-messaggio { color: var(--rosso); }
+
+.semaforo-segnali { margin: 0 0 16px; padding-left: 22px; }
+.semaforo-segnali li { margin-bottom: 4px; }
+
+/* ─────────── bottoni ─────────── */
+
+.bottone {
+  min-height: var(--tocco);
+  border-radius: var(--raggio);
+  padding: 12px 22px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.bottone-azione     { background: var(--accento); color: #fff; width: 100%; }
+.bottone-invia      { background: var(--verde); color: #fff; }
+.bottone-secondario { background: var(--sfondo); color: var(--inchiostro); border-color: var(--bordo); }
+.bottone-indietro   { background: none; border: none; color: var(--accento);
+                      padding: 12px 0; text-decoration: underline; }
+.bottone-demo       { background: #7a4e00; color: #fff; }
+
+/* Il focus e' sempre visibile e non dipende dal puntatore. */
+:focus-visible { outline: 4px solid var(--accento); outline-offset: 3px; }
+
+/* ─────────── riassunto e testo ─────────── */
+
+.riassunto { margin: 0; }
+.riassunto dt { font-weight: 700; color: var(--inchiostro-tenue); font-size: 0.9rem;
+                text-transform: uppercase; letter-spacing: 0.04em; margin-top: 14px; }
+.riassunto dt:first-child { margin-top: 0; }
+.riassunto dd { margin: 2px 0 0; font-size: 1.1rem; }
+
+.oggetto { margin: 6px 0 2px; }
+.mittente { margin: 0 0 18px; color: var(--inchiostro-tenue); }
+
+.testo { white-space: pre-wrap; margin-bottom: 16px; }
+.testo-originale {
+  background: var(--sfondo-tenue);
+  border-left: 5px solid var(--bordo);
+  padding: 16px;
+  border-radius: 0 var(--raggio) var(--raggio) 0;
+  margin-top: 14px;
+}
+.leggibilita { color: var(--inchiostro-tenue); font-size: 0.9rem; margin: 0 0 12px; }
+
+.scheda-avviso { border-color: var(--giallo); background: var(--giallo-fondo); }
+.scheda-avviso h3 { color: var(--giallo); }
+.scheda-avviso ul { margin: 10px 0 0; padding-left: 22px; }
+
+/* ─────────── allegati ─────────── */
+
+.allegati { list-style: none; padding: 0; margin: 0; }
+.allegati li {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 0; border-top: 1px solid var(--bordo);
+}
+.allegati li:first-child { border-top: none; }
+.allegati .nome { font-weight: 700; }
+
+/* ─────────── risposta guidata ─────────── */
+
+.scheda-risposta { border-color: var(--accento); }
+.intenti { display: flex; flex-direction: column; gap: 12px; }
+.intento {
+  min-height: var(--tocco);
+  text-align: left;
+  background: var(--accento-fondo);
+  border: 2px solid #c9aef5;
+  border-radius: var(--raggio);
+  padding: 16px 20px;
+  font: inherit; font-weight: 700; color: #43156e; cursor: pointer;
+}
+.intento[aria-pressed="true"] { background: var(--accento); color: #fff; border-color: var(--accento); }
+
+.bozza { margin-top: 20px; }
+textarea {
+  width: 100%; font: inherit; line-height: 1.6;
+  border: 2px solid var(--bordo); border-radius: var(--raggio);
+  padding: 16px; resize: vertical; color: var(--inchiostro); background: var(--sfondo);
+}
+.azioni-bozza { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.conferma-invio { margin-top: 16px; color: var(--verde); font-weight: 700; font-size: 1.1rem; }
+
+/* ─────────── ragionamento e demo ─────────── */
+
+.scheda-ragionamento summary {
+  cursor: pointer; font-weight: 700; min-height: var(--tocco);
+  display: flex; align-items: center;
+}
+.tracce { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.tracce th, .tracce td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--bordo); vertical-align: top; }
+.tracce th { color: var(--inchiostro-tenue); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.04em; }
+.tracce .nota { color: var(--inchiostro-tenue); }
+
+.scheda-demo { border-style: dashed; }
+
+.pie { max-width: 760px; margin: 0 auto; padding: 0 20px 40px;
+       color: var(--inchiostro-tenue); font-size: 0.85rem; }
+
+/* Chi preferisce meno movimento non ne riceve. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

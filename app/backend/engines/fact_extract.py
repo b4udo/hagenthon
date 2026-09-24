@@ -171,6 +171,12 @@ def estrai_valori_grezzi(testo: str, anno_default: int) -> dict[str, list[tuple[
                 if valore is None:
                     continue
                 occupati.append((m.start(), m.end()))
+                # Le stesse esclusioni di estrai_fatti. I due lati del
+                # confronto di FactGuard devono applicare le stesse regole:
+                # altrimenti una data di legge, esclusa dall'originale ma
+                # vista qui, verrebbe denunciata come "inventata".
+                if tipo == "data" and _e_citazione_normativa(testo, m.start()):
+                    continue
                 risultato[tipo].append((grezzo, valore))
 
     return risultato

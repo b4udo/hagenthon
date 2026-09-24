@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Posta Chiara</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<a class="salta-al-contenuto" href="#contenuto">Vai al contenuto</a>
+
+<header class="testata">
+  <div class="testata-interno">
+    <h1 class="logo">Posta&nbsp;Chiara</h1>
+    <p class="sottotitolo">La sua posta, spiegata.</p>
+    <p class="autonomia" id="autonomia" aria-live="polite">
+      Risposte inviate da sola: <strong id="contatore-autonomia">0</strong>
+    </p>
+  </div>
+</header>
+
+<main id="contenuto" class="contenuto">
+
+  <!-- ─────────── elenco ─────────── -->
+  <section id="vista-elenco" aria-labelledby="titolo-elenco">
+    <h2 id="titolo-elenco">Le sue email</h2>
+    <p class="aiuto">Tocchi un messaggio per leggerlo spiegato in parole semplici.</p>
+    <ul class="elenco" id="elenco-email">
+      <li class="caricamento">Sto caricando la posta…</li>
+    </ul>
+  </section>
+
+  <!-- ─────────── lettura ─────────── -->
+  <section id="vista-lettura" hidden aria-labelledby="titolo-lettura">
+    <button type="button" class="bottone bottone-indietro" id="btn-indietro">
+      ← Torna a tutte le email
+    </button>
+
+    <h2 id="titolo-lettura" class="oggetto"></h2>
+    <p class="mittente" id="mittente"></p>
+
+    <!-- semaforo -->
+    <div class="semaforo" id="semaforo" role="status" aria-live="polite">
+      <p class="semaforo-messaggio" id="semaforo-messaggio"></p>
+      <ul class="semaforo-segnali" id="semaforo-segnali"></ul>
+      <button type="button" class="bottone bottone-azione" id="btn-azione"></button>
+    </div>
+
+    <!-- riassunto -->
+    <div class="scheda" id="scheda-riassunto" hidden>
+      <h3>In breve</h3>
+      <dl class="riassunto">
+        <dt>Chi le scrive</dt><dd id="chi-scrive"></dd>
+        <dt>Cosa le chiedono</dt><dd id="cosa-vogliono"></dd>
+        <dt>Entro quando</dt><dd id="entro-quando"></dd>
+      </dl>
+    </div>
+
+    <!-- avviso di verifica fallita -->
+    <div class="scheda scheda-avviso" id="scheda-verifica" hidden role="alert">
+      <h3>⚠ Non le mostro la versione semplificata</h3>
+      <p>Il controllo automatico ha trovato una differenza rispetto all'originale,
+         quindi le mostro il testo così come è arrivato.</p>
+      <ul id="problemi-verifica"></ul>
+    </div>
+
+    <!-- testo -->
+    <div class="scheda">
+      <h3 id="titolo-testo">Il messaggio</h3>
+      <p class="leggibilita" id="leggibilita"></p>
+      <div class="testo" id="testo-messaggio"></div>
+      <button type="button" class="bottone bottone-secondario" id="btn-originale">
+        Mostra il testo originale
+      </button>
+      <div class="testo testo-originale" id="testo-originale" hidden></div>
+    </div>
+
+    <!-- allegati -->
+    <div class="scheda" id="scheda-allegati" hidden>
+      <h3>Documenti allegati</h3>
+      <ul class="allegati" id="elenco-allegati"></ul>
+    </div>
+
+    <!-- risposta guidata -->
+    <div class="scheda scheda-risposta" id="scheda-risposta" hidden>
+      <h3>Cosa vuole fare?</h3>
+      <p class="aiuto">Scelga una risposta. Potrà rileggerla prima di inviarla.</p>
+      <div class="intenti" id="intenti"></div>
+
+      <div class="bozza" id="bozza" hidden>
+        <h4 id="titolo-bozza">La sua risposta</h4>
+        <p class="aiuto">La legga con calma. Se va bene, prema Invia.</p>
+        <textarea id="testo-bozza" rows="9" aria-labelledby="titolo-bozza"></textarea>
+        <div class="azioni-bozza">
+          <button type="button" class="bottone bottone-invia" id="btn-invia">
+            Invia la risposta
+          </button>
+          <button type="button" class="bottone bottone-secondario" id="btn-annulla">
+            Annulla
+          </button>
+        </div>
+      </div>
+
+      <p class="conferma-invio" id="conferma-invio" hidden role="status" aria-live="polite">
+        ✓ Risposta inviata.
+      </p>
+    </div>
+
+    <!-- come ha ragionato -->
+    <details class="scheda scheda-ragionamento">
+      <summary>Come ha ragionato il sistema</summary>
+      <p class="aiuto">
+        Ogni riga è un agente della pipeline. <strong id="riepilogo-token"></strong>
+      </p>
+      <table class="tracce">
+        <thead>
+          <tr><th>Agente</th><th>Modalità</th><th>Esito</th><th>ms</th><th>Token</th><th>Nota</th></tr>
+        </thead>
+        <tbody id="corpo-tracce"></tbody>
+      </table>
+    </details>
+
+    <!-- strumenti da presentatore -->
+    <div class="scheda scheda-demo">
+      <h3>Strumenti per la dimostrazione</h3>
+      <button type="button" class="bottone bottone-demo" id="btn-avvelena">
+        E se l'AI sbaglia?
+      </button>
+      <p class="aiuto">
+        Corrompe di proposito la versione semplificata per far scattare il
+        controllo davanti a lei.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="pie">
+  <p>
+    Posta Chiara · prototipo · modalità LLM: <strong id="modalita-llm">—</strong> ·
+    nessuna chiave API richiesta
+  </p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

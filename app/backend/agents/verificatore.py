@@ -32,6 +32,7 @@ def verifica(
     fatti_originale: list[Fatto],
     testo_semplificato: str,
     anno_default: int,
+    testo_originale: str | None = None,
 ) -> EsitoVerifica:
     """Confronta i fatti dell'originale con quelli del testo semplificato.
 
@@ -90,8 +91,26 @@ def verifica(
             )
 
     # ── cio' che resta orfano e' comparso dal nulla ──
+    #
+    # "Inventato" significa: non c'e' nell'originale. NON significa "non e'
+    # fra i fatti protetti". La differenza non e' accademica: i fatti sono
+    # estratti solo se ancorati a una parola chiave, quindi una data che
+    # nell'originale compare come "con valuta 1 ottobre 2026" non e' un fatto
+    # — ma esiste, e denunciarla come inventata e' un falso positivo.
+    # Il confronto va fatto contro il testo originale, non contro la lista.
+    nell_originale: dict[str, set[str]] = {}
+    if testo_originale is not None:
+        nell_originale = {
+            tipo: {v for _, v in valori}
+            for tipo, valori in fact_extract.estrai_valori_grezzi(
+                testo_originale, anno_default
+            ).items()
+        }
+
     for tipo in TIPI_CON_INVENZIONE:
-        for grezzo, _ in orfani.get(tipo, []):
+        for grezzo, valore in orfani.get(tipo, []):
+            if valore in nell_originale.get(tipo, set()):
+                continue
             problemi.append(
                 ProblemaVerifica(
                     tipo=TipoProblema.INVENTATO,

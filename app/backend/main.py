@@ -100,17 +100,37 @@ def elabora(email_id: str, avvelena: bool = False, ricalcola: bool = False) -> d
 
 
 def _leggibilita(email: Email, risultato) -> dict:
+    """Tre misure, non una, perche' raccontano cose diverse.
+
+    Il testo riscritto guadagna poco: un motore a regole non puo' rifondere i
+    periodi senza rischiare di storpiarli, e non lo fa apposta. Il guadagno
+    vero sta nel riassunto Chi / Cosa / Entro quando, che e' cio' che Maria
+    legge per primo. Riportiamo entrambi: un solo numero, scelto fra i due,
+    sarebbe una mezza verita'.
+    """
     prima = gulpease.gulpease(email.corpo)
+    s = risultato.semplificazione
+
     dopo = (
-        gulpease.gulpease(risultato.semplificazione.testo_semplificato)
-        if risultato.semplificazione and risultato.semplificazione_mostrata
+        gulpease.gulpease(s.testo_semplificato)
+        if s and risultato.semplificazione_mostrata
         else None
     )
+
+    riassunto = None
+    if s and risultato.semplificazione_mostrata:
+        testo_riassunto = " ".join(
+            filter(None, [s.chi_scrive, s.cosa_vogliono, s.entro_quando])
+        )
+        riassunto = gulpease.gulpease(testo_riassunto)
+
     return {
         "prima": prima,
         "prima_giudizio": gulpease.giudizio(prima),
         "dopo": dopo,
         "dopo_giudizio": gulpease.giudizio(dopo) if dopo is not None else None,
+        "riassunto": riassunto,
+        "riassunto_giudizio": gulpease.giudizio(riassunto) if riassunto is not None else None,
     }
 
 
