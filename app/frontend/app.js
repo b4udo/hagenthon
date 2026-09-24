@@ -14,7 +14,23 @@ const stato = {
   emailCorrente: null,
   risultato: null,
   bozzaScelta: null,
+  dettaturaAccettata: false,  // l'avviso sulla dettatura si mostra una volta sola
 };
+
+/* Modo tecnico: `?tecnico=1`.
+ *
+ * Il pannello "Come ha ragionato il sistema" e il pulsante "E se l'AI sbaglia?"
+ * servono alla giuria, non a Maria. Mostrarli a lei sarebbe esattamente
+ * l'errore che il bando chiama «strumento pensato per sviluppatori»: una
+ * persona che apre la posta non deve trovarsi davanti una tabella di agenti,
+ * millisecondi e token.
+ *
+ * Restano nel prodotto e restano veri — si aprono con un parametro nell'URL,
+ * che e' come li mostriamo in demo.
+ */
+function modoTecnico() {
+  return new URLSearchParams(window.location.search).get("tecnico") === "1";
+}
 
 const ETICHETTE_SEMAFORO = { verde: "Può rispondere", giallo: "Da controllare", rosso: "Attenzione" };
 const SIMBOLI = { verde: "●", giallo: "●", rosso: "●" };
@@ -95,6 +111,11 @@ function dataItaliana(iso) {
 // ───────────────────────────── lettura ─────────────────────────────
 
 async function apri(id, avvelena = false) {
+  // Aprire un'altra email mentre la voce legge la precedente e' il modo piu'
+  // rapido di confondersi su quale messaggio si sta ascoltando.
+  Voce.fermaLettura();
+  Voce.fermaAscolto();
+
   const percorso = `/api/email/${id}/elabora` + (avvelena ? "?avvelena=true" : "");
   const [email, risultato] = await Promise.all([
     chiedi(`/api/email/${id}`),
@@ -290,6 +311,9 @@ function scegliIntento(bozza, contenitore, bottone) {
   $("testo-bozza").value = bozza.testo;
   $("bozza").hidden = false;
   $("conferma-invio").hidden = true;
+  statoVoce("");
+  const avviso = $("bozza").querySelector(".voce-avviso");
+  if (avviso) avviso.remove();
   $("testo-bozza").focus();
 }
 
@@ -337,9 +361,169 @@ function disegnaTracce(r) {
       : `Token usati su questa email: ${r.token_usati}.`;
 }
 
+// ───────────────────────────── voce ─────────────────────────────
+//
+// Maria usa i vocali di WhatsApp e non scrive: sa parlare, non digitare.
+// Ascoltare e dettare non sono un di piu', sono il suo modo di usare un
+// dispositivo. Vedi voce.js per la differenza di privacy fra le due.
+
+function testoRiassunto() {
+  const r = stato.risultato;
+  if (!r || !r.semplificazione) return "";
+  const s = r.semplificazione;
+  return [
+    `Chi le scrive: ${s.chi_scrive}.`,
+    `Cosa le chiedono: ${s.cosa_vogliono}`,
+    s.entro_quando ? `Entro quando: ${s.entro_quando}.` : "Non c'è una scadenza.",
+  ].join(" ");
+}
+
+function testoMessaggio() {
+  return $("testo-messaggio").textContent || "";
+}
+
+/** Collega un pulsante a un testo: prima pressione legge, seconda ferma. */
+function collegaLettura(idBottone, prendiTesto) {
+  const bottone = $(idBottone);
+  if (!bottone) return;
+
+  if (!Voce.puoLeggere()) {
+    // Meglio assente che presente e inerte: un pulsante che non fa nulla
+    // e' peggio di nessun pulsante per chi non puo' verificarne l'effetto.
+    bottone.hidden = true;
+    return;
+  }
+
+  bottone.setAttribute("aria-pressed", "false");
+  bottone.addEventListener("click", () => {
+    if (bottone.getAttribute("aria-pressed") === "true") {
+      Voce.fermaLettura();
+      return;
+    }
+    const testo = prendiTesto();
+    if (!testo.trim()) return;
+    azzeraPulsantiVoce();
+    bottone.setAttribute("aria-pressed", "true");
+    Voce.leggi(testo);
+  });
+}
+
+function pulsantiVoce() {
+  return [$("btn-ascolta-riassunto"), $("btn-ascolta-messaggio"), $("btn-ascolta-bozza")]
+    .filter(Boolean);
+}
+
+function azzeraPulsantiVoce() {
+  for (const b of pulsantiVoce()) b.setAttribute("aria-pressed", "false");
+}
+
+function mostraBarraVoce(attiva) {
+  $("barra-voce").hidden = !attiva;
+  document.body.classList.toggle("voce-attiva", attiva);
+  if (!attiva) azzeraPulsantiVoce();
+}
+
+function statoVoce(messaggio, errore = false) {
+  const p = $("voce-stato");
+  p.textContent = messaggio || "";
+  p.classList.toggle("voce-stato-errore", Boolean(errore));
+}
+
+// ─────────── dettatura ───────────
+
+function avviaDettatura() {
+  const bottone = $("btn-detta");
+  const area = $("testo-bozza");
+  const inizialeLunghezza = area.value.length;
+
+  bottone.setAttribute("aria-pressed", "true");
+  bottone.innerHTML = '<span aria-hidden="true">■</span> Ho finito di parlare';
+  statoVoce("La sto ascoltando. Parli pure con calma.");
+
+  const partito = Voce.ascolta({
+    alTesto: (testo) => {
+      // Si aggiunge in coda alla bozza scelta, non la si sostituisce: la
+      // risposta resta quella verificata, la voce ci aggiunge una frase.
+      const separatore = inizialeLunghezza && !area.value.endsWith("\n") ? "\n" : "";
+      area.value = area.value.slice(0, inizialeLunghezza) + separatore + testo;
+    },
+    alFine: (testo) => {
+      bottone.setAttribute("aria-pressed", "false");
+      bottone.innerHTML = '<span aria-hidden="true">🎤</span> Aggiunga con la voce';
+      statoVoce(testo ? "Ho scritto quello che ha detto. Lo rilegga pure." : "");
+    },
+    alErrore: (messaggio) => statoVoce(messaggio, true),
+  });
+
+  if (!partito) statoVoce("Questo browser non sa ascoltare il microfono.", true);
+}
+
+/** L'avviso sulla dettatura, una volta sola e prima del primo uso.
+ *
+ * In Chrome il riconoscimento vocale non e' locale: l'audio va a un servizio
+ * del fornitore del browser. E' l'unica cosa in tutto Posta Chiara che esce
+ * dal dispositivo, e chi la usa deve saperlo **prima**, non dopo.
+ */
+function chiediConsensoDettatura() {
+  if (stato.dettaturaAccettata) { avviaDettatura(); return; }
+
+  const avviso = document.createElement("div");
+  avviso.className = "voce-avviso";
+  avviso.setAttribute("role", "alertdialog");
+  avviso.innerHTML = `
+    <p><strong>Un avviso prima di cominciare.</strong> Per capire quello che dice,
+       il browser manda la sua voce a un servizio esterno. È l'unica parte di
+       Posta Chiara che esce da questo dispositivo: tutto il resto resta qui.
+       Se preferisce, può scrivere o lasciare la risposta così com'è.</p>
+    <div class="azioni">
+      <button type="button" class="bottone bottone-microfono" data-si>Va bene, ascolti</button>
+      <button type="button" class="bottone bottone-secondario" data-no>No, lascio stare</button>
+    </div>`;
+
+  $("bozza").insertBefore(avviso, $("voce-stato"));
+  avviso.querySelector("[data-si]").focus();
+
+  avviso.querySelector("[data-si]").addEventListener("click", () => {
+    stato.dettaturaAccettata = true;
+    avviso.remove();
+    avviaDettatura();
+  });
+  avviso.querySelector("[data-no]").addEventListener("click", () => {
+    avviso.remove();
+    $("btn-detta").focus();
+  });
+}
+
+function preparaVoce() {
+  collegaLettura("btn-ascolta-riassunto", testoRiassunto);
+  collegaLettura("btn-ascolta-messaggio", testoMessaggio);
+  collegaLettura("btn-ascolta-bozza", () => $("testo-bozza").value);
+
+  Voce.osservaLettura(mostraBarraVoce);
+  $("btn-ferma-voce").addEventListener("click", () => Voce.fermaLettura());
+
+  const detta = $("btn-detta");
+  if (!Voce.puoAscoltare()) {
+    // Firefox e Safari desktop non espongono il riconoscimento vocale.
+    detta.disabled = true;
+    detta.title = "Questo browser non sa ascoltare il microfono.";
+    detta.hidden = true;
+    return;
+  }
+  detta.setAttribute("aria-pressed", "false");
+  detta.addEventListener("click", () => {
+    if (Voce.staAscoltando()) { Voce.fermaAscolto(); return; }
+    chiediConsensoDettatura();
+  });
+}
+
 // ───────────────────────────── avvio ─────────────────────────────
 
 function tornaAllElenco() {
+  // La voce non deve continuare a leggere un'email che non e' piu' aperta.
+  Voce.fermaLettura();
+  Voce.fermaAscolto();
+  statoVoce("");
   $("vista-lettura").hidden = true;
   $("vista-elenco").hidden = false;
   window.scrollTo(0, 0);
@@ -347,6 +531,12 @@ function tornaAllElenco() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  if (modoTecnico()) {
+    for (const el of document.querySelectorAll(".solo-tecnico")) el.hidden = false;
+  }
+
+  preparaVoce();
+
   $("btn-indietro").addEventListener("click", tornaAllElenco);
   $("btn-invia").addEventListener("click", () => {
     inviaRisposta().catch((e) => alert("Non sono riuscito a inviare: " + e.message));

@@ -35,6 +35,14 @@
 
 * { box-sizing: border-box; }
 
+/* `hidden` deve vincere su qualunque `display` di classe.
+   Senza questa riga un elemento con `display: flex` nel suo selettore resta
+   visibile anche con l'attributo `hidden` messo da JavaScript: la specificita'
+   di una classe batte quella di `[hidden]`. E' il modo in cui la barra della
+   voce e' rimasta incollata in fondo allo schermo finche' non l'abbiamo vista
+   in una schermata. */
+[hidden] { display: none !important; }
+
 html { font-size: 20px; }
 
 body {
@@ -166,6 +174,74 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
 
 /* Il focus e' sempre visibile e non dipende dal puntatore. */
 :focus-visible { outline: 4px solid var(--accento); outline-offset: 3px; }
+
+/* ─────────── voce ───────────
+
+   Maria usa i vocali di WhatsApp e non scrive: ascoltare e dettare non sono
+   rifiniture, sono il modo in cui usa un telefono. I comandi della voce hanno
+   percio' la stessa dignita' visiva dei pulsanti principali, non l'aspetto di
+   un'opzione secondaria.
+
+   Piu' alti del minimo (56 invece di 48): sono i due pulsanti che si premono
+   piu' spesso, e il tremore peggiora quando la mano e' gia' stanca. */
+
+.bottone-voce, .bottone-microfono {
+  min-height: 56px;
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 14px;
+}
+.bottone-voce      { background: var(--accento-fondo); color: #43156e; border-color: #a97ef0; }
+.bottone-microfono { background: var(--accento); color: #fff; }
+
+/* Mentre parla o ascolta, il pulsante lo dice da solo: chi non sente bene si
+   accorge dallo stato del pulsante, non dall'audio. */
+.bottone-voce[aria-pressed="true"] { background: var(--accento); color: #fff; border-color: var(--accento); }
+.bottone-microfono[aria-pressed="true"] { background: var(--rosso); border-color: var(--rosso); }
+
+.voce-strumenti { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.voce-stato {
+  margin: 12px 0 0;
+  min-height: 1.6em;           /* riservato: il testo che appare non sposta i pulsanti sotto */
+  font-weight: 700;
+  color: var(--accento);
+}
+.voce-stato:empty { min-height: 0; margin: 0; }
+.voce-stato-errore { color: var(--rosso); }
+
+/* Avviso sulla dettatura: compare una volta sola, prima del primo uso. */
+.voce-avviso {
+  margin: 14px 0 0;
+  background: var(--giallo-fondo);
+  border: 2px solid var(--giallo);
+  color: var(--giallo);
+  border-radius: var(--raggio);
+  padding: 14px 16px;
+  font-size: 0.95rem;
+}
+.voce-avviso p { margin: 0 0 12px; }
+.voce-avviso .azioni { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* La barra per fermare la lettura resta a portata ovunque si sia scorso. */
+.barra-voce {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--sfondo);
+  border-top: 3px solid var(--accento);
+  padding: 12px 20px;
+  display: flex; justify-content: center;
+  z-index: 50;
+}
+.bottone-ferma { background: var(--rosso); color: #fff; min-width: 260px; }
+
+/* Con la barra aperta, l'ultimo pezzo di pagina resta raggiungibile. */
+body.voce-attiva .contenuto { padding-bottom: 96px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .bottone-microfono[aria-pressed="true"] { animation: pulsa 1.4s ease-in-out infinite; }
+}
+@keyframes pulsa {
+  50% { box-shadow: 0 0 0 8px rgba(163, 18, 27, 0.18); }
+}
 
 /* ─────────── riassunto e testo ─────────── */
 

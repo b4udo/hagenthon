@@ -69,10 +69,27 @@ def server() -> str:
 
 @pytest.fixture(scope="module")
 def browser():
+    """Il browser dei test.
+
+    Normalmente invisibile, perche' cosi' la suite gira ovunque e anche in CI.
+    Per **guardare** i test mentre lavorano — utile in demo, e per capire un
+    fallimento molto piu' in fretta che leggendo un traceback:
+
+        $env:PLAYWRIGHT_VISIBILE = "1"        # PowerShell
+        python -m pytest app/tests/test_e2e_frontend.py -q
+
+    `PLAYWRIGHT_LENTEZZA` (millisecondi per azione) rallenta il browser quanto
+    basta a seguirlo con l'occhio: 400 e' una buona velocita' da proiettore.
+    """
+    import os as _os
+
+    visibile = _os.environ.get("PLAYWRIGHT_VISIBILE", "").strip() in ("1", "true", "si")
+    lentezza = float(_os.environ.get("PLAYWRIGHT_LENTEZZA", "0") or 0)
+
     try:
         with sync_playwright() as p:
             try:
-                b = p.chromium.launch()
+                b = p.chromium.launch(headless=not visibile, slow_mo=lentezza)
             except Exception as errore:  # browser non scaricato
                 pytest.skip(f"Chromium non disponibile: {errore}")
             yield b
@@ -175,20 +192,29 @@ def test_il_nipote_in_rubrica_e_verde(page: Page):
 # ───────────────────────── FactGuard dal vivo ─────────────────────────
 
 
-def test_email_avvelenata_il_rifiuto_compare_a_schermo(page: Page):
-    page.wait_for_selector(".voce")
-    page.locator(".voce", has_text="INPS").first.click()
+def test_email_avvelenata_il_rifiuto_compare_a_schermo(browser, server):
+    """Il pulsante che avvelena e' uno strumento da presentatore.
 
-    expect(page.locator("#scheda-verifica")).to_be_hidden()
+    Vive dietro `?tecnico=1` insieme al resto della strumentazione: Maria non
+    deve trovarsi in pagina un pulsante che rompe apposta la sua posta.
+    """
+    contesto = browser.new_context(viewport={"width": 820, "height": 1180})
+    pagina = contesto.new_page()
+    pagina.goto(f"{server}/?tecnico=1")
+    pagina.wait_for_selector(".voce")
+    pagina.locator(".voce", has_text="INPS").first.click()
 
-    page.locator("#btn-avvelena").click()
+    expect(pagina.locator("#scheda-verifica")).to_be_hidden()
 
-    avviso = page.locator("#scheda-verifica")
+    pagina.locator("#btn-avvelena").click()
+
+    avviso = pagina.locator("#scheda-verifica")
     expect(avviso).to_be_visible()
     expect(avviso).to_contain_text("1.247,83")
     expect(avviso).to_contain_text("1.247")
     # Rifiutata la semplificazione, si torna all'originale.
-    expect(page.locator("#scheda-riassunto")).to_be_hidden()
+    expect(pagina.locator("#scheda-riassunto")).to_be_hidden()
+    contesto.close()
 
 
 # ───────────────────────── accessibilita' ─────────────────────────
@@ -247,3 +273,125 @@ def test_i_cambi_di_stato_passano_da_una_regione_aria_live(page: Page):
     page.locator(".voce").first.click()
     assert page.get_attribute("#semaforo", "aria-live") == "polite"
     assert page.get_attribute("#autonomia", "aria-live") == "polite"
+
+
+# ─────────────────── la voce, e cosa Maria non deve vedere ───────────────────
+
+
+def test_maria_non_vede_i_pannelli_tecnici(page: Page):
+    """Il bando boccia gli strumenti «pensati per sviluppatori».
+
+    Una tabella di agenti, millisecondi e token addosso a chi apre la posta e'
+    esattamente quell'errore. Restano nel prodotto, dietro ?tecnico=1.
+    """
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    expect(page.locator("#scheda-riassunto")).to_be_visible()
+
+    expect(page.locator(".scheda-ragionamento")).to_be_hidden()
+    expect(page.locator(".scheda-demo")).to_be_hidden()
+    expect(page.locator(".pie-tecnico")).to_be_hidden()
+
+
+def test_con_tecnico_1_la_giuria_vede_la_pipeline(browser, server):
+    contesto = browser.new_context(viewport={"width": 820, "height": 1180})
+    pagina = contesto.new_page()
+    pagina.goto(f"{server}/?tecnico=1")
+    pagina.wait_for_selector(".voce")
+    pagina.locator(".voce", has_text="Bianchi").first.click()
+
+    expect(pagina.locator(".scheda-ragionamento")).to_be_visible()
+    expect(pagina.locator(".scheda-demo")).to_be_visible()
+    assert pagina.locator("#corpo-tracce tr").count() >= 5
+    contesto.close()
+
+
+def test_i_comandi_della_voce_sono_presenti_e_abbastanza_grandi(page: Page):
+    """Maria usa i vocali di WhatsApp: ascoltare e dettare non sono un extra."""
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    page.locator(".intento", has_text="Confermo che vengo").click()
+    expect(page.locator("#testo-bozza")).to_be_visible()
+
+    for selettore in ["#btn-ascolta-riassunto", "#btn-ascolta-messaggio",
+                      "#btn-ascolta-bozza", "#btn-detta"]:
+        elemento = page.locator(selettore)
+        expect(elemento).to_be_visible()
+        riquadro = elemento.bounding_box()
+        assert riquadro["height"] >= TARGET_MINIMO_PX, f"{selettore}: {riquadro}"
+
+
+def test_la_barra_di_arresto_appare_solo_mentre_legge(page: Page):
+    """Regressione: `display: flex` in una classe batte l'attributo `hidden`.
+
+    La barra era rimasta incollata in fondo allo schermo dal primo caricamento.
+    """
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    expect(page.locator("#scheda-riassunto")).to_be_visible()
+    expect(page.locator("#barra-voce")).to_be_hidden()
+
+
+def test_ascolta_il_riassunto_passa_alla_sintesi_il_testo_giusto(page: Page):
+    """Il testo letto e' quello della scheda, con le sigle rese pronunciabili."""
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    expect(page.locator("#scheda-riassunto")).to_be_visible()
+
+    # Si intercetta speechSynthesis.speak: in un browser senza voci installate
+    # non si sente nulla, ma quello che il codice *chiede* di leggere si vede.
+    page.evaluate("""() => {
+        window.__letto = [];
+        const vero = window.speechSynthesis.speak.bind(window.speechSynthesis);
+        window.speechSynthesis.speak = (u) => { window.__letto.push(u.text); vero(u); };
+    }""")
+    page.locator("#btn-ascolta-riassunto").click()
+    page.wait_for_function("window.__letto && window.__letto.length > 0", timeout=5000)
+
+    letto = page.evaluate("window.__letto")[0]
+    assert "Chi le scrive" in letto
+    assert "Cosa le chiedono" in letto
+    # Le sigle lette lettera per lettera suonerebbero come parole senza senso.
+    assert "dottoressa" in letto, letto
+
+
+def test_la_dettatura_avvisa_prima_che_la_voce_esca_dal_dispositivo(page: Page):
+    """L'unica funzione che manda qualcosa fuori deve dirlo *prima*, non dopo."""
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    page.locator(".intento", has_text="Confermo che vengo").click()
+
+    page.locator("#btn-detta").click()
+    avviso = page.locator(".voce-avviso")
+    expect(avviso).to_be_visible()
+    assert "esce da questo dispositivo" in avviso.inner_text()
+
+    # Si deve poter rifiutare, e rifiutare non deve accendere il microfono.
+    page.locator("[data-no]").click()
+    expect(avviso).to_have_count(0)
+
+
+def test_la_dettatura_non_sostituisce_la_bozza_verificata(page: Page):
+    """La voce aggiunge in coda: i fatti verificati non si perdono parlando."""
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    page.locator(".intento", has_text="Confermo che vengo").click()
+
+    prima = page.locator("#testo-bozza").input_value()
+    assert "14 ottobre 2026" in prima
+
+    # Si simula il risultato della dettatura come lo produce voce.js: il testo
+    # detto si aggiunge in coda, non sostituisce la bozza gia' verificata.
+    # String.fromCharCode(10) e non la sequenza di escape: Python la
+    # interpreterebbe prima del browser, spezzando la stringa JavaScript.
+    page.evaluate(
+        "() => {"
+        "  const area = document.getElementById('testo-bozza');"
+        "  const inizio = area.value.length;"
+        "  area.value = area.value.slice(0, inizio) + String.fromCharCode(10)"
+        "             + 'Grazie mille.';"
+        "}"
+    )
+    dopo = page.locator("#testo-bozza").input_value()
+    assert "14 ottobre 2026" in dopo, dopo
+    assert "Grazie mille." in dopo, dopo
