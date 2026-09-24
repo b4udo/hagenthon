@@ -73,7 +73,7 @@ def verifica(
                     trovato=grezzo_trovato,
                     spiegazione=(
                         f"{_ETICHETTA[tipo].capitalize()} non corrisponde "
-                        f"all'originale: {fatto.testo_originale} e' diventato {grezzo_trovato}."
+                        f"all'originale: {fatto.testo_originale} è diventato {grezzo_trovato}."
                     ),
                 )
             )
@@ -118,7 +118,7 @@ def verifica(
                     trovato=grezzo,
                     spiegazione=(
                         f"Nella versione semplificata compare {grezzo}, "
-                        f"che non e' presente nell'originale."
+                        f"che non è presente nell'originale."
                     ),
                 )
             )
@@ -143,7 +143,7 @@ def _feedback(problemi: list[ProblemaVerifica]) -> str:
             righe.append(f"- Manca {p.fatto.testo_originale}: riportalo esattamente.")
         elif p.tipo is TipoProblema.ALTERATO and p.fatto:
             righe.append(
-                f"- {p.fatto.testo_originale} e' stato riportato come {p.trovato}: "
+                f"- {p.fatto.testo_originale} è stato riportato come {p.trovato}: "
                 f"usa il valore esatto dell'originale."
             )
         elif p.tipo is TipoProblema.INVENTATO:

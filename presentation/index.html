@@ -229,12 +229,13 @@
   /* ---------- note del presentatore ---------- */
   .nota { display: none; }
   body.note .nota {
-    display: block; position: fixed; left: 0; right: 0; bottom: 56px; z-index: 40;
+    display: block; position: fixed; left: 0; right: 0; bottom: 74px; z-index: 40;
     margin: 0 clamp(18px, 3.2vw, 46px);
-    border: 1px solid rgba(161,0,255,0.35); border-left: 5px solid var(--purple);
-    border-radius: 14px; background: rgba(70,0,115,0.5);
-    backdrop-filter: blur(6px);
-    padding: 12px 18px; color: rgba(255,255,255,0.88); font-size: 15px; line-height: 1.5;
+    max-height: 26vh; overflow-y: auto;
+    border: 1px solid rgba(190,130,255,0.45); border-left: 5px solid var(--purple);
+    border-radius: 14px; background: rgba(26,0,44,0.96);
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+    padding: 12px 18px; color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.55;
   }
   body.note .nota::before {
     content: "Nota del presentatore"; display: block;
@@ -242,6 +243,11 @@
     color: var(--purple-light); margin-bottom: 4px;
   }
   body.note .slide { padding-bottom: 30vh; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide { animation: none; }
+    .barra i { transition: none; }
+  }
 
   @media (max-width: 860px) {
     .g2, .g3, .g4, .g23, .fila { grid-template-columns: 1fr; }

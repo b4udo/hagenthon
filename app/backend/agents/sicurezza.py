@@ -16,7 +16,7 @@ NOME_PERSONA_FIDUCIA = "Luca"
 MESSAGGI = {
     "rosso": "Non risponda a questa email. Sembra una truffa.",
     "giallo": f"Non sono sicuro. Chieda a {NOME_PERSONA_FIDUCIA} prima di rispondere.",
-    "verde": "Puo' rispondere tranquillamente.",
+    "verde": "Può rispondere tranquillamente.",
 }
 
 

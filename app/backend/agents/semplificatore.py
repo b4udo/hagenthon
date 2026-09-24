@@ -56,7 +56,7 @@ def _chi_scrive(mittente_nome: str, categoria: Categoria) -> str:
         case Categoria.PERSONA_CONOSCIUTA:
             return mittente_nome
         case Categoria.COMMERCIALE:
-            return f"{mittente_nome} (pubblicita')"
+            return f"{mittente_nome} (pubblicità)"
         case _:
             return mittente_nome
 

@@ -16,7 +16,7 @@ const stato = {
   bozzaScelta: null,
 };
 
-const ETICHETTE_SEMAFORO = { verde: "Puo' rispondere", giallo: "Da controllare", rosso: "Attenzione" };
+const ETICHETTE_SEMAFORO = { verde: "Può rispondere", giallo: "Da controllare", rosso: "Attenzione" };
 const SIMBOLI = { verde: "●", giallo: "●", rosso: "●" };
 
 // ───────────────────────────── rete locale ─────────────────────────────

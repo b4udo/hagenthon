@@ -91,10 +91,10 @@ LOCUZIONI: tuple[tuple[str, str], ...] = (
 
     # esiti e disponibilita'
     (r"e'\s+stato\s+predisposto\s+ed\s+e'\s+da\s+ritenersi\s+disponibile\s+per\s+il\s+ritiro",
-     "e' pronto"),
+     "è pronto"),
     (r"è\s+stato\s+predisposto\s+ed\s+è\s+da\s+ritenersi\s+disponibile\s+per\s+il\s+ritiro",
      "è pronto"),
-    (r"e'\s+da\s+ritenersi\s+disponibile", "e' disponibile"),
+    (r"(?:e'|è)\s+da\s+ritenersi\s+disponibile", "è disponibile"),
     (r"dalla\s+S\.?\s*V\.?\s+richiest[oa]", "che ha chiesto"),
     (r"da\s+lei\s+richiest[oa]", "che ha chiesto"),
 

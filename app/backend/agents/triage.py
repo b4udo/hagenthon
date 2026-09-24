@@ -90,7 +90,7 @@ def _a_regole(
         return EsitoTriage(
             categoria=Categoria.COMMERCIALE,
             priorita=Priorita.SECONDO_PIANO,
-            motivo="E' pubblicita'. Puo' leggerla con calma o lasciarla stare.",
+            motivo="È pubblicità. Può leggerla con calma o lasciarla stare.",
             confidenza=0.85,
         )
     else:
