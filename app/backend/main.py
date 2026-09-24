@@ -62,12 +62,50 @@ def salute() -> dict:
 
 
 @app.get("/api/mailbox")
-def mailbox() -> dict:
+def mailbox(cartella: str = db.IN_ARRIVO) -> dict:
+    """La casella, una cartella per volta.
+
+    `inviata` non contiene email ricevute ma le risposte di Maria: hanno un
+    destinatario invece di un mittente, quindi arrivano da `posta_inviata()` e
+    non dalla tabella `email`. Il frontend le distingue dal campo `tipo`.
+    """
+    if cartella not in db.CARTELLE:
+        raise HTTPException(status_code=400, detail="Cartella sconosciuta")
+
+    if cartella == db.INVIATA:
+        elementi = db.posta_inviata()
+        tipo = "inviata"
+    else:
+        elementi = db.elenco_email(cartella)
+        tipo = "ricevuta"
+
     return {
         "proprietario": db.proprietario(),
-        "email": db.elenco_email(),
+        "cartella": cartella,
+        "tipo": tipo,
+        "email": elementi,
+        "conteggi": db.conteggi_cartelle(),
         "inviate": db.conteggio_invii(),
     }
+
+
+@app.post("/api/email/{email_id}/elimina")
+def elimina(email_id: str) -> dict:
+    """Sposta nel cestino. Non cancella: l'email cambia cartella.
+
+    Con un tremore alla mano, una cancellazione irreversibile e' esattamente
+    l'errore che toglie autonomia invece di darla.
+    """
+    if not db.sposta(email_id, db.ELIMINATA):
+        raise HTTPException(status_code=404, detail="Email non trovata")
+    return {"cartella": db.ELIMINATA, "conteggi": db.conteggi_cartelle()}
+
+
+@app.post("/api/email/{email_id}/ripristina")
+def ripristina(email_id: str) -> dict:
+    if not db.sposta(email_id, db.IN_ARRIVO):
+        raise HTTPException(status_code=404, detail="Email non trovata")
+    return {"cartella": db.IN_ARRIVO, "conteggi": db.conteggi_cartelle()}
 
 
 @app.get("/api/email/{email_id}")
@@ -96,6 +134,10 @@ def elabora(email_id: str, avvelena: bool = False, ricalcola: bool = False) -> d
 
     payload = risultato.model_dump()
     payload["leggibilita"] = _leggibilita(email, risultato)
+    # Se Maria ha gia' risposto, l'interfaccia lo dice invece di riproporle le
+    # stesse tre scelte come se non fosse successo niente.
+    payload["gia_risposto"] = email_id in db.id_con_risposta()
+    payload["cartella"] = grezza.get("cartella", db.IN_ARRIVO)
     return payload
 
 

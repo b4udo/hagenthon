@@ -24,8 +24,23 @@
 
   <!-- ─────────── elenco ─────────── -->
   <section id="vista-elenco" aria-labelledby="titolo-elenco">
-    <h2 id="titolo-elenco">Le sue email</h2>
-    <p class="aiuto">Tocchi un messaggio per leggerlo spiegato in parole semplici.</p>
+
+    <!-- Le tre cartelle sono sempre visibili, mai dentro un menu a scomparsa:
+         chi non ha mai usato le cartelle non va a cercarle dietro un'icona. -->
+    <nav class="cartelle" aria-label="Cartelle della posta">
+      <button type="button" class="cartella" data-cartella="in_arrivo" aria-current="page">
+        Posta in arrivo <span class="conteggio" data-conteggio="in_arrivo"></span>
+      </button>
+      <button type="button" class="cartella" data-cartella="inviata">
+        Posta inviata <span class="conteggio" data-conteggio="inviata"></span>
+      </button>
+      <button type="button" class="cartella" data-cartella="eliminata">
+        Posta eliminata <span class="conteggio" data-conteggio="eliminata"></span>
+      </button>
+    </nav>
+
+    <h2 id="titolo-elenco">Posta in arrivo</h2>
+    <p class="aiuto" id="aiuto-elenco">Tocchi un messaggio per leggerlo spiegato in parole semplici.</p>
     <ul class="elenco" id="elenco-email">
       <li class="caricamento">Sto caricando la posta…</li>
     </ul>
@@ -39,6 +54,19 @@
 
     <h2 id="titolo-lettura" class="oggetto"></h2>
     <p class="mittente" id="mittente"></p>
+
+    <p class="stato-risposta" id="stato-risposta" hidden role="status">
+      ✓ A questa email ha già risposto.
+    </p>
+
+    <div class="azioni-cartella">
+      <button type="button" class="bottone bottone-secondario" id="btn-elimina">
+        Sposta nella posta eliminata
+      </button>
+      <button type="button" class="bottone bottone-secondario" id="btn-ripristina" hidden>
+        Rimetti nella posta in arrivo
+      </button>
+    </div>
 
     <!-- semaforo -->
     <div class="semaforo" id="semaforo" role="status" aria-live="polite">

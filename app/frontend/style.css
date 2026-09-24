@@ -139,6 +139,79 @@ h4 { font-size: 1.05rem; margin: 0 0 6px; }
 .pallino-rosso  { background: var(--rosso-fondo);  color: var(--rosso);  border-color: var(--rosso); }
 .pallino-attesa { background: var(--sfondo-tenue); color: var(--inchiostro-tenue); border-color: var(--bordo); }
 
+/* ─────────── cartelle ───────────
+
+   Maria non ha mai usato le cartelle di posta. Percio' non sono un menu, non
+   sono icone e non si nascondono: sono tre pulsanti larghi, scritti a parole,
+   sempre tutti e tre visibili, con accanto quante cose contengono. Quella in
+   cui si trova e' marcata con aria-current, non solo col colore. */
+
+.cartelle {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 22px;
+}
+.cartella {
+  min-height: var(--tocco);
+  flex: 1 1 auto;
+  background: var(--sfondo);
+  color: var(--inchiostro);
+  border: 2px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: 10px 18px;
+  font: inherit; font-weight: 700;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+}
+.cartella[aria-current="page"] {
+  background: var(--accento); color: #fff; border-color: var(--accento);
+}
+.conteggio {
+  background: var(--sfondo-tenue); color: var(--inchiostro-tenue);
+  border-radius: 999px; padding: 1px 10px;
+  font-size: 0.8rem;
+}
+.cartella[aria-current="page"] .conteggio { background: #ffffff; color: #43156e; }
+.conteggio:empty { display: none; }
+
+/* ─────────── già risposto ───────────
+
+   Lo stato non e' affidato al solo colore: c'e' la spunta e c'e' la parola. */
+
+.risposto {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--verde-fondo); color: var(--verde);
+  border: 2px solid var(--verde);
+  border-radius: 999px; padding: 2px 12px;
+  font-size: 0.78rem; font-weight: 700;
+}
+.stato-risposta {
+  background: var(--verde-fondo);
+  border: 2px solid var(--verde);
+  color: var(--verde);
+  border-radius: var(--raggio);
+  padding: 12px 16px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+.azioni-cartella { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+
+/* La voce gia' risposta resta leggibile: si distingue, non si spegne. */
+.voce-risposta { border-left: 6px solid var(--verde); }
+
+/* ─────────── posta inviata ─────────── */
+
+.voce-inviata .voce-mittente::before { content: "A: "; font-weight: 400; color: var(--inchiostro-tenue); }
+.anteprima {
+  display: block; margin-top: 6px;
+  color: var(--inchiostro-tenue); font-size: 0.9rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vuota {
+  background: var(--sfondo); border: 2px dashed var(--bordo);
+  border-radius: var(--raggio); padding: 28px 20px;
+  text-align: center; color: var(--inchiostro-tenue);
+}
+
 /* ─────────── semaforo ─────────── */
 
 .semaforo { border: 3px solid; border-radius: var(--raggio); padding: 20px; margin-bottom: 18px; }

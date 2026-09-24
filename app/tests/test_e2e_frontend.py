@@ -395,3 +395,96 @@ def test_la_dettatura_non_sostituisce_la_bozza_verificata(page: Page):
     dopo = page.locator("#testo-bozza").input_value()
     assert "14 ottobre 2026" in dopo, dopo
     assert "Grazie mille." in dopo, dopo
+
+
+# ─────────────────── cartelle e stato «già risposto» ───────────────────
+
+
+def test_le_tre_cartelle_sono_sempre_visibili(page: Page):
+    """Mai dentro un menu: chi non ha mai usato le cartelle non va a cercarle."""
+    page.wait_for_selector(".cartella")
+    etichette = [c.inner_text().split("\n")[0] for c in page.locator(".cartella").all()]
+    assert etichette == ["Posta in arrivo", "Posta inviata", "Posta eliminata"]
+
+    # La cartella corrente e' marcata semanticamente, non col solo colore.
+    corrente = page.locator('.cartella[aria-current="page"]')
+    expect(corrente).to_have_count(1)
+    assert corrente.inner_text().startswith("Posta in arrivo")
+
+
+def test_dopo_l_invio_l_email_e_marcata_gia_risposto(page: Page):
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+
+    # Prima di rispondere non c'e' nessuna marcatura.
+    expect(page.locator("#stato-risposta")).to_be_hidden()
+
+    page.locator(".intento", has_text="Confermo che vengo").click()
+    page.locator("#btn-invia").click()
+    expect(page.locator("#conferma-invio")).to_be_visible()
+    expect(page.locator("#stato-risposta")).to_be_visible()
+
+    # E la marcatura sopravvive al ritorno nell'elenco.
+    page.locator("#btn-indietro").click()
+    riga = page.locator(".voce", has_text="Bianchi").first
+    expect(riga.locator("[data-risposto]")).to_be_visible()
+    expect(riga.locator("[data-risposto]")).to_contain_text("Già risposto")
+    # Anche per chi non vede i colori: lo stato sta nel nome accessibile.
+    assert "Già risposto" in riga.get_attribute("aria-label")
+
+
+def test_la_posta_inviata_elenca_le_risposte(page: Page):
+    # Il server di questo modulo e' condiviso da tutti i test del file, quindi
+    # gli invii si accumulano: si misura la differenza, non il totale.
+    page.locator(".cartella", has_text="Posta inviata").click()
+    page.wait_for_selector(".voce-inviata, .vuota")
+    prima = page.locator(".voce-inviata").count()
+
+    page.locator(".cartella", has_text="Posta in arrivo").click()
+    page.wait_for_selector(".voce")
+    page.locator(".voce", has_text="Bianchi").first.click()
+    page.locator(".intento", has_text="Confermo che vengo").click()
+    page.locator("#btn-invia").click()
+    expect(page.locator("#conferma-invio")).to_be_visible()
+
+    page.locator("#btn-indietro").click()
+    page.locator(".cartella", has_text="Posta inviata").click()
+
+    expect(page.locator("#titolo-elenco")).to_have_text("Posta inviata")
+    inviata = page.locator(".voce-inviata")
+    expect(inviata).to_have_count(prima + 1)
+    # La piu' recente sta in cima, ed e' quella appena mandata al medico.
+    expect(inviata.first).to_contain_text("Bianchi")
+    expect(inviata.first).to_contain_text("Re:")
+
+
+def test_eliminare_sposta_nel_cestino_e_si_torna_indietro(page: Page):
+    page.wait_for_selector(".voce")
+    quante = page.locator(".voce").count()
+
+    page.locator(".voce", has_text="Spesa Conveniente").first.click()
+    page.locator("#btn-elimina").click()
+
+    page.wait_for_selector(".voce")
+    assert page.locator(".voce").count() == quante - 1
+
+    page.locator(".cartella", has_text="Posta eliminata").click()
+    expect(page.locator(".voce")).to_have_count(1)
+
+    # Nel cestino si ripristina, non si elimina di nuovo.
+    page.locator(".voce").first.click()
+    expect(page.locator("#btn-elimina")).to_be_hidden()
+    expect(page.locator("#btn-ripristina")).to_be_visible()
+
+    page.locator("#btn-ripristina").click()
+    page.locator(".cartella", has_text="Posta in arrivo").click()
+    page.wait_for_selector(".voce")
+    assert page.locator(".voce").count() == quante
+
+
+def test_una_cartella_vuota_lo_dice_a_parole(page: Page):
+    page.wait_for_selector(".cartella")
+    page.locator(".cartella", has_text="Posta eliminata").click()
+    vuota = page.locator(".vuota")
+    expect(vuota).to_be_visible()
+    expect(vuota).to_contain_text("Non ha eliminato nessun messaggio")

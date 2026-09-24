@@ -15,6 +15,25 @@ const stato = {
   risultato: null,
   bozzaScelta: null,
   dettaturaAccettata: false,  // l'avviso sulla dettatura si mostra una volta sola
+  cartella: "in_arrivo",
+};
+
+const TITOLI_CARTELLA = {
+  in_arrivo: "Posta in arrivo",
+  inviata: "Posta inviata",
+  eliminata: "Posta eliminata",
+};
+
+const AIUTI_CARTELLA = {
+  in_arrivo: "Tocchi un messaggio per leggerlo spiegato in parole semplici.",
+  inviata: "Le risposte che ha inviato lei.",
+  eliminata: "I messaggi che ha tolto dalla posta in arrivo. Può sempre rimetterli indietro.",
+};
+
+const VUOTE = {
+  in_arrivo: "Non c'è nessun messaggio.",
+  inviata: "Non ha ancora inviato nessuna risposta.",
+  eliminata: "Non ha eliminato nessun messaggio.",
 };
 
 /* Modo tecnico: `?tecnico=1`.
@@ -49,41 +68,132 @@ async function chiedi(percorso, opzioni) {
 // ───────────────────────────── elenco ─────────────────────────────
 
 async function caricaElenco() {
-  const dati = await chiedi("/api/mailbox");
+  const dati = await chiedi(`/api/mailbox?cartella=${encodeURIComponent(stato.cartella)}`);
   aggiornaContatore(dati.inviate);
+  aggiornaCartelle(dati.conteggi);
+
+  $("titolo-elenco").textContent = TITOLI_CARTELLA[stato.cartella] || "Le sue email";
+  $("aiuto-elenco").textContent = AIUTI_CARTELLA[stato.cartella] || "";
 
   const elenco = $("elenco-email");
   elenco.innerHTML = "";
 
-  for (const email of dati.email) {
-    const voce = document.createElement("li");
-    const bottone = document.createElement("button");
-    bottone.type = "button";
-    bottone.className = "voce";
-
-    bottone.innerHTML = `
-      <span class="voce-alto">
-        <span class="pallino pallino-attesa" data-pallino>· da controllare</span>
-        <span class="voce-mittente"></span>
-        <span class="voce-data"></span>
-      </span>
-      <span class="voce-oggetto"></span>`;
-
-    bottone.querySelector(".voce-mittente").textContent = email.mittente_nome;
-    bottone.querySelector(".voce-oggetto").textContent = email.oggetto;
-    bottone.querySelector(".voce-data").textContent = dataItaliana(email.data_ricezione);
-    bottone.setAttribute(
-      "aria-label",
-      `${email.mittente_nome}. ${email.oggetto}. Apri per leggere.`
-    );
-
-    bottone.addEventListener("click", () => apri(email.id));
-    voce.appendChild(bottone);
-    elenco.appendChild(voce);
-
-    // Il verdetto arriva dalla pipeline, non e' precalcolato nel corpus.
-    valutaInSecondoPiano(email.id, bottone);
+  if (!dati.email.length) {
+    const vuota = document.createElement("li");
+    vuota.className = "vuota";
+    vuota.textContent = VUOTE[stato.cartella] || "Non c'è niente qui.";
+    elenco.appendChild(vuota);
+    return;
   }
+
+  for (const elemento of dati.email) {
+    elenco.appendChild(
+      dati.tipo === "inviata" ? voceInviata(elemento) : voceRicevuta(elemento)
+    );
+  }
+}
+
+function voceRicevuta(email) {
+  const voce = document.createElement("li");
+  const bottone = document.createElement("button");
+  bottone.type = "button";
+  bottone.className = "voce" + (email.gia_risposto ? " voce-risposta" : "");
+
+  bottone.innerHTML = `
+    <span class="voce-alto">
+      <span class="pallino pallino-attesa" data-pallino>· da controllare</span>
+      <span class="risposto" data-risposto hidden>✓ Già risposto</span>
+      <span class="voce-mittente"></span>
+      <span class="voce-data"></span>
+    </span>
+    <span class="voce-oggetto"></span>`;
+
+  bottone.querySelector(".voce-mittente").textContent = email.mittente_nome;
+  bottone.querySelector(".voce-oggetto").textContent = email.oggetto;
+  bottone.querySelector(".voce-data").textContent = dataItaliana(email.data_ricezione);
+
+  if (email.gia_risposto) bottone.querySelector("[data-risposto]").hidden = false;
+
+  bottone.setAttribute(
+    "aria-label",
+    `${email.mittente_nome}. ${email.oggetto}.` +
+      (email.gia_risposto ? " Già risposto." : "") +
+      " Apri per leggere."
+  );
+
+  bottone.addEventListener("click", () => apri(email.id));
+  voce.appendChild(bottone);
+
+  // Il verdetto arriva dalla pipeline, non e' precalcolato nel corpus.
+  valutaInSecondoPiano(email.id, bottone);
+  return voce;
+}
+
+function voceInviata(invio) {
+  const voce = document.createElement("li");
+  const bottone = document.createElement("button");
+  bottone.type = "button";
+  bottone.className = "voce voce-inviata";
+
+  bottone.innerHTML = `
+    <span class="voce-alto">
+      <span class="risposto">✓ Inviata</span>
+      <span class="voce-mittente"></span>
+      <span class="voce-data"></span>
+    </span>
+    <span class="voce-oggetto"></span>
+    <span class="anteprima"></span>`;
+
+  bottone.querySelector(".voce-mittente").textContent = invio.destinatario_nome;
+  bottone.querySelector(".voce-oggetto").textContent = invio.oggetto;
+  bottone.querySelector(".voce-data").textContent = oraItaliana(invio.inviato_il);
+  bottone.querySelector(".anteprima").textContent = anteprima(invio.testo);
+  bottone.setAttribute(
+    "aria-label",
+    `Risposta inviata a ${invio.destinatario_nome}. ${invio.oggetto}. Apri per rileggerla.`
+  );
+
+  // Una risposta inviata si rilegge, non si rielabora: non c'e' una pipeline
+  // da far girare su un testo che ha scritto lei.
+  bottone.addEventListener("click", () => mostraInviata(invio));
+  voce.appendChild(bottone);
+  return voce;
+}
+
+function anteprima(testo) {
+  const piatto = String(testo).replace(/\s+/g, " ").trim();
+  return piatto.length > 90 ? piatto.slice(0, 90) + "…" : piatto;
+}
+
+function mostraInviata(invio) {
+  alert(
+    `A: ${invio.destinatario_nome}\n` +
+      `Oggetto: ${invio.oggetto}\n\n${invio.testo}`
+  );
+}
+
+function aggiornaCartelle(conteggi) {
+  for (const bottone of document.querySelectorAll(".cartella")) {
+    const nome = bottone.dataset.cartella;
+    if (nome === stato.cartella) bottone.setAttribute("aria-current", "page");
+    else bottone.removeAttribute("aria-current");
+  }
+  if (!conteggi) return;
+  for (const segno of document.querySelectorAll("[data-conteggio]")) {
+    const n = conteggi[segno.dataset.conteggio];
+    segno.textContent = n ? String(n) : "";
+  }
+}
+
+function apriCartella(nome) {
+  stato.cartella = nome;
+  Voce.fermaLettura();
+  $("vista-lettura").hidden = true;
+  $("vista-elenco").hidden = false;
+  caricaElenco().catch((e) => {
+    $("elenco-email").innerHTML =
+      `<li class="caricamento">Non riesco a caricare la posta: ${e.message}</li>`;
+  });
 }
 
 async function valutaInSecondoPiano(id, bottone) {
@@ -106,6 +216,14 @@ function dataItaliana(iso) {
                 "lug", "ago", "set", "ott", "nov", "dic"];
   const p = String(iso).split("-");
   return p.length === 3 ? `${Number(p[2])} ${mesi[Number(p[1]) - 1]}` : iso;
+}
+
+function oraItaliana(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const due = (n) => String(n).padStart(2, "0");
+  return `${d.getDate()} ${["gen","feb","mar","apr","mag","giu",
+    "lug","ago","set","ott","nov","dic"][d.getMonth()]}, ${due(d.getHours())}:${due(d.getMinutes())}`;
 }
 
 // ───────────────────────────── lettura ─────────────────────────────
@@ -140,6 +258,7 @@ function disegna(email, r) {
   $("mittente").textContent = `Da ${email.mittente_nome} — ${email.mittente_email}`;
 
   disegnaSemaforo(r.sicurezza);
+  disegnaStatoCartella(r);
   disegnaRiassunto(r);
   disegnaTesto(email, r);
   disegnaAllegati(email.allegati);
@@ -147,6 +266,17 @@ function disegna(email, r) {
   disegnaTracce(r);
 
   $("conferma-invio").hidden = true;
+}
+
+function disegnaStatoCartella(r) {
+  // Chi ha gia' risposto deve vederlo subito: riproporre le tre scelte come
+  // se non fosse successo niente e' il modo piu' rapido di far inviare due
+  // volte la stessa cosa a chi non ricorda di averlo gia' fatto.
+  $("stato-risposta").hidden = !r.gia_risposto;
+
+  const eliminata = r.cartella === "eliminata";
+  $("btn-elimina").hidden = eliminata;
+  $("btn-ripristina").hidden = !eliminata;
 }
 
 function disegnaSemaforo(sicurezza) {
@@ -333,6 +463,16 @@ async function inviaRisposta() {
   $("bozza").hidden = true;
   $("conferma-invio").hidden = false;
   aggiornaContatore(dati.completate_da_sola);
+
+  // Da adesso questa email e' "gia' risposto", qui e nell'elenco.
+  $("stato-risposta").hidden = false;
+  if (stato.risultato) stato.risultato.gia_risposto = true;
+}
+
+async function spostaEmail(destinazione) {
+  if (!stato.emailCorrente) return;
+  await chiedi(`/api/email/${stato.emailCorrente.id}/${destinazione}`, { method: "POST" });
+  tornaAllElenco();
 }
 
 function aggiornaContatore(n) {
@@ -536,6 +676,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   preparaVoce();
+
+  for (const bottone of document.querySelectorAll(".cartella")) {
+    bottone.addEventListener("click", () => apriCartella(bottone.dataset.cartella));
+  }
+  $("btn-elimina").addEventListener("click", () => {
+    spostaEmail("elimina").catch((e) => alert("Non sono riuscito a spostarla: " + e.message));
+  });
+  $("btn-ripristina").addEventListener("click", () => {
+    spostaEmail("ripristina").catch((e) => alert("Non sono riuscito a rimetterla: " + e.message));
+  });
 
   $("btn-indietro").addEventListener("click", tornaAllElenco);
   $("btn-invia").addEventListener("click", () => {

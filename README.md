@@ -190,11 +190,11 @@ La mappa che un giurato deve trovare senza cercarla. Ogni riga punta a file che 
 python -m pytest -q
 ```
 
-**Risultato su un clone pulito, con le sole dipendenze di `requirements.txt`: 57 passati, 1 saltato.**
+**Risultato su un clone pulito, con le sole dipendenze di `requirements.txt`: 69 passati, 1 saltato.**
 
 Il saltato è la suite end-to-end del browser ([`app/tests/test_e2e_frontend.py`](app/tests/test_e2e_frontend.py)): usa **Playwright**, che è una dipendenza **facoltativa** e non è in `requirements.txt`. Senza Playwright il modulo si salta invece di fallire, così la suite principale non dipende da un pacchetto opzionale.
 
-Con Playwright installato quella suite gira davvero — avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium — e il totale diventa **70 passati, 0 saltati**. Dettaglio di cosa copre ciascun file: [`docs/VALIDAZIONE.md`](docs/VALIDAZIONE.md).
+Con Playwright installato quella suite gira davvero — avvia un `uvicorn` su `127.0.0.1` e percorre l'interfaccia in un Chromium — e il totale diventa **94 passati, 0 saltati**. Dettaglio di cosa copre ciascun file: [`docs/VALIDAZIONE.md`](docs/VALIDAZIONE.md).
 
 **Nessun test tocca la rete** — ed è banale rispettarlo, perché nel progetto non esiste codice capace di toccarla. Il primo test di `test_llm_modes.py` lo dimostra invece di assumerlo.
 

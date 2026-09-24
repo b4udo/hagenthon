@@ -34,7 +34,11 @@ CREATE TABLE IF NOT EXISTS email (
     corpo           TEXT NOT NULL,
     data_ricezione  TEXT NOT NULL,
     in_rubrica      INTEGER NOT NULL DEFAULT 0,
-    allegati        TEXT NOT NULL DEFAULT '[]'
+    allegati        TEXT NOT NULL DEFAULT '[]',
+    -- 'in_arrivo' | 'eliminata'. La posta inviata non sta qui: e' la tabella
+    -- `invio`, perche' una risposta non e' un'email ricevuta con un flag
+    -- diverso — ha un destinatario invece di un mittente.
+    cartella        TEXT NOT NULL DEFAULT 'in_arrivo'
 );
 
 CREATE TABLE IF NOT EXISTS rubrica (
@@ -151,6 +155,13 @@ def reimposta() -> None:
 # ─────────────────────────── letture ───────────────────────────
 
 
+IN_ARRIVO = "in_arrivo"
+ELIMINATA = "eliminata"
+INVIATA = "inviata"          # cartella virtuale: vive nella tabella `invio`
+
+CARTELLE = (IN_ARRIVO, INVIATA, ELIMINATA)
+
+
 def _riga_a_email(r: sqlite3.Row) -> dict[str, Any]:
     return {
         "id": r["id"],
@@ -161,12 +172,65 @@ def _riga_a_email(r: sqlite3.Row) -> dict[str, Any]:
         "data_ricezione": r["data_ricezione"],
         "in_rubrica": bool(r["in_rubrica"]),
         "allegati": json.loads(r["allegati"]),
+        "cartella": r["cartella"],
     }
 
 
-def elenco_email() -> list[dict[str, Any]]:
-    righe = interroga("SELECT * FROM email ORDER BY data_ricezione DESC, id ASC")
-    return [_riga_a_email(r) for r in righe]
+def elenco_email(cartella: str = IN_ARRIVO) -> list[dict[str, Any]]:
+    """Le email di una cartella, con l'indicazione di quelle gia' risposte.
+
+    `gia_risposto` non e' una colonna: e' il fatto che esista un invio legato a
+    quell'email. Tenerlo derivato invece che memorizzato significa che non puo'
+    andare fuori sincrono con la verita', che e' la tabella `invio`.
+    """
+    righe = interroga(
+        "SELECT * FROM email WHERE cartella = ? ORDER BY data_ricezione DESC, id ASC",
+        (cartella,),
+    )
+    risposte = id_con_risposta()
+    elenco = []
+    for r in righe:
+        email = _riga_a_email(r)
+        email["gia_risposto"] = email["id"] in risposte
+        elenco.append(email)
+    return elenco
+
+
+def id_con_risposta() -> set[str]:
+    """Gli id delle email a cui Maria ha gia' risposto."""
+    return {r["email_id"] for r in interroga("SELECT DISTINCT email_id FROM invio")}
+
+
+def conteggi_cartelle() -> dict[str, int]:
+    in_arrivo = interroga(
+        "SELECT COUNT(*) AS n FROM email WHERE cartella = ?", (IN_ARRIVO,)
+    )[0]["n"]
+    eliminate = interroga(
+        "SELECT COUNT(*) AS n FROM email WHERE cartella = ?", (ELIMINATA,)
+    )[0]["n"]
+    return {
+        IN_ARRIVO: int(in_arrivo),
+        INVIATA: conteggio_invii(),
+        ELIMINATA: int(eliminate),
+    }
+
+
+def sposta(email_id: str, cartella: str) -> bool:
+    """Sposta un'email fra le cartelle. Falso se l'email non esiste.
+
+    Eliminare e' reversibile per costruzione: l'email cambia cartella, non
+    sparisce. Una cancellazione irreversibile con un tremore alla mano e' il
+    genere di errore che toglie autonomia invece di darla.
+    """
+    if cartella not in (IN_ARRIVO, ELIMINATA):
+        raise ValueError(f"cartella non valida: {cartella}")
+    conn = connessione()
+    with _lock:
+        cursore = conn.execute(
+            "UPDATE email SET cartella = ? WHERE id = ?", (cartella, email_id)
+        )
+        conn.commit()
+        return cursore.rowcount > 0
 
 
 def leggi_email(email_id: str) -> dict[str, Any] | None:
@@ -253,3 +317,38 @@ def invii() -> list[dict[str, Any]]:
 
 def conteggio_invii() -> int:
     return int(interroga("SELECT COUNT(*) AS n FROM invio")[0]["n"])
+
+
+def posta_inviata() -> list[dict[str, Any]]:
+    """Le risposte inviate, pronte da mostrare.
+
+    Destinatario e oggetto vengono dall'email originale: una risposta non
+    ripete quei dati, li eredita dal messaggio a cui risponde. Si legge con una
+    join invece di duplicarli nella tabella `invio`, dove potrebbero divergere.
+    """
+    righe = interroga(
+        """SELECT i.id, i.email_id, i.intento, i.testo, i.inviato_il,
+                  e.mittente_nome, e.mittente_email, e.oggetto
+           FROM invio i
+           LEFT JOIN email e ON e.id = i.email_id
+           ORDER BY i.id DESC"""
+    )
+    return [
+        {
+            "id": f"inv-{r['id']}",
+            "email_id": r["email_id"],
+            "destinatario_nome": r["mittente_nome"] or "(destinatario sconosciuto)",
+            "destinatario_email": r["mittente_email"] or "",
+            "oggetto": _oggetto_di_risposta(r["oggetto"]),
+            "testo": r["testo"],
+            "intento": r["intento"],
+            "inviato_il": r["inviato_il"],
+        }
+        for r in righe
+    ]
+
+
+def _oggetto_di_risposta(oggetto: str | None) -> str:
+    if not oggetto:
+        return "Risposta"
+    return oggetto if oggetto.lower().startswith("re:") else f"Re: {oggetto}"
