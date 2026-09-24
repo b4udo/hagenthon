@@ -1,0 +1,35 @@
+{
+  "properties": {
+    "chi_scrive": {
+      "title": "Chi Scrive",
+      "type": "string"
+    },
+    "cosa_vogliono": {
+      "title": "Cosa Vogliono",
+      "type": "string"
+    },
+    "entro_quando": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entro Quando"
+    },
+    "testo_semplificato": {
+      "title": "Testo Semplificato",
+      "type": "string"
+    }
+  },
+  "required": [
+    "chi_scrive",
+    "cosa_vogliono",
+    "testo_semplificato"
+  ],
+  "title": "EsitoSemplificazione",
+  "type": "object"
+}

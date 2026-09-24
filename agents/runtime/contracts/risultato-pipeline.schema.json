@@ -1,0 +1,463 @@
+{
+  "$defs": {
+    "AzioneSuggerita": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoAzione"
+        },
+        "etichetta": {
+          "title": "Etichetta",
+          "type": "string"
+        },
+        "valore": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valore"
+        }
+      },
+      "required": [
+        "tipo",
+        "etichetta"
+      ],
+      "title": "AzioneSuggerita",
+      "type": "object"
+    },
+    "BozzaRisposta": {
+      "properties": {
+        "intento": {
+          "$ref": "#/$defs/Intento"
+        },
+        "etichetta": {
+          "title": "Etichetta",
+          "type": "string"
+        },
+        "testo": {
+          "title": "Testo",
+          "type": "string"
+        },
+        "fatti_usati": {
+          "items": {
+            "$ref": "#/$defs/Fatto"
+          },
+          "title": "Fatti Usati",
+          "type": "array"
+        }
+      },
+      "required": [
+        "intento",
+        "etichetta",
+        "testo"
+      ],
+      "title": "BozzaRisposta",
+      "type": "object"
+    },
+    "Categoria": {
+      "enum": [
+        "sanita",
+        "ente_pubblico",
+        "persona_conosciuta",
+        "commerciale",
+        "sconosciuto"
+      ],
+      "title": "Categoria",
+      "type": "string"
+    },
+    "EsitoAgente": {
+      "enum": [
+        "ok",
+        "fallback",
+        "errore"
+      ],
+      "title": "EsitoAgente",
+      "type": "string"
+    },
+    "EsitoSemplificazione": {
+      "properties": {
+        "chi_scrive": {
+          "title": "Chi Scrive",
+          "type": "string"
+        },
+        "cosa_vogliono": {
+          "title": "Cosa Vogliono",
+          "type": "string"
+        },
+        "entro_quando": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entro Quando"
+        },
+        "testo_semplificato": {
+          "title": "Testo Semplificato",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chi_scrive",
+        "cosa_vogliono",
+        "testo_semplificato"
+      ],
+      "title": "EsitoSemplificazione",
+      "type": "object"
+    },
+    "EsitoSicurezza": {
+      "properties": {
+        "semaforo": {
+          "$ref": "#/$defs/Semaforo"
+        },
+        "messaggio": {
+          "title": "Messaggio",
+          "type": "string"
+        },
+        "segnali": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Segnali",
+          "type": "array"
+        },
+        "azione": {
+          "$ref": "#/$defs/AzioneSuggerita"
+        }
+      },
+      "required": [
+        "semaforo",
+        "messaggio",
+        "azione"
+      ],
+      "title": "EsitoSicurezza",
+      "type": "object"
+    },
+    "EsitoTriage": {
+      "properties": {
+        "categoria": {
+          "$ref": "#/$defs/Categoria"
+        },
+        "priorita": {
+          "$ref": "#/$defs/Priorita"
+        },
+        "motivo": {
+          "title": "Motivo",
+          "type": "string"
+        },
+        "confidenza": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidenza",
+          "type": "number"
+        }
+      },
+      "required": [
+        "categoria",
+        "priorita",
+        "motivo",
+        "confidenza"
+      ],
+      "title": "EsitoTriage",
+      "type": "object"
+    },
+    "EsitoVerifica": {
+      "properties": {
+        "passa": {
+          "title": "Passa",
+          "type": "boolean"
+        },
+        "problemi": {
+          "items": {
+            "$ref": "#/$defs/ProblemaVerifica"
+          },
+          "title": "Problemi",
+          "type": "array"
+        },
+        "feedback_per_retry": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Feedback Per Retry"
+        }
+      },
+      "required": [
+        "passa"
+      ],
+      "title": "EsitoVerifica",
+      "type": "object"
+    },
+    "Fatto": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoFatto"
+        },
+        "testo_originale": {
+          "title": "Testo Originale",
+          "type": "string"
+        },
+        "valore_normalizzato": {
+          "title": "Valore Normalizzato",
+          "type": "string"
+        },
+        "ancora": {
+          "default": "",
+          "title": "Ancora",
+          "type": "string"
+        },
+        "posizione": {
+          "default": 0,
+          "title": "Posizione",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tipo",
+        "testo_originale",
+        "valore_normalizzato"
+      ],
+      "title": "Fatto",
+      "type": "object"
+    },
+    "Intento": {
+      "enum": [
+        "conferma",
+        "chiedi_info",
+        "non_posso"
+      ],
+      "title": "Intento",
+      "type": "string"
+    },
+    "ModalitaAgente": {
+      "enum": [
+        "regole",
+        "llm-replay"
+      ],
+      "title": "ModalitaAgente",
+      "type": "string"
+    },
+    "Priorita": {
+      "enum": [
+        "azione_richiesta",
+        "informativa",
+        "secondo_piano"
+      ],
+      "title": "Priorita",
+      "type": "string"
+    },
+    "ProblemaVerifica": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoProblema"
+        },
+        "fatto": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Fatto"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "trovato": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trovato"
+        },
+        "spiegazione": {
+          "title": "Spiegazione",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tipo",
+        "spiegazione"
+      ],
+      "title": "ProblemaVerifica",
+      "type": "object"
+    },
+    "Semaforo": {
+      "enum": [
+        "verde",
+        "giallo",
+        "rosso"
+      ],
+      "title": "Semaforo",
+      "type": "string"
+    },
+    "TipoAzione": {
+      "enum": [
+        "telefono",
+        "inoltra",
+        "rispondi",
+        "nessuna"
+      ],
+      "title": "TipoAzione",
+      "type": "string"
+    },
+    "TipoFatto": {
+      "enum": [
+        "data",
+        "importo",
+        "orario"
+      ],
+      "title": "TipoFatto",
+      "type": "string"
+    },
+    "TipoProblema": {
+      "enum": [
+        "mancante",
+        "alterato",
+        "inventato"
+      ],
+      "title": "TipoProblema",
+      "type": "string"
+    },
+    "TracciaAgente": {
+      "description": "Una riga del pannello «Come ha ragionato».\n\nRende la pipeline ispezionabile invece che magica: e' il modo piu'\neconomico di mostrare la profondita' agentica a chi ha cinque minuti.",
+      "properties": {
+        "agente": {
+          "title": "Agente",
+          "type": "string"
+        },
+        "modalita": {
+          "$ref": "#/$defs/ModalitaAgente",
+          "default": "regole"
+        },
+        "durata_ms": {
+          "default": 0,
+          "title": "Durata Ms",
+          "type": "integer"
+        },
+        "esito": {
+          "$ref": "#/$defs/EsitoAgente",
+          "default": "ok"
+        },
+        "nota": {
+          "default": "",
+          "title": "Nota",
+          "type": "string"
+        },
+        "token": {
+          "default": 0,
+          "title": "Token",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "agente"
+      ],
+      "title": "TracciaAgente",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "email_id": {
+      "title": "Email Id",
+      "type": "string"
+    },
+    "triage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EsitoTriage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "sicurezza": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EsitoSicurezza"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "fatti": {
+      "items": {
+        "$ref": "#/$defs/Fatto"
+      },
+      "title": "Fatti",
+      "type": "array"
+    },
+    "semplificazione": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EsitoSemplificazione"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "verifica": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EsitoVerifica"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "bozze": {
+      "items": {
+        "$ref": "#/$defs/BozzaRisposta"
+      },
+      "title": "Bozze",
+      "type": "array"
+    },
+    "semplificazione_mostrata": {
+      "default": false,
+      "title": "Semplificazione Mostrata",
+      "type": "boolean"
+    },
+    "tracce": {
+      "items": {
+        "$ref": "#/$defs/TracciaAgente"
+      },
+      "title": "Tracce",
+      "type": "array"
+    },
+    "token_usati": {
+      "default": 0,
+      "title": "Token Usati",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "email_id"
+  ],
+  "title": "RisultatoPipeline",
+  "type": "object"
+}

@@ -21,12 +21,10 @@ def test_ancoraggio_a_parola_chiave(anno):
     assert per_tipo == {"data": "2026-10-14", "orario": "09:30", "importo": "1247.83"}
     assert all(f.ancora for f in fatti)
 
-
-def test_senza_ancora_il_valore_non_e_un_fatto(anno):
-    # Nessuna parola chiave nei 40 caratteri precedenti: si scarta. Lo span
-    # resta comunque prenotato, cosi' "14.10" non viene riletto come orario.
-    testo = "Riferimento pratica numero 14.10.2026 assegnato all'ufficio."
-    assert fact_extract.estrai_fatti(testo, anno) == []
+    # Senza parola chiave nei 40 caratteri precedenti si scarta. Lo span resta
+    # comunque prenotato, cosi' "14.10" non viene riletto come orario.
+    senza_ancora = "Riferimento pratica numero 14.10.2026 assegnato all'ufficio."
+    assert fact_extract.estrai_fatti(senza_ancora, anno) == []
 
 
 def test_il_civico_non_e_un_importo(anno):

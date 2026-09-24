@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "Categoria": {
+      "enum": [
+        "sanita",
+        "ente_pubblico",
+        "persona_conosciuta",
+        "commerciale",
+        "sconosciuto"
+      ],
+      "title": "Categoria",
+      "type": "string"
+    },
+    "Priorita": {
+      "enum": [
+        "azione_richiesta",
+        "informativa",
+        "secondo_piano"
+      ],
+      "title": "Priorita",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "categoria": {
+      "$ref": "#/$defs/Categoria"
+    },
+    "priorita": {
+      "$ref": "#/$defs/Priorita"
+    },
+    "motivo": {
+      "title": "Motivo",
+      "type": "string"
+    },
+    "confidenza": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidenza",
+      "type": "number"
+    }
+  },
+  "required": [
+    "categoria",
+    "priorita",
+    "motivo",
+    "confidenza"
+  ],
+  "title": "EsitoTriage",
+  "type": "object"
+}

@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "Fatto": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoFatto"
+        },
+        "testo_originale": {
+          "title": "Testo Originale",
+          "type": "string"
+        },
+        "valore_normalizzato": {
+          "title": "Valore Normalizzato",
+          "type": "string"
+        },
+        "ancora": {
+          "default": "",
+          "title": "Ancora",
+          "type": "string"
+        },
+        "posizione": {
+          "default": 0,
+          "title": "Posizione",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tipo",
+        "testo_originale",
+        "valore_normalizzato"
+      ],
+      "title": "Fatto",
+      "type": "object"
+    },
+    "TipoFatto": {
+      "enum": [
+        "data",
+        "importo",
+        "orario"
+      ],
+      "title": "TipoFatto",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "fatti": {
+      "items": {
+        "$ref": "#/$defs/Fatto"
+      },
+      "title": "Fatti",
+      "type": "array"
+    }
+  },
+  "title": "EsitoEstrazione",
+  "type": "object"
+}

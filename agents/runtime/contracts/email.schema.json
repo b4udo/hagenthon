@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "Allegato": {
+      "properties": {
+        "nome": {
+          "title": "Nome",
+          "type": "string"
+        },
+        "tipo": {
+          "default": "altro",
+          "title": "Tipo",
+          "type": "string"
+        },
+        "dimensione_kb": {
+          "default": 0,
+          "title": "Dimensione Kb",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "nome"
+      ],
+      "title": "Allegato",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "mittente_nome": {
+      "title": "Mittente Nome",
+      "type": "string"
+    },
+    "mittente_email": {
+      "title": "Mittente Email",
+      "type": "string"
+    },
+    "oggetto": {
+      "title": "Oggetto",
+      "type": "string"
+    },
+    "corpo": {
+      "title": "Corpo",
+      "type": "string"
+    },
+    "data_ricezione": {
+      "title": "Data Ricezione",
+      "type": "string"
+    },
+    "allegati": {
+      "items": {
+        "$ref": "#/$defs/Allegato"
+      },
+      "title": "Allegati",
+      "type": "array"
+    },
+    "in_rubrica": {
+      "default": false,
+      "title": "In Rubrica",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "id",
+    "mittente_nome",
+    "mittente_email",
+    "oggetto",
+    "corpo",
+    "data_ricezione"
+  ],
+  "title": "Email",
+  "type": "object"
+}

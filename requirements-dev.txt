@@ -1,0 +1,15 @@
+# Dipendenze di sviluppo e di test. NON servono per eseguire il progetto.
+#
+# Tenute separate da requirements.txt di proposito: chi clona il repository per
+# vederlo funzionare installa solo le dipendenze di runtime, e quelle non
+# parlano con Internet. Playwright scarica un browser, quindi non ha posto
+# nel percorso "clona ed esegui".
+#
+#   pip install -r requirements-dev.txt
+#   python -m playwright install chromium
+#   python -m pytest app/tests -q
+
+-r requirements.txt
+
+playwright>=1.48
+pytest-playwright>=0.5

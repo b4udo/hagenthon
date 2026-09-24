@@ -67,7 +67,11 @@ CREATE TABLE IF NOT EXISTS invio (
 """
 
 _conn: sqlite3.Connection | None = None
-_lock = threading.Lock()
+
+# Rientrante di proposito: `interroga()` prende il lock e poi chiama
+# `connessione()`, che puo' prenderlo a sua volta alla prima inizializzazione.
+# Con un Lock semplice sarebbe un blocco immediato.
+_lock = threading.RLock()
 
 
 def connessione() -> sqlite3.Connection:
@@ -80,6 +84,20 @@ def connessione() -> sqlite3.Connection:
                 _conn.executescript(SCHEMA)
                 _popola(_conn)
     return _conn
+
+
+def interroga(sql: str, parametri: tuple = ()) -> list[sqlite3.Row]:
+    """Ogni lettura passa da qui, sotto lock.
+
+    Una connessione sqlite3 condivisa fra thread non tollera execute()
+    concorrenti: solleva "bad parameter or other API misuse". Uvicorn serve
+    gli endpoint sincroni da un threadpool e l'interfaccia chiede le sei
+    email tutte insieme all'apertura, quindi la concorrenza non e' teorica —
+    e' il caso normale. Proteggere solo le scritture non basta: il guasto si
+    e' visto in un test end-to-end su browser vero.
+    """
+    with _lock:
+        return connessione().execute(sql, parametri).fetchall()
 
 
 def _popola(conn: sqlite3.Connection) -> None:
@@ -147,33 +165,28 @@ def _riga_a_email(r: sqlite3.Row) -> dict[str, Any]:
 
 
 def elenco_email() -> list[dict[str, Any]]:
-    cur = connessione().execute(
-        "SELECT * FROM email ORDER BY data_ricezione DESC, id ASC"
-    )
-    return [_riga_a_email(r) for r in cur.fetchall()]
+    righe = interroga("SELECT * FROM email ORDER BY data_ricezione DESC, id ASC")
+    return [_riga_a_email(r) for r in righe]
 
 
 def leggi_email(email_id: str) -> dict[str, Any] | None:
-    cur = connessione().execute("SELECT * FROM email WHERE id = ?", (email_id,))
-    r = cur.fetchone()
-    return _riga_a_email(r) if r else None
+    righe = interroga("SELECT * FROM email WHERE id = ?", (email_id,))
+    return _riga_a_email(righe[0]) if righe else None
 
 
 def rubrica() -> list[dict[str, str]]:
-    cur = connessione().execute("SELECT nome, email FROM rubrica ORDER BY nome")
-    return [{"nome": r["nome"], "email": r["email"]} for r in cur.fetchall()]
+    righe = interroga("SELECT nome, email FROM rubrica ORDER BY nome")
+    return [{"nome": r["nome"], "email": r["email"]} for r in righe]
 
 
 def in_rubrica(indirizzo: str) -> bool:
-    cur = connessione().execute(
-        "SELECT 1 FROM rubrica WHERE lower(email) = lower(?)", (indirizzo,)
+    return bool(
+        interroga("SELECT 1 FROM rubrica WHERE lower(email) = lower(?)", (indirizzo,))
     )
-    return cur.fetchone() is not None
 
 
 def proprietario() -> dict[str, str]:
-    cur = connessione().execute("SELECT chiave, valore FROM proprietario")
-    return {r["chiave"]: r["valore"] for r in cur.fetchall()}
+    return {r["chiave"]: r["valore"] for r in interroga("SELECT chiave, valore FROM proprietario")}
 
 
 # ────────────────────── stato della pipeline ──────────────────────
@@ -191,11 +204,10 @@ def salva_stato(email_id: str, risultato_json: str, quando: str) -> None:
 
 
 def leggi_stato(email_id: str) -> str | None:
-    cur = connessione().execute(
+    righe = interroga(
         "SELECT risultato FROM stato_pipeline WHERE email_id = ?", (email_id,)
     )
-    r = cur.fetchone()
-    return r["risultato"] if r else None
+    return righe[0]["risultato"] if righe else None
 
 
 def dimentica_stato(email_id: str) -> None:
@@ -206,12 +218,11 @@ def dimentica_stato(email_id: str) -> None:
 
 
 def stati_salvati() -> list[dict[str, str]]:
-    cur = connessione().execute(
+    righe = interroga(
         "SELECT email_id, aggiornato_il FROM stato_pipeline ORDER BY aggiornato_il DESC"
     )
     return [
-        {"email_id": r["email_id"], "aggiornato_il": r["aggiornato_il"]}
-        for r in cur.fetchall()
+        {"email_id": r["email_id"], "aggiornato_il": r["aggiornato_il"]} for r in righe
     ]
 
 
@@ -229,7 +240,6 @@ def registra_invio(email_id: str, intento: str, testo: str, quando: str) -> None
 
 
 def invii() -> list[dict[str, Any]]:
-    cur = connessione().execute("SELECT * FROM invio ORDER BY id")
     return [
         {
             "email_id": r["email_id"],
@@ -237,10 +247,9 @@ def invii() -> list[dict[str, Any]]:
             "testo": r["testo"],
             "inviato_il": r["inviato_il"],
         }
-        for r in cur.fetchall()
+        for r in interroga("SELECT * FROM invio ORDER BY id")
     ]
 
 
 def conteggio_invii() -> int:
-    cur = connessione().execute("SELECT COUNT(*) AS n FROM invio")
-    return int(cur.fetchone()["n"])
+    return int(interroga("SELECT COUNT(*) AS n FROM invio")[0]["n"])

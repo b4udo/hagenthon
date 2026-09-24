@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "Fatto": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoFatto"
+        },
+        "testo_originale": {
+          "title": "Testo Originale",
+          "type": "string"
+        },
+        "valore_normalizzato": {
+          "title": "Valore Normalizzato",
+          "type": "string"
+        },
+        "ancora": {
+          "default": "",
+          "title": "Ancora",
+          "type": "string"
+        },
+        "posizione": {
+          "default": 0,
+          "title": "Posizione",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tipo",
+        "testo_originale",
+        "valore_normalizzato"
+      ],
+      "title": "Fatto",
+      "type": "object"
+    },
+    "ProblemaVerifica": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoProblema"
+        },
+        "fatto": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Fatto"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "trovato": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trovato"
+        },
+        "spiegazione": {
+          "title": "Spiegazione",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tipo",
+        "spiegazione"
+      ],
+      "title": "ProblemaVerifica",
+      "type": "object"
+    },
+    "TipoFatto": {
+      "enum": [
+        "data",
+        "importo",
+        "orario"
+      ],
+      "title": "TipoFatto",
+      "type": "string"
+    },
+    "TipoProblema": {
+      "enum": [
+        "mancante",
+        "alterato",
+        "inventato"
+      ],
+      "title": "TipoProblema",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "passa": {
+      "title": "Passa",
+      "type": "boolean"
+    },
+    "problemi": {
+      "items": {
+        "$ref": "#/$defs/ProblemaVerifica"
+      },
+      "title": "Problemi",
+      "type": "array"
+    },
+    "feedback_per_retry": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Feedback Per Retry"
+    }
+  },
+  "required": [
+    "passa"
+  ],
+  "title": "EsitoVerifica",
+  "type": "object"
+}

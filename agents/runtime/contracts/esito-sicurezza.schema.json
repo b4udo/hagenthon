@@ -1,0 +1,78 @@
+{
+  "$defs": {
+    "AzioneSuggerita": {
+      "properties": {
+        "tipo": {
+          "$ref": "#/$defs/TipoAzione"
+        },
+        "etichetta": {
+          "title": "Etichetta",
+          "type": "string"
+        },
+        "valore": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valore"
+        }
+      },
+      "required": [
+        "tipo",
+        "etichetta"
+      ],
+      "title": "AzioneSuggerita",
+      "type": "object"
+    },
+    "Semaforo": {
+      "enum": [
+        "verde",
+        "giallo",
+        "rosso"
+      ],
+      "title": "Semaforo",
+      "type": "string"
+    },
+    "TipoAzione": {
+      "enum": [
+        "telefono",
+        "inoltra",
+        "rispondi",
+        "nessuna"
+      ],
+      "title": "TipoAzione",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "semaforo": {
+      "$ref": "#/$defs/Semaforo"
+    },
+    "messaggio": {
+      "title": "Messaggio",
+      "type": "string"
+    },
+    "segnali": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Segnali",
+      "type": "array"
+    },
+    "azione": {
+      "$ref": "#/$defs/AzioneSuggerita"
+    }
+  },
+  "required": [
+    "semaforo",
+    "messaggio",
+    "azione"
+  ],
+  "title": "EsitoSicurezza",
+  "type": "object"
+}

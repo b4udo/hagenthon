@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Posta Chiara · Hagenthon · Accenture Application Engineering</title>
+<style>
+  :root {
+    --purple: #A100FF;
+    --purple-light: #BE82FF;
+    --purple-dark: #460073;
+    --ink: #0A0014;
+    --rose: #FF50A0;
+    --bg: #050008;
+    --testo: rgba(255,255,255,0.78);
+    --tenue: rgba(255,255,255,0.55);
+    --bordo: rgba(255,255,255,0.1);
+    --card: rgba(255,255,255,0.02);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: #fff;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---------- barra di avanzamento ---------- */
+  .barra {
+    position: fixed; top: 0; left: 0; right: 0; height: 4px;
+    background: rgba(255,255,255,0.06); z-index: 60;
+  }
+  .barra i {
+    display: block; height: 100%; width: 9.09%;
+    background: linear-gradient(90deg, var(--purple-dark), var(--purple), var(--purple-light));
+    transition: width 260ms ease;
+  }
+
+  /* ---------- intestazione di marca ---------- */
+  .brand {
+    position: fixed; top: 18px; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(18px, 3.2vw, 46px); pointer-events: none;
+  }
+  .brand .logo { font-size: clamp(13px, 1.1vw, 16px); font-weight: 700; letter-spacing: -0.02em; }
+  .brand .logo .mark { color: var(--purple); }
+  .brand .org { text-align: right; font-size: 9px; line-height: 1.4; }
+  .brand .org .a { color: var(--purple-light); text-transform: uppercase; letter-spacing: 0.25em; font-weight: 600; }
+  .brand .org .b { color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.2em; }
+
+  /* ---------- struttura del mazzo ---------- */
+  .deck { position: relative; flex: 1 1 auto; min-height: 0; }
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column; justify-content: center;
+    padding: clamp(66px, 9vh, 96px) clamp(20px, 5vw, 72px) clamp(70px, 10vh, 96px);
+    overflow-y: auto;
+    animation: entra 280ms ease both;
+  }
+  .slide.attiva { display: flex; }
+  @keyframes entra { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .slide > .contenuto { width: 100%; max-width: 1180px; margin: 0 auto; }
+
+  /* ---------- tipografia ---------- */
+  .eyebrow {
+    display: inline-block; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05); border-radius: 999px;
+    padding: 6px 16px; font-size: clamp(9px, 0.78vw, 11px); text-transform: uppercase;
+    letter-spacing: 0.25em; color: rgba(255,255,255,0.7); margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(28px, 3.5vw, 50px); font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 10px; line-height: 1.15;
+  }
+  .slide-1 h1 { font-size: clamp(42px, 6.4vw, 92px); }
+  .grad {
+    background: linear-gradient(90deg, var(--purple-light), var(--purple));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { font-size: clamp(15px, 1.35vw, 21px); color: rgba(255,255,255,0.65); margin: 0 0 clamp(14px, 2.4vh, 28px); max-width: 900px; }
+  .slide-1 .sub { font-size: clamp(17px, 1.9vw, 27px); color: rgba(255,255,255,0.72); }
+  h3 { font-size: clamp(10px, 0.85vw, 12px); text-transform: uppercase; letter-spacing: 0.2em; color: var(--purple-light); margin: 0 0 10px; }
+  h4 { font-size: clamp(9px, 0.78vw, 11px); text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); margin: 0 0 8px; }
+  p { margin: 0 0 10px; }
+  strong { color: #fff; }
+  .mono { font-family: "Courier New", ui-monospace, monospace; }
+  code {
+    font-family: "Courier New", ui-monospace, monospace;
+    background: rgba(161,0,255,0.12); border: 1px solid rgba(161,0,255,0.25);
+    border-radius: 6px; padding: 1px 6px; color: var(--purple-light); font-size: 0.92em;
+  }
+
+  /* ---------- elenchi ---------- */
+  .bullets { list-style: none; padding: 0; margin: 0; }
+  .bullets li {
+    position: relative; padding-left: 22px; color: var(--testo);
+    margin-bottom: 8px; font-size: clamp(14px, 1.18vw, 19px);
+  }
+  .bullets li::before { content: "\203A"; position: absolute; left: 0; color: var(--purple); font-weight: 700; }
+  .bullets.fitta li { margin-bottom: 5px; font-size: clamp(13px, 1.05vw, 17px); }
+
+  /* ---------- card e griglie ---------- */
+  .card {
+    border: 1px solid var(--bordo); border-radius: 16px;
+    background: var(--card); padding: clamp(14px, 1.6vw, 24px) clamp(16px, 1.8vw, 26px);
+  }
+  .card.viola { border-color: rgba(161,0,255,0.3); background: rgba(161,0,255,0.07); }
+  .card.rosa { border-color: rgba(255,80,160,0.32); background: rgba(255,80,160,0.06); }
+  .card h5 {
+    margin: 0 0 10px; font-size: clamp(14px, 1.25vw, 20px);
+    font-weight: 700; letter-spacing: -0.01em; color: #fff;
+  }
+  .card p { font-size: clamp(13px, 1.05vw, 17px); color: var(--tenue); }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.4vw, 20px); }
+  .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.1vw, 16px); }
+  .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.1vw, 16px); }
+  .g23 { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(14px, 1.6vw, 24px); align-items: start; }
+
+  .badge {
+    display: inline-block; border: 1px solid rgba(161,0,255,0.3);
+    background: rgba(161,0,255,0.1); border-radius: 999px; padding: 2px 10px;
+    font-family: "Courier New", ui-monospace, monospace; font-size: clamp(10px, 0.82vw, 12px);
+    font-weight: 700; color: var(--purple-light); white-space: nowrap;
+  }
+  .badge.det { border-color: rgba(255,255,255,0.18); background: transparent; color: rgba(255,255,255,0.6); }
+  .badge.viva { border-color: rgba(255,80,160,0.45); background: rgba(255,80,160,0.12); color: var(--rose); letter-spacing: 0.1em; }
+
+  /* ---------- tabelle ---------- */
+  table { width: 100%; border-collapse: collapse; }
+  caption { text-align: left; }
+  th, td {
+    text-align: left; padding: 7px 12px 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: clamp(12px, 1.02vw, 17px); vertical-align: top;
+  }
+  th {
+    font-size: clamp(9px, 0.76vw, 11px); text-transform: uppercase; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.5); font-weight: 600; padding-bottom: 9px;
+  }
+  td { color: var(--testo); }
+  td.chiave { color: #fff; font-weight: 600; white-space: nowrap; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.up { color: var(--purple-light); font-weight: 700; }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+
+  /* ---------- pipeline (slide 4 e 5) ---------- */
+  .pipe { display: flex; flex-direction: column; gap: clamp(4px, 0.7vh, 9px); }
+  .nodo {
+    border: 1px solid var(--bordo); border-radius: 14px; background: var(--card);
+    padding: clamp(8px, 1.05vw, 14px) clamp(11px, 1.25vw, 18px);
+  }
+  .nodo .n {
+    display: inline-block; font-family: "Courier New", ui-monospace, monospace;
+    font-weight: 700; color: var(--purple-light); font-size: clamp(11px, 0.9vw, 14px); margin-right: 8px;
+  }
+  .nodo .tit { font-weight: 700; font-size: clamp(13px, 1.1vw, 18px); letter-spacing: -0.01em; }
+  .nodo .meta { display: block; color: var(--tenue); font-size: clamp(11px, 0.92vw, 15px); line-height: 1.45; margin-top: 3px; }
+  .nodo.orch { border-color: rgba(161,0,255,0.28); background: rgba(161,0,255,0.06); }
+  .nodo.chiave { border-color: rgba(190,130,255,0.55); background: rgba(161,0,255,0.1); }
+  .nodo.hitl { border: 2px solid rgba(255,80,160,0.45); background: rgba(255,80,160,0.07); }
+  .fila { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 0.9vw, 14px); }
+  .fila.frecciata { grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; }
+  .fr {
+    align-self: center; color: var(--purple); font-size: clamp(14px, 1.3vw, 22px);
+    line-height: 1; text-align: center;
+  }
+  .fr.giu { display: block; width: 100%; padding: 1px 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+
+  /* ---------- blocco rifiuto FactGuard ---------- */
+  .rifiuto {
+    border: 1px solid rgba(255,80,160,0.4); border-left: 5px solid var(--rose);
+    background: rgba(255,80,160,0.07); border-radius: 14px;
+    padding: clamp(12px, 1.4vw, 20px) clamp(14px, 1.6vw, 24px);
+    font-family: "Courier New", ui-monospace, monospace;
+    font-size: clamp(12px, 1.12vw, 18px); line-height: 1.75; color: rgba(255,255,255,0.85);
+  }
+  .rifiuto .w { color: var(--rose); font-weight: 700; }
+  .rifiuto del { color: rgba(255,255,255,0.45); text-decoration-color: var(--rose); }
+  .rifiuto .ok { color: var(--purple-light); }
+
+  .frase {
+    border-left: 3px solid var(--purple); padding: 2px 0 2px 16px; margin: 0 0 12px;
+    font-size: clamp(15px, 1.35vw, 22px); color: #fff; font-weight: 600; letter-spacing: -0.01em;
+  }
+  .kpi { font-variant-numeric: tabular-nums; font-size: clamp(26px, 3vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+  .kpi.viola { color: var(--purple-light); }
+  .kpi.rosa { color: var(--rose); }
+  .kpi-eti { font-size: clamp(10px, 0.82vw, 12px); text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); }
+
+  /* ---------- barra inferiore ---------- */
+  .fondo {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 55;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 10px clamp(18px, 3.2vw, 46px) 14px;
+    background: linear-gradient(to top, var(--bg) 62%, rgba(5,0,8,0));
+  }
+  footer {
+    font-size: clamp(9px, 0.74vw, 11px); text-transform: uppercase; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.25);
+  }
+  footer .mark { color: var(--purple); }
+  .comandi { display: flex; align-items: center; gap: 10px; }
+  .comandi button {
+    min-width: 46px; min-height: 46px; padding: 0 14px;
+    border: 1px solid rgba(255,255,255,0.18); border-radius: 999px;
+    background: rgba(255,255,255,0.04); color: #fff;
+    font-family: inherit; font-size: 17px; line-height: 1; cursor: pointer;
+    transition: border-color 160ms, background 160ms;
+  }
+  .comandi button:hover { border-color: var(--purple); background: rgba(161,0,255,0.14); }
+  .comandi button:disabled { opacity: 0.32; cursor: default; }
+  .comandi button:disabled:hover { border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); }
+  .contatore {
+    font-family: "Courier New", ui-monospace, monospace; font-size: clamp(12px, 0.95vw, 14px);
+    font-variant-numeric: tabular-nums; color: rgba(255,255,255,0.7); min-width: 62px; text-align: center;
+  }
+  .aiuto { font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: rgba(255,255,255,0.3); }
+
+  :focus-visible { outline: 3px solid var(--purple-light); outline-offset: 3px; border-radius: 6px; }
+
+  /* ---------- note del presentatore ---------- */
+  .nota { display: none; }
+  body.note .nota {
+    display: block; position: fixed; left: 0; right: 0; bottom: 56px; z-index: 40;
+    margin: 0 clamp(18px, 3.2vw, 46px);
+    border: 1px solid rgba(161,0,255,0.35); border-left: 5px solid var(--purple);
+    border-radius: 14px; background: rgba(70,0,115,0.5);
+    backdrop-filter: blur(6px);
+    padding: 12px 18px; color: rgba(255,255,255,0.88); font-size: 15px; line-height: 1.5;
+  }
+  body.note .nota::before {
+    content: "Nota del presentatore"; display: block;
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.25em;
+    color: var(--purple-light); margin-bottom: 4px;
+  }
+  body.note .slide { padding-bottom: 30vh; }
+
+  @media (max-width: 860px) {
+    .g2, .g3, .g4, .g23, .fila { grid-template-columns: 1fr; }
+    .fila.frecciata { grid-template-columns: 1fr; }
+    .fr { transform: rotate(90deg); }
+  }
+
+  @media print {
+    body { overflow: visible; height: auto; display: block; }
+    .barra, .fondo, .brand { display: none; }
+    .deck { position: static; }
+    .slide { position: static; display: flex !important; page-break-after: always; min-height: 96vh; animation: none; }
+    .nota { display: block !important; position: static !important; margin-top: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="barra" aria-hidden="true"><i id="riempi"></i></div>
+
+<div class="brand" aria-hidden="true">
+  <span class="logo">Posta Chiara<span class="mark">&gt;</span></span>
+  <span class="org">
+    <span class="a">Accenture</span><br />
+    <span class="b">Application Engineering</span>
+  </span>
+</div>
+
+<main class="deck" id="deck">
+
+  <!-- ============ 1 ============ -->
+  <section class="slide slide-1 attiva" aria-roledescription="slide" aria-label="Slide 1 di 11: Posta Chiara">
+    <div class="contenuto">
+      <span class="eyebrow">Tema 01 · Accessibilità Digitale</span>
+      <h1>Posta <span class="grad">Chiara</span></h1>
+      <p class="sub">accanto a chi si ferma davanti al riquadro bianco</p>
+      <div class="g3" style="margin-top:clamp(16px,3vh,34px)">
+        <div class="card"><h4>Il problema</h4><p>Maria, 74 anni. Preme <strong>Rispondi</strong> e si blocca.</p></div>
+        <div class="card"><h4>La soluzione</h4><p>Sei agenti in pipeline. La risposta si <strong>sceglie</strong>, non si scrive.</p></div>
+        <div class="card"><h4>La garanzia</h4><p><strong>FactGuard</strong>: codice deterministico, mai un LLM.</p></div>
+      </div>
+    </div>
+    <aside class="nota">Posta Chiara. Non un client di posta più grande: uno che sta accanto a chi si blocca davanti al riquadro bianco della risposta. Undici slide, cinque minuti, una dimostrazione dal vivo alla slide sei.</aside>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 2 di 11: Maria, 74 anni">
+    <div class="contenuto">
+      <span class="eyebrow">Persona e barriera</span>
+      <h1>Maria, <span class="grad">74 anni</span></h1>
+      <p class="sub">Ogni dettaglio impone un vincolo tecnico. Se non impone nulla, l'abbiamo tolto.</p>
+      <div class="g23">
+        <table>
+          <caption class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Dettagli della persona e vincoli tecnici che impongono</caption>
+          <thead><tr><th scope="col">Dettaglio</th><th scope="col">Vincolo che impone</th></tr></thead>
+          <tbody>
+            <tr><td class="chiave">Tremore, artrosi</td><td>Target <strong>&ge; 44px</strong> · niente drag, niente doppio clic</td></tr>
+            <tr><td class="chiave">Cataratta iniziale</td><td>Contrasto <strong>&ge; 7:1</strong> · base <strong>20px</strong></td></tr>
+            <tr><td class="chiave">Vocali WhatsApp, non digita</td><td>La risposta si <strong>sceglie</strong>, non si scrive</td></tr>
+            <tr><td class="chiave">Tablet 10&Prime; sul tavolo</td><td>Colonna singola, niente menu a scomparsa</td></tr>
+            <tr><td class="chiave">Mai usato le cartelle</td><td>Una sola lista piatta, zero gerarchie</td></tr>
+          </tbody>
+        </table>
+        <div class="card rosa">
+          <h4 style="color:var(--rose)">Il momento esatto in cui si ferma</h4>
+          <p style="color:rgba(255,255,255,0.82);font-size:clamp(13px,1.12vw,18px)">Apre la mail della dott.ssa Bianchi: le chiede di <strong>confermare la visita del 14 ottobre</strong>.<br />
+          Preme <strong>Rispondi</strong>.<br />
+          Davanti a lei, un <strong>riquadro bianco vuoto</strong>.<br />
+          Chiude tutto e aspetta <strong>domenica</strong>, quando viene Luca.</p>
+        </div>
+      </div>
+    </div>
+    <aside class="nota">Maria non è un profilo generico. Il tremore fissa i 44 pixel, la cataratta il contrasto 7 a 1, i vocali di WhatsApp decidono che la risposta si sceglie invece di scriverla. E il blocco ha un momento preciso: preme Rispondi e si ferma. Non è una difficoltà, è un'attesa di sei giorni.</aside>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 3 di 11: Prima domenica prossima, ora 4 minuti">
+    <div class="contenuto">
+      <span class="eyebrow">Il miglioramento</span>
+      <h1>Prima: domenica prossima.<br />Ora: <span class="grad">4 minuti</span>.</h1>
+      <div class="g2" style="margin-top:clamp(12px,2.4vh,26px)">
+        <div class="card">
+          <h4>Prima &mdash; non una schermata brutta: un fallimento</h4>
+          <ul class="bullets">
+            <li>Preme Rispondi, riquadro bianco</li>
+            <li>L'email <strong>non parte</strong></li>
+            <li>Attesa fino a domenica: <strong>6 giorni</strong></li>
+            <li>Autonomia guadagnata: <strong>zero</strong></li>
+          </ul>
+        </div>
+        <div class="card viola">
+          <h4 style="color:var(--purple-light)">Dopo &mdash; una risposta inviata</h4>
+          <ul class="bullets">
+            <li>Legge <strong>Chi · Cosa · Entro quando</strong></li>
+            <li>Sceglie l'intento: <strong>&laquo;Confermo&raquo;</strong></li>
+            <li>Rilegge e <strong>preme invia</strong></li>
+            <li>Tempo totale: <strong>4 minuti</strong></li>
+          </ul>
+        </div>
+      </div>
+      <p class="frase" style="margin-top:clamp(12px,2.4vh,24px)">Nel prodotto Maria vede un contatore: <span class="grad">&laquo;Risposte inviate da sola&raquo;</span>. L'autonomia è misurata, non promessa.</p>
+    </div>
+    <aside class="nota">Il prima non è una schermata brutta: è un fallimento, l'email non parte e si aspetta il nipote. Il dopo è una risposta effettivamente inviata. E nel prodotto c'è un contatore visibile a Maria, "Risposte inviate da sola": l'autonomia la misuriamo dentro l'applicazione, non in una slide.</aside>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 4 di 11: L'architettura agentica">
+    <div class="contenuto">
+      <span class="eyebrow">Runtime · 24% del punteggio</span>
+      <h1>L'architettura <span class="grad">agentica</span></h1>
+      <div class="pipe">
+        <div class="nodo orch">
+          <span class="tit">Orchestratore</span>
+          <span class="meta">Stato esternalizzato su disco (JSON), ripartenza da checkpoint · <strong>limiti di iterazione</strong> (max 2 retry) · <strong>budget token</strong> per email · routing deterministico-first</span>
+        </div>
+        <span class="fr giu" aria-hidden="true">&#9660;</span>
+        <div class="fila">
+          <div class="nodo"><span class="n">1</span><span class="tit">Triage</span><span class="meta">ente · persona · commerciale · sospetta</span><span class="chips"><span class="badge">regole · seam Haiku</span></span></div>
+          <div class="nodo"><span class="n">2</span><span class="tit">Sicurezza</span><span class="meta">semaforo + azione, regole spiegabili</span><span class="chips"><span class="badge det">mai LLM</span></span></div>
+          <div class="nodo"><span class="n">3</span><span class="tit">Estrazione fatti</span><span class="meta">date · importi · orari, ancorati a keyword</span><span class="chips"><span class="badge det">mai LLM</span></span></div>
+        </div>
+        <span class="fr giu" aria-hidden="true">&#9660;</span>
+        <div class="fila frecciata">
+          <div class="nodo"><span class="n">4</span><span class="tit">Semplificatore</span><span class="meta">parole semplici + Chi / Cosa / Entro quando</span><span class="chips"><span class="badge">regole · seam Sonnet</span></span></div>
+          <span class="fr" aria-hidden="true">&rarr;</span>
+          <div class="nodo chiave"><span class="n">5</span><span class="tit">Verificatore &mdash; FactGuard</span><span class="meta">confronta i fatti originale vs semplificato · fallisce &rarr; retry con feedback · fallisce ancora &rarr; fallback all'originale evidenziato</span><span class="chips"><span class="badge det">mai LLM, per progetto</span></span></div>
+          <span class="fr" aria-hidden="true">&rarr;</span>
+          <div class="nodo"><span class="n">6</span><span class="tit">Compositore</span><span class="meta">bozza per intento, slot riempiti coi fatti <strong>verificati</strong></span><span class="chips"><span class="badge">regole · seam Sonnet</span></span></div>
+        </div>
+        <span class="fr giu" aria-hidden="true">&#9660;</span>
+        <div class="nodo hitl">
+          <span class="tit">Escalation umana &mdash; Maria rilegge e preme invia</span>
+          <span class="meta">Nessun invio automatico. Mai, in nessun caso.</span>
+        </div>
+      </div>
+    </div>
+    <aside class="nota">Sei agenti specializzati in pipeline, un contratto Pydantic per ciascun confine. L'orchestratore tiene lo stato fuori dal processo, in JSON ispezionabile, e impone limiti di iterazione e un budget token per email. Il routing è deterministico-first: per ogni agente è scritto quando NON chiamare un modello. Il verificatore è al centro, e non è un LLM.</aside>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 5 di 11: Il team che ha costruito il team">
+    <div class="contenuto">
+      <span class="eyebrow">Build-time · 9 agenti</span>
+      <h1>Il team che ha <span class="grad">costruito il team</span></h1>
+      <div class="pipe">
+        <div class="nodo orch">
+          <span class="tit">team-leader</span>
+          <span class="meta">Possiede piano e timebox · apre e chiude i gate di fase · non scrive codice di produzione · stato in <code>state/progress.json</code></span>
+        </div>
+        <span class="fr giu" aria-hidden="true">&#9660;</span>
+        <div class="g4">
+          <div class="nodo"><h4>Developers</h4><span class="meta"><strong>dev-core</strong> · <strong>dev-pipeline</strong> · <strong>dev-frontend</strong> · <strong>dev-corpus</strong> · <strong>dev-deck</strong></span></div>
+          <div class="nodo"><h4>QA</h4><span class="meta"><strong>test-engineer</strong> · <strong>qa-critic</strong> (sola lettura su <code>app/</code>)</span></div>
+          <div class="nodo"><h4>Review</h4><span class="meta"><strong>bando-compliance</strong> &mdash; audit contro i 4 file del bando</span></div>
+          <div class="nodo hitl"><h4 style="color:var(--rose)">Human gate</h4><span class="meta">La persona, a 3 checkpoint di fase</span></div>
+        </div>
+      </div>
+      <div class="g23" style="margin-top:clamp(12px,2.2vh,22px)">
+        <p class="frase" style="margin:0">Abbiamo scritto prima gli agenti, <span class="grad">poi gli agenti hanno scritto l'app</span>.</p>
+        <ul class="bullets fitta">
+          <li><strong>Confine di file disgiunto</strong> per ogni agente: lavorano in parallelo senza collidere</li>
+          <li>I prompt in <code>agents/runtime/prompts/</code> sono <strong>caricati dal codice a runtime</strong>, non copiati dentro</li>
+          <li>Conseguenza: <strong>la documentazione non può divergere dal comportamento</strong> &mdash; è lo stesso file</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="nota">Il progetto è stato sviluppato da una persona sola: i sotto-agenti sostituiscono il secondo sviluppatore. Nove agenti di build, ciascuno con un confine di file disgiunto, quindi in parallelo senza collidere. La frase da tenere: abbiamo scritto prima gli agenti, poi gli agenti hanno scritto l'app. E i prompt di runtime non descrivono il codice: sono caricati dal codice. La documentazione non può divergere dal comportamento perché è lo stesso file.</aside>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 6 di 11: FactGuard, il verificatore">
+    <div class="contenuto">
+      <span class="eyebrow">Robustezza · dimostrata, non affermata</span>
+      <h1>Il motore propone, il verificatore controlla, <span class="grad">la persona decide</span>.</h1>
+      <div class="g23" style="margin-top:clamp(8px,1.6vh,18px)">
+        <div>
+          <div class="rifiuto">
+            <span class="w">&#9888; Verifica fallita: l'importo non corrisponde all'originale.</span><br />
+            &nbsp;&nbsp;&nbsp;Originale: <span class="ok">&euro;&nbsp;1.247,83</span> &nbsp;·&nbsp; Semplificata: <del>&euro;&nbsp;1.247</del><br />
+            &nbsp;&nbsp;&nbsp;&rarr; Semplificazione <span class="w">rifiutata</span>. Mostro il testo originale.
+          </div>
+          <p style="margin-top:12px"><span class="badge viva">DAL VIVO</span> <span style="color:var(--tenue);font-size:clamp(12px,1vw,16px)">Il pulsante da presentatore &laquo;E se l'AI sbaglia?&raquo; inietta la corruzione mentre guardate.</span></p>
+        </div>
+        <ul class="bullets">
+          <li><strong>Il verificatore non è un LLM: è codice deterministico.</strong> Un verificatore che allucina dà una garanzia falsa.</li>
+          <li>Confronta <strong>date, importi, orari</strong> fra originale e versione semplificata.</li>
+          <li>Fatto mancante, alterato o <strong>inventato</strong> &rarr; semplificazione rifiutata.</li>
+          <li>Il fallback non è un errore: è <strong>l'originale con i punti chiave evidenziati</strong>.</li>
+          <li>Nessuna semplificazione non verificata arriva mai sullo schermo di Maria.</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="nota">Qui lo mostro dal vivo. Premo il pulsante da presentatore, l'importo viene corrotto da 1.247,83 a 1.247, e FactGuard rifiuta e ricade sull'originale. La frase: il verificatore non è un LLM, è codice deterministico. Un verificatore che allucina dà una garanzia falsa. Se in sala non parte, il blocco di rifiuto che vedete in slide è esattamente l'output del prodotto.</aside>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 7 di 11: HITL a due livelli">
+    <div class="contenuto">
+      <span class="eyebrow">Escalation umana intenzionale</span>
+      <h1>HITL a <span class="grad">due livelli</span></h1>
+      <div class="g2" style="margin-top:clamp(10px,2vh,22px)">
+        <div class="card viola">
+          <h5>Nel prodotto</h5>
+          <ul class="bullets">
+            <li><strong>Nessuna email parte</strong> senza che Maria abbia riletto e premuto invia</li>
+            <li>Semaforo giallo &rarr; &laquo;chiedi a una persona di fiducia&raquo; + pulsante</li>
+            <li>Nessun invio automatico, in nessun caso</li>
+          </ul>
+        </div>
+        <div class="card viola">
+          <h5>Nella build</h5>
+          <ul class="bullets">
+            <li><strong>Nessuna fase avanza</strong> senza che lo sviluppatore abbia approvato il gate</li>
+            <li><strong>3 gate</strong> umani: T+1:15 · T+2:20 · T+2:30</li>
+            <li>Registrati in <code>build-time/state/progress.json</code></li>
+          </ul>
+        </div>
+      </div>
+      <p class="frase" style="margin-top:clamp(12px,2.4vh,26px)">La simmetria non è casuale: <span class="grad">la stessa regola per chi usa il sistema e per chi lo costruisce</span>.</p>
+      <p style="color:var(--tenue);font-size:clamp(12px,1vw,16px);margin:0">Lo stato dei gate di build usa lo stesso pattern di stato esternalizzato del runtime: verificabile, non dichiarato.</p>
+    </div>
+    <aside class="nota">Human in the loop compare due volte. Nel prodotto: nessuna email parte senza che Maria l'abbia riletta e abbia premuto invia. Nella build: nessuna fase è avanzata senza che io approvassi il gate, e i tre gate sono registrati su file con lo stesso pattern di stato esternalizzato che usiamo a runtime. La simmetria non è un espediente narrativo: è la stessa regola applicata a chi usa il sistema e a chi lo costruisce.</aside>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 8 di 11: Nessuna chiave, nessun codice di rete">
+    <div class="contenuto">
+      <span class="eyebrow">Efficienza dei token · secrets · privacy</span>
+      <h1>Nessuna chiave, <span class="grad">nessun codice di rete</span></h1>
+      <div class="g2" style="margin-top:clamp(8px,1.6vh,18px)">
+        <div class="card">
+          <h5><code>off</code> &mdash; il default</h5>
+          <ul class="bullets fitta">
+            <li>Solo regole deterministiche, nessuna seam LLM attraversata</li>
+            <li><strong>0 token</strong> per email</li>
+            <li>La giuria clona ed esegue <strong>senza configurare nulla</strong></li>
+          </ul>
+        </div>
+        <div class="card viola">
+          <h5><code>replay</code> &mdash; per mostrare la seam</h5>
+          <ul class="bullets fitta">
+            <li>Attraversa <strong>tutta</strong> la seam: prompt caricato, input hashato, JSON validato con Pydantic, token contati, retry</li>
+            <li>Solo il <strong>trasporto</strong> è sostituito</li>
+            <li>FactGuard verifica un output che il codice <strong>non ha generato lui</strong></li>
+          </ul>
+        </div>
+      </div>
+      <ul class="bullets fitta" style="margin-top:clamp(10px,2vh,20px)">
+        <li>Nessuna dipendenza <code>anthropic</code>, nessun client HTTP in tutto <code>app/</code>. Non è disattivato: <strong>non esiste</strong>.</li>
+        <li>Un <strong>test scansiona staticamente i sorgenti</strong> e lo dimostra a ogni esecuzione della suite.</li>
+      </ul>
+      <div class="card rosa" style="margin-top:clamp(10px,1.8vh,18px)">
+        <p style="color:rgba(255,255,255,0.85);font-size:clamp(13px,1.08vw,18px);margin:0">Le fixture di <code>replay</code> sono <strong>output di esempio scritti in fase di sviluppo, non registrazioni di chiamate API</strong>. Non volevamo una chiave in un repository pubblico.</p>
+      </div>
+    </div>
+    <aside class="nota">Non esiste una chiave API in questo progetto: non nel repo, non nella cronologia. Due modalità sole: off di default, replay per mostrare la seam attraversata. Nessuna dipendenza anthropic e nessun client HTTP in tutta la cartella app, e un test lo verifica scansionando i sorgenti. Detto con precisione: le fixture sono output di esempio scritti in fase di sviluppo, non registrazioni di chiamate API. Non volevamo una chiave in un repository pubblico.</aside>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 9 di 11: Validazione">
+    <div class="contenuto">
+      <span class="eyebrow">Evidenza, non impressione</span>
+      <h1><span class="grad">Validazione</span></h1>
+      <div class="g3" style="margin-bottom:clamp(10px,2vh,20px)">
+        <div class="card"><div class="kpi viola">51</div><div class="kpi-eti">test superati · 1 skipped</div></div>
+        <div class="card"><div class="kpi viola">90,1</div><div class="kpi-eti">Gulpease della sintesi, em-01 (molto facile)</div></div>
+        <div class="card"><div class="kpi rosa">3</div><div class="kpi-eti">falsi positivi reali trovati e corretti</div></div>
+      </div>
+      <div class="g23">
+        <table>
+          <thead><tr><th scope="col">Email</th><th scope="col">Originale</th><th scope="col">Sintesi Chi/Cosa/Entro quando</th></tr></thead>
+          <tbody>
+            <tr><td class="chiave mono">em-01</td><td class="num">57,5</td><td class="num up">90,1 &mdash; molto facile</td></tr>
+            <tr><td class="chiave mono">em-02</td><td class="num">64,7</td><td class="num up">68,0</td></tr>
+            <tr><td class="chiave mono">em-04</td><td class="num">48,7</td><td class="num up">49,8</td></tr>
+          </tbody>
+        </table>
+        <ul class="bullets fitta">
+          <li><strong>Onestà sul dato:</strong> il <em>corpo riscritto</em> guadagna poco &mdash; <strong>57,0 &rarr; 57,3</strong> di media. Un motore a regole non può rifondere le frasi senza rischiare di tradirle.</li>
+          <li>Il guadagno vero è nella <strong>sintesi Chi / Cosa / Entro quando</strong>, che è anche ciò che Maria legge per prima.</li>
+          <li>Eseguire la pipeline sul corpus ha fatto emergere <strong>3 falsi positivi veri</strong>: l'email INPS autentica veniva segnalata come phishing perché conteneva &laquo;non richiede mai le credenziali&raquo;.</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="nota">51 test verdi, uno skipped. Il Gulpease misurato sul corpus: la sintesi sale davvero, fino a 90 su em-01. Il corpo riscritto quasi no, da 57,0 a 57,3 di media, e lo diciamo noi per primi: un motore a regole non rifonde le frasi senza rischiare di tradirle, ed è esattamente per questo che la seam LLM esiste. Eseguire la pipeline sul corpus ha fatto emergere tre falsi positivi veri, poi corretti: l'email INPS autentica finiva in phishing perché diceva "non richiede mai le credenziali".</aside>
+  </section>
+
+  <!-- ============ 10 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 10 di 11: Limiti e rischi">
+    <div class="contenuto">
+      <span class="eyebrow">Autonomia e limiti · dichiarati per primi</span>
+      <h1>Limiti e <span class="grad">rischi</span></h1>
+      <div class="g2" style="margin-top:clamp(8px,1.6vh,18px)">
+        <div class="card">
+          <h4>Quello che il sistema non sa fare</h4>
+          <ul class="bullets fitta">
+            <li><strong>FactGuard verifica la <em>presenza</em> dei fatti, non il loro <em>ruolo</em>:</strong> non distingue &laquo;importo dovuto&raquo; da &laquo;importo già versato&raquo;. È esattamente lì che serve la persona.</li>
+            <li>La <strong>classificazione truffa non è infallibile</strong>: soglia deliberatamente prudenziale, nel dubbio dice &laquo;chiedi a una persona di fiducia&raquo;, <strong>mai &laquo;è sicura&raquo;</strong>.</li>
+            <li>Dice <strong>cosa c'è scritto, mai cosa fare</strong>: niente contenuti clinici, fiscali o legali.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Quello che è fuori dallo scope</h4>
+          <ul class="bullets fitta">
+            <li>Niente <strong>PEC</strong>, niente <strong>SPID</strong>, nessun modulo compilato.</li>
+            <li>Il <strong>semplificatore a regole</strong> copre il burocratese ricorrente, non il testo libero arbitrario.</li>
+            <li>Database <strong>in memoria</strong>: lo stato si azzera al riavvio.</li>
+            <li><strong>Casella simulata</strong>: nessuna integrazione IMAP reale.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <aside class="nota">I limiti li dichiariamo noi, prima che li chieda la giuria. Il più importante: FactGuard verifica la presenza dei fatti, non il loro ruolo. Non distingue un importo dovuto da un importo già versato, ed è precisamente per questo che la persona resta nel ciclo. La classificazione truffa ha una soglia prudenziale: nel dubbio dice "chiedi a qualcuno di fiducia", mai "è sicura". Il resto è scope: niente PEC, niente SPID, casella simulata.</aside>
+  </section>
+
+  <!-- ============ 11 ============ -->
+  <section class="slide" hidden aria-roledescription="slide" aria-label="Slide 11 di 11: Dove sta l'AI">
+    <div class="contenuto">
+      <span class="eyebrow">La domanda che arriverà comunque</span>
+      <h1>Dove sta <span class="grad">l'AI</span></h1>
+      <p class="frase" style="margin-top:clamp(8px,1.6vh,18px)">L'AI ha progettato e scritto <span class="grad">l'intero sistema</span>: 9 agenti di build, i prompt, i contratti, i test.</p>
+      <div class="g4" style="margin-top:clamp(10px,2vh,22px)">
+        <div class="card viola"><h4 style="color:var(--purple-light)">Verificabile</h4><p>Ogni decisione è codice leggibile, non un output da interpretare.</p></div>
+        <div class="card viola"><h4 style="color:var(--purple-light)">Ripetibile</h4><p>Stesso input, stesso output. Sempre. Anche fra sei mesi.</p></div>
+        <div class="card viola"><h4 style="color:var(--purple-light)">A costo zero</h4><p>0 token per email nel default. Il costo marginale di una casella è zero.</p></div>
+        <div class="card rosa"><h4 style="color:var(--rose)">Privato</h4><p>La posta sanitaria e previdenziale di una persona anziana <strong>non lascia il dispositivo</strong>.</p></div>
+      </div>
+      <p class="sub" style="margin-top:clamp(14px,2.6vh,28px);font-size:clamp(15px,1.5vw,24px);color:rgba(255,255,255,0.8)">A runtime il default è deterministico <strong>di proposito</strong>. La seam LLM esiste, è completa, e ve l'abbiamo mostrata attraversata.</p>
+      <p style="margin-top:clamp(10px,2vh,20px);font-size:clamp(16px,1.7vw,28px);font-weight:700;letter-spacing:-0.02em">Posta <span class="grad">Chiara</span> &mdash; <span style="color:rgba(255,255,255,0.6);font-weight:400">accanto a chi si ferma davanti al riquadro bianco.</span></p>
+    </div>
+    <aside class="nota">La domanda arriva sempre, quindi la anticipiamo. L'AI ha progettato e scritto l'intero sistema: nove agenti di build, i prompt, i contratti, i test. A runtime il default è deterministico di proposito: verificabile, ripetibile, a costo zero, e la posta sanitaria e previdenziale di una persona anziana non lascia il dispositivo. Grazie.</aside>
+  </section>
+
+</main>
+
+<div class="fondo">
+  <footer>
+    Hagenthon <span class="mark">&gt;</span> Posta Chiara &middot; Accenture Application Engineering
+  </footer>
+  <nav class="comandi" aria-label="Navigazione delle slide">
+    <span class="aiuto" aria-hidden="true">&larr; &rarr; · spazio · P = note</span>
+    <button type="button" id="prec" aria-label="Slide precedente">&larr;</button>
+    <span class="contatore" id="contatore" aria-live="polite" aria-atomic="true">1 / 11</span>
+    <button type="button" id="succ" aria-label="Slide successiva">&rarr;</button>
+    <button type="button" id="btnNote" aria-pressed="false" aria-label="Mostra o nascondi le note del presentatore" style="font-size:13px;letter-spacing:0.12em">P</button>
+  </nav>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var slides    = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var totale    = slides.length;
+  var riempi    = document.getElementById("riempi");
+  var contatore = document.getElementById("contatore");
+  var prec      = document.getElementById("prec");
+  var succ      = document.getElementById("succ");
+  var btnNote   = document.getElementById("btnNote");
+  var corrente  = 0;
+
+  function mostra(n) {
+    if (n < 0) { n = 0; }
+    if (n > totale - 1) { n = totale - 1; }
+    corrente = n;
+    for (var k = 0; k < totale; k++) {
+      var attiva = (k === n);
+      slides[k].classList.toggle("attiva", attiva);
+      if (attiva) { slides[k].removeAttribute("hidden"); }
+      else { slides[k].setAttribute("hidden", ""); }
+    }
+    contatore.textContent = (n + 1) + " / " + totale;
+    riempi.style.width = (((n + 1) / totale) * 100) + "%";
+    prec.disabled = (n === 0);
+    succ.disabled = (n === totale - 1);
+    document.title = "Posta Chiara · " + (n + 1) + "/" + totale;
+    /* deep link, utile per riprendere dopo un refresh; innocuo su file:// */
+    try { history.replaceState(null, "", "#s" + (n + 1)); } catch (err) { /* ignorato */ }
+  }
+
+  function avanti()  { mostra(corrente + 1); }
+  function indietro(){ mostra(corrente - 1); }
+
+  function commutaNote() {
+    var acceso = document.body.classList.toggle("note");
+    btnNote.setAttribute("aria-pressed", acceso ? "true" : "false");
+  }
+
+  prec.addEventListener("click", indietro);
+  succ.addEventListener("click", avanti);
+  btnNote.addEventListener("click", commutaNote);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) { return; }
+    var k = e.key;
+    var suPulsante = e.target && e.target.tagName === "BUTTON";
+
+    if (k === "ArrowRight" || k === "Right" || k === "PageDown") { e.preventDefault(); avanti(); return; }
+    if (k === "ArrowLeft"  || k === "Left"  || k === "PageUp")   { e.preventDefault(); indietro(); return; }
+    if (k === " " || k === "Spacebar" || k === "Space") {
+      if (suPulsante) { return; }      /* lo spazio attiva il pulsante a fuoco */
+      e.preventDefault();
+      if (e.shiftKey) { indietro(); } else { avanti(); }
+      return;
+    }
+    if (k === "Home") { e.preventDefault(); mostra(0); return; }
+    if (k === "End")  { e.preventDefault(); mostra(totale - 1); return; }
+    if (k === "p" || k === "P") {
+      if (suPulsante && e.target === btnNote) { return; }
+      e.preventDefault(); commutaNote(); return;
+    }
+  });
+
+  var iniziale = /^#s(\d+)$/.exec(window.location.hash || "");
+  mostra(iniziale ? (parseInt(iniziale[1], 10) - 1) : 0);
+})();
+</script>
+
+</body>
+</html>

@@ -14,11 +14,8 @@ def test_la_stessa_data_in_tre_formati_ha_lo_stesso_valore(anno):
     assert normalize.normalizza_data("14/10/2026", anno) == atteso
     assert normalize.normalizza_data("14 ottobre 2026", anno) == atteso
     assert normalize.normalizza_data("14-10-2026", anno) == atteso
-
-
-def test_la_data_senza_anno_usa_l_anno_dell_orologio(anno):
-    # Mai date.today(): il corpus scadrebbe da solo.
-    assert normalize.normalizza_data("14 ottobre", anno) == "2026-10-14"
+    # L'anno mancante viene dall'orologio, mai da date.today().
+    assert normalize.normalizza_data("14 ottobre", anno) == atteso
 
 
 def test_lo_stesso_importo_con_simbolo_o_con_la_parola_euro(anno):

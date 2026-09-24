@@ -141,19 +141,16 @@ def link_mascherati(corpo: str) -> list[tuple[str, str]]:
 # legittimita', non di truffa. Senza questa distinzione la comunicazione
 # autentica dell'INPS verrebbe marcata come phishing — un falso positivo che
 # costa piu' di quanto valga la regola.
-NEGAZIONI = (
-    "non richiede",
-    "non richiediamo",
-    "non chiede",
-    "non chiediamo",
-    "non le chiede",
-    "non le chiederemo",
-    "non vi chiede",
-    "non verranno mai richiesti",
-    "non saranno mai richiesti",
-    "mai",
-    "diffidi",
-    "diffidare",
+# Espressione regolare e non una lista di sottostringhe: fra "non" e il verbo
+# puo' esserci un pronome ("non LE chiediamo", "non VI richiediamo"), e con il
+# confronto per sottostringa quella forma sfuggirebbe. E' la stessa famiglia
+# del falso positivo che marcava come phishing l'email autentica dell'INPS.
+RE_NEGAZIONE = re.compile(
+    r"non\s+(?:le\s+|vi\s+|ci\s+|ti\s+)?(?:richied|chied|domand)"
+    r"|non\s+(?:verranno|saranno|sara'|sarà)\s+mai\s+richiest"
+    r"|mai\b"
+    r"|diffid",
+    re.IGNORECASE,
 )
 
 # Il segnale di truffa non e' *nominare* una credenziale: e' chiederla. L'INPS
@@ -192,7 +189,7 @@ def _chiede_credenziali(testo: str) -> bool:
         inizio = testo.find(parola)
         while inizio != -1:
             prima = testo[max(0, inizio - FINESTRA_NEGAZIONE) : inizio]
-            if not any(n in prima for n in NEGAZIONI):
+            if not RE_NEGAZIONE.search(prima):
                 contesto = testo[max(0, inizio - FINESTRA_RICHIESTA) : inizio + 60]
                 if any(r in contesto for r in RICHIESTE_ESPLICITE):
                     return True

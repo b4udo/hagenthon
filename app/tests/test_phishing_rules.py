@@ -19,7 +19,8 @@ CORPO_INPS_AUTENTICO = (
     "personali.\n"
     "Si rammenta che l'Istituto non richiede mai, tramite posta elettronica, la "
     "comunicazione di credenziali di accesso, codici dispositivi o coordinate "
-    "bancarie."
+    "bancarie.\n"
+    "Diffidi da chi le chiede di inserire le credenziali in un modulo."
 )
 
 

@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "EsitoAgente": {
+      "enum": [
+        "ok",
+        "fallback",
+        "errore"
+      ],
+      "title": "EsitoAgente",
+      "type": "string"
+    },
+    "ModalitaAgente": {
+      "enum": [
+        "regole",
+        "llm-replay"
+      ],
+      "title": "ModalitaAgente",
+      "type": "string"
+    }
+  },
+  "description": "Una riga del pannello «Come ha ragionato».\n\nRende la pipeline ispezionabile invece che magica: e' il modo piu'\neconomico di mostrare la profondita' agentica a chi ha cinque minuti.",
+  "properties": {
+    "agente": {
+      "title": "Agente",
+      "type": "string"
+    },
+    "modalita": {
+      "$ref": "#/$defs/ModalitaAgente",
+      "default": "regole"
+    },
+    "durata_ms": {
+      "default": 0,
+      "title": "Durata Ms",
+      "type": "integer"
+    },
+    "esito": {
+      "$ref": "#/$defs/EsitoAgente",
+      "default": "ok"
+    },
+    "nota": {
+      "default": "",
+      "title": "Nota",
+      "type": "string"
+    },
+    "token": {
+      "default": 0,
+      "title": "Token",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "agente"
+  ],
+  "title": "TracciaAgente",
+  "type": "object"
+}
