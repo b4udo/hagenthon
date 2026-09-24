@@ -1,0 +1,28 @@
+# Segreti — presente dal primo commit, prima che esista qualcosa da proteggere.
+# Questo progetto non usa alcuna chiave API (vedi README), ma la regola resta.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Stato di runtime — rigenerato a ogni avvio, non fa parte della consegna
+app/backend/state/data/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/

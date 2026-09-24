@@ -1,0 +1,15 @@
+# Posta Chiara — dipendenze
+#
+# Nota deliberata: il pacchetto `anthropic` NON compare qui, e non e' una
+# dimenticanza. La seam LLM del progetto non ha trasporto di rete: in modalita'
+# `replay` legge output di esempio da app/fixtures/llm/. Nessun modulo di
+# app/ importa un client HTTP, e app/tests/test_llm_modes.py lo verifica
+# staticamente leggendo i sorgenti.
+#
+# `httpx` e' presente solo perche' il TestClient di Starlette lo richiede.
+
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pytest>=8.3
+httpx>=0.27

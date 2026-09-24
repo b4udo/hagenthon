@@ -1,0 +1,112 @@
+{
+  "proprietario": {
+    "nome": "Maria Rossi",
+    "email": "maria.rossi47@gmail.com"
+  },
+  "rubrica": [
+    {
+      "nome": "Luca Rossi",
+      "email": "luca.rossi92@gmail.com"
+    },
+    {
+      "nome": "Studio medico dott.ssa Giulia Bianchi",
+      "email": "segreteria@studiobianchi-torino.it"
+    },
+    {
+      "nome": "Anna Rossi",
+      "email": "anna.rossi.to@gmail.com"
+    },
+    {
+      "nome": "Paolo Rossi",
+      "email": "paolo.rossi.mail@libero.it"
+    },
+    {
+      "nome": "Carla Ferrero",
+      "email": "carla.ferrero48@virgilio.it"
+    },
+    {
+      "nome": "Farmacia Sant'Anna",
+      "email": "info@farmaciasantanna-torino.it"
+    }
+  ],
+  "email": [
+    {
+      "id": "em-01",
+      "mittente_nome": "Studio medico dott.ssa Giulia Bianchi",
+      "mittente_email": "segreteria@studiobianchi-torino.it",
+      "oggetto": "Conferma appuntamento - visita di controllo del 14 ottobre",
+      "corpo": "Gentile signora Rossi,\n\nLe scriviamo dalla segreteria dello studio della dott.ssa Giulia Bianchi in merito alla visita di controllo già concordata.\n\nL'appuntamento è fissato per mercoledì 14 ottobre 2026 alle ore 9:30, presso lo studio di Via Roma 15, 10121 Torino (secondo piano, citofono «Studio Bianchi»).\n\nLa preghiamo cortesemente di volerci confermare la Sua presenza entro il 10 ottobre 2026, rispondendo a questo messaggio oppure telefonando alla segreteria al numero 011 555 0147, dal lunedì al venerdì dalle ore 9:00 alle ore 13:00. In mancanza di riscontro entro il termine indicato, l'orario riservato potrà essere assegnato ad altro paziente.\n\nLe ricordiamo di portare con sé la tessera sanitaria e l'eventuale documentazione già in Suo possesso.\n\nRestiamo a disposizione per ogni necessità e Le porgiamo i nostri più cordiali saluti.\n\nSegreteria dello Studio medico dott.ssa Giulia Bianchi\nVia Roma 15 - 10121 Torino\nTel. 011 555 0147",
+      "data_ricezione": "2026-10-05",
+      "allegati": [],
+      "in_rubrica": true
+    },
+    {
+      "id": "em-02",
+      "mittente_nome": "Comune di Torino - Ufficio Anagrafe",
+      "mittente_email": "anagrafe@comune.torino.it",
+      "oggetto": "Prot. n. 2026/14785 - Comunicazione di disponibilità al ritiro di certificato anagrafico di residenza",
+      "corpo": "Spett.le Sig.ra ROSSI MARIA,\n\ncon riferimento all'istanza acquisita agli atti di questo Ufficio in data 24 settembre 2026 e protocollata al n. 2026/14785, si comunica che, ai sensi e per gli effetti degli artt. 33 e 40 del D.P.R. 28 dicembre 2000, n. 445, nonché della vigente disciplina regolamentare comunale in materia di servizi demografici, il certificato anagrafico di residenza dalla S.V. richiesto è stato predisposto ed è da ritenersi disponibile per il ritiro.\n\nSi invita pertanto la S.V. a voler provvedere al ritiro del documento di cui sopra presso lo sportello n. 4 dell'Ufficio Anagrafe, sito in Via dell'Esempio 12, 10122 Torino, entro e non oltre il giorno 20 ottobre 2026, negli orari di apertura al pubblico di seguito indicati: dal lunedì al venerdì dalle ore 8:45 alle ore 12:30; il giovedì è previsto altresì il rientro pomeridiano dalle ore 14:00 alle ore 16:00.\n\nSi rammenta che il ritiro potrà avvenire esclusivamente previa esibizione di documento di riconoscimento in corso di validità. È ammessa la delega a soggetto terzo, purché redatta in forma scritta e corredata di copia fotostatica del documento di identità del delegante.\n\nDecorso inutilmente il termine sopra indicato, la pratica sarà archiviata d'ufficio senza ulteriore comunicazione, fatta salva la facoltà dell'interessata di presentare nuova istanza.\n\nLa presente comunicazione è trasmessa in via telematica e non necessita di sottoscrizione autografa.\n\nDistinti saluti.\n\nIl Responsabile del Procedimento\nUfficio Anagrafe - Servizi Demografici",
+      "data_ricezione": "2026-10-02",
+      "allegati": [
+        {
+          "nome": "comunicazione-ritiro-prot-2026-14785.pdf",
+          "tipo": "pdf",
+          "dimensione_kb": 214
+        }
+      ],
+      "in_rubrica": false
+    },
+    {
+      "id": "em-03",
+      "mittente_nome": "Poste Italiane - Servizio Sicurezza Clienti",
+      "mittente_email": "no-reply@poste-sicurezza-clienti.info",
+      "oggetto": "AVVISO URGENTE: il suo conto è stato temporaneamente bloccato",
+      "corpo": "Gentile Cliente,\n\nLa informiamo che, a seguito di un accesso anomalo rilevato dai nostri sistemi di controllo, il suo conto è stato temporaneamente bloccato in via precauzionale.\n\nPer ripristinare immediatamente l'operatività del conto ed evitare la sospensione definitiva è necessario completare la procedura di verifica dell'identità entro 24 ore dalla ricezione del presente messaggio.\n\nProceda subito alla verifica al seguente indirizzo:\n<a href=\"https://poste-sicurezza-clienti.info/verifica\">https://www.poste.it/area-personale/verifica</a>\n(in alternativa clicca qui (https://poste-sicurezza-clienti.info/verifica) )\n\nPer completare la procedura le verranno richiesti: nome utente, password, codice PosteID, numero della carta associata al conto e il codice OTP che riceverà sul telefono cellulare. La invitiamo a tenere tali dati a portata di mano prima di iniziare.\n\nATTENZIONE: in caso di mancata verifica entro il termine perentorio di 24 ore, il conto sarà bloccato in via definitiva e le somme depositate saranno trasferite d'ufficio su un conto di garanzia. Non rispondere a questo messaggio e non recarsi allo sportello: la procedura può essere completata unicamente online.\n\nLa ringraziamo per la sollecita collaborazione.\n\nServizio Sicurezza Clienti\nPoste Italiane S.p.A.",
+      "data_ricezione": "2026-10-06",
+      "allegati": [],
+      "in_rubrica": false
+    },
+    {
+      "id": "em-04",
+      "mittente_nome": "INPS - Istituto Nazionale Previdenza Sociale",
+      "mittente_email": "comunicazioni@inps.it",
+      "oggetto": "Cedolino della pensione - mensilità di ottobre 2026",
+      "corpo": "Gentile Sig.ra Maria Rossi,\n\nsi comunica che è disponibile nell'area riservata del portale dell'Istituto il cedolino relativo al trattamento pensionistico di cui Ella è titolare, riferito alla mensilità di ottobre 2026.\n\nPer la mensilità in oggetto l'importo netto in pagamento è pari a € 1.247,83, determinato al netto delle ritenute erariali operate a titolo di acconto e delle trattenute già evidenziate nelle mensilità precedenti, secondo quanto previsto dalla normativa vigente in materia.\n\nIl pagamento è posto in riscossione con valuta 1 ottobre 2026 presso l'istituto di credito indicato nella domanda di accredito agli atti dell'Istituto. La mensilità successiva sarà posta in pagamento in data 3 novembre 2026.\n\nIl documento in formato elettronico, allegato alla presente, è altresì consultabile e scaricabile accedendo al servizio «Cedolino pensione» del portale istituzionale, previa autenticazione con le credenziali digitali personali.\n\nSi rammenta che l'Istituto non richiede mai, tramite posta elettronica, la comunicazione di credenziali di accesso, codici dispositivi o coordinate bancarie.\n\nLa presente comunicazione è generata automaticamente: si prega di non rispondere a questo indirizzo. Per assistenza è possibile rivolgersi alla sede territoriale competente o a un patronato.\n\nDistinti saluti.\n\nDirezione Centrale Pensioni",
+      "data_ricezione": "2026-10-03",
+      "allegati": [
+        {
+          "nome": "cedolino-pensione-ottobre-2026.pdf",
+          "tipo": "pdf",
+          "dimensione_kb": 96
+        }
+      ],
+      "in_rubrica": false
+    },
+    {
+      "id": "em-05",
+      "mittente_nome": "Luca Rossi",
+      "mittente_email": "luca.rossi92@gmail.com",
+      "oggetto": "Ciao nonna, domenica vengo a pranzo!",
+      "corpo": "Ciao nonna,\n\ncome stai? Ti scrivo al volo dal treno.\n\nDomenica 11 ottobre vengo a pranzo da te, arrivo verso mezzogiorno. Non metterti a cucinare mezzo mondo come l'ultima volta, mi basta la tua pasta al forno!\n\nIl dolce lo porto io. Ti faccio vedere anche le foto della gita in montagna, te ne allego una intanto.\n\nSe ti serve che passi al supermercato prima di venire, scrivimi pure o chiamami quando vuoi.\n\nUn abbraccio forte,\nLuca",
+      "data_ricezione": "2026-10-04",
+      "allegati": [
+        {
+          "nome": "gita-in-montagna.jpg",
+          "tipo": "immagine",
+          "dimensione_kb": 1840
+        }
+      ],
+      "in_rubrica": true
+    },
+    {
+      "id": "em-06",
+      "mittente_nome": "Spesa Conveniente",
+      "mittente_email": "offerte@spesaconvenienteshop.it",
+      "oggetto": "Sconti fino al 50% su tutta la spesa - offerte del mese",
+      "corpo": "Buongiorno,\n\nda giovedì 1 a domenica 11 ottobre, nei punti vendita Spesa Conveniente e sul negozio online, ti aspettano sconti fino al 50% su centinaia di prodotti:\n\n- Frutta e verdura di stagione: -30%\n- Pasta, riso e legumi: 3x2 su tutta la linea\n- Detersivi e prodotti per la casa: -50% sul secondo pezzo\n- Sottocosto del fine settimana: caffè macinato e olio extravergine\n\nCon la carta fedeltà accumuli punti doppi su ogni acquisto e ricevi un buono da usare nella spesa successiva.\n\nConsegna a domicilio gratuita per ordini superiori a 50 euro, anche il sabato mattina.\n\nBuona spesa e a presto!\nIl team di Spesa Conveniente\n\n---\nRicevi questa e-mail perché sei iscritto alla nostra newsletter promozionale.\nSe non desideri più ricevere le nostre comunicazioni puoi annullare l'iscrizione qui: https://spesaconvenienteshop.it/disiscrizione",
+      "data_ricezione": "2026-10-01",
+      "allegati": [],
+      "in_rubrica": false
+    }
+  ]
+}
